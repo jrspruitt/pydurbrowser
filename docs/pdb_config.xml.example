@@ -1,0 +1,37 @@
+<durbrowser>
+	<uid></uid>
+    <title>Directory Title</title>
+    <desc>Directory Description.</desc>
+    <heading>
+        <meta>CDATA HTML to include in head</meta>
+    </heading>
+    <page>
+    	<type>Page type, default|img_gallery</type>
+		<inherit>Should page type and list plugins be inherent by childrend [1, 0]</inherit>
+		<list>
+			<plugin>List plugins, all, or empty for file/dir, or add for each one desired.</plugin>
+		</list>
+    </page>
+	<display>
+		<plugin>Display plugins, all, or empty for none, or add for each one desired.</plugin>
+	</display>
+	<files>
+		<exclude>
+	        <regex>Regular expression to match against.</regex>
+		</exclude>
+		<ignore>
+			<regex></regex>
+		</ignore>
+		<show_raw>
+			<regex></regex>
+		</show_raw>
+    </files>
+	<dirs>
+		<exclude>
+		        <regex></regex>
+		</exclude>
+		<ignore>
+				<regex></regex>
+		</ignore>
+    </dirs>
+</durbrowser>

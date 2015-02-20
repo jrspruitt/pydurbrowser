@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+ <title>Title - This is standard RSS, item links will be shown on page if bookmarks list plugin enabled.</title>
+ <description>Description - RSS HTML will be in page, so browsers looking for it, will show it has RSS feed.</description>
+ <link>Link</link>
+ 
+ <item>
+  <title>Title - Item links much be fully qualified URLs to work in RSS readers.</title>
+  <description>Description - Relative links will work fine for the page listings though.</description>
+  <link>Link</link>
+ </item>
+ 
+</channel>
+</rss>

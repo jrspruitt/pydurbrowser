@@ -1,0 +1,147 @@
+.mcalc_containers {
+	display:block;
+	/*position:relative;*/
+	margin-top:.4em;
+	width:25em;
+	/*border:solid 1px black;*/
+}
+.mcalc_seperator {
+	display:block;
+	/*margin-top:.4em;*/
+	height:2px;
+	background-color:#000000;
+}
+.mcalc_label {
+	display:block;
+	/*margin-top:.4em;*/
+	font-size:1.2em;
+}
+.mcalc_button_container {
+	display:inline-block;
+	position:relative;
+	top:0em;
+	left:0em;
+	width:8em;
+	height:inherit;
+	vertical-align:middle;
+
+}
+.mcalc_button {
+	font-size:.9em;
+	width:8.8em;
+}
+.mcalc_nobutton_label {
+	padding-top:.1em;
+	font-size:1.1em;
+}
+.mcalc_input_container {
+	display:inline-block;
+	position:relative;
+	top:0em;
+	left:0em;
+	width:10.5em;
+	height:inherit;
+	vertical-align:middle;
+}
+.mcalc_input {
+	font-size:.9em;
+	width:11.4em;
+}
+.mcalc_units_container {
+	display:inline-block;
+	position:relative;
+	top:0em;
+	right:0em;
+	width:3.7em;
+	height:inherit;
+	text-align:right;
+	vertical-align:middle;
+}
+.mcalc_select {
+	font-size:.9em;
+	width:4.2em;
+}
+.mcalc_noselect_label {
+	font-size:1em;
+	font-weight:bolder;
+	height:inherit;
+}
+.mcalc_choice {
+	width:11em;
+	font-size:.9em;
+	vertical-align:middle;
+}
+.mcalc_graph_container {
+	display:none;
+	margin-left:-.6em;
+	margin-top:.4em;
+	width:24em;
+	height:26.5em;
+	padding:.1em;
+}
+.mcalc_graph_container canvas {
+	border:solid black 1px;
+}
+.mcalc_xy_floater {
+	position:absolute;
+	display:none;
+	background-color:#EEE;
+	border:solid 1px #000000;
+	padding:.5em;
+	width:13em;
+	box-shadow: 1px 1px 2px #888888;
+	z-index:10000;
+}
+.mcalc_diagram_container {
+	display:none;
+	position:relative;
+	width:22.875em;
+	margin:auto;
+	margin-top:.9em;
+	margin-bottom:.7em;
+}
+.mcalc_diagram_container img{
+	width:22.75em;
+	border:solid 1px black;
+	box-shadow:1px 1px 1px 1px #888888;
+}
+.mcalc_showhide_label {
+	font-size:.9em;
+	font-weight:bold;
+}
+
+.mcalc_input_error {
+	background:#FFB2B2;
+}
+.mcalc_input_active {
+	background:#ccEEcc;
+}
+
+.mcalc_control_container {
+	display:block;
+	border-top:solid 1px #AAA;
+	border-bottom:solid 1px #AAA;
+	margin-top:0em;
+	margin-right:0em;
+	margin-left:0em;
+	box-shadow: 0px 1px 2px #888888;
+	background-color:#DDD;
+}
+.mcalc_control_menu {
+	text-align:center;
+	box-shadow: 0px 0px 2.8em .3em #FFF inset;
+}
+.mcalc_control_menu select{
+	font-size:.7em;
+	width:5.9em;
+}
+.mcalc_control_menu_button {
+	font-size:.7em;
+	width:5.8em;
+}
+.mcalc_control_set {
+	width:3.5em;
+	font-size:.7em;
+}
+
+
