@@ -97,7 +97,9 @@ def handler(item, config):
 
                 elif line.startswith('Author'):
                     try:
-                        _, name, email = line.split()
+                        parts = line.split()
+                        email = parts[-1]
+                        name = ' '.join(parts[1:-1])
                     except:
                         name = 'Nobody'
                         email = ''
