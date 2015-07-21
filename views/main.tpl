@@ -32,6 +32,10 @@
     </script>
     </head>
 <body>
+    % if item.config.logged_in:
+    % edit = 'Edit' if item.config.is_parent else 'New'
+        <a href="/cfg_edit/{{ item.config.url }}/pdb_config.xml">{{ edit }} Config</a><br />
+    % end
     <div class="heading_container">
     	% if item.config.head_img:
     	<div>
@@ -41,7 +45,7 @@
     	</div>
     	%end
         <div class="heading_content">
-            <a class="title first_color bolder" href="{{ item.config.link }}">{{ item.config.title }}</a>
+            <a class="title first_color bolder" href="{{ item.config.parent_url }}">{{ item.config.title }}</a>
         
             <div class="description">{{! item.config.desc }}</div>
         </div>

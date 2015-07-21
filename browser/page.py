@@ -20,7 +20,6 @@
 
 import os
 from markdown import markdown
-from browser.settings import readme_names, readme_alt_paths
 
 class page(object):
     """Page object
@@ -64,26 +63,13 @@ def _load_readme(page):
         readme_path = os.path.join(page.config.path, page.config.readme)
         if os.path.exists(readme_path):
             _open_readme(readme_path, page)
-            return
-            
-    for readme in readme_names:
-        readme_path = os.path.join(page.config.path, readme)
-        if os.path.exists(readme_path):
-            _open_readme(readme_path, page)
-            break
-        else:
-            for alt_path in readme_alt_paths:
-                apath = os.path.join(page.config.path, alt_path, readme)
-                if os.path.exists(apath):
-                    _open_readme(apath, page)
-                    break
 
 
 def _load_page_config(page):
     module = 'browser.plugins.page'
     try:
-        mod = __import__(module, globals(), locals(), [page.config.type], -1)
-        handler = getattr(mod, page.config.type)
+        mod = __import__(module, globals(), locals(), [page.config.page['type']], -1)
+        handler = getattr(mod, page.config.page['type'])
     except:
         try:
             mod = __import__(module, globals(), locals(), ['default'], -1)

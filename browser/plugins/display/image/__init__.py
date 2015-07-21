@@ -26,8 +26,9 @@ from bottle import template
 from browser.utils import get_filesize
 from browser.settings import get_css, display_prefix
 from browser.items import get_items
-from browser.config.parse import get_config
-from browser.plugins import load_plugin_list
+from browser.config.config import get_config
+from browser.plugins import load_plugins
+from browser.plugins.list import image as pimage
 
 def check(xfile):
     """Determine if file should be handled by this plugin.
@@ -62,18 +63,19 @@ def handler(xfile):
     handler.
     """
 
+    img_plugin = 'browser.plugins.list.image'
     default_width = 800
     default_height = 600
     xfile.config.css.append(get_css('media.css'))
     config = get_config(os.path.dirname(xfile.url))
-    config.list_plugins = load_plugin_list(['browser.plugins.list.image'])
+    config.list_plugins = [{'name':img_plugin, 'plugin':pimage}]
     items = get_items(config)
     peer_files = []
     nexti = None
     prev = None
 
     if 'browser.plugins.list.image' in items:
-        for item in items['browser.plugins.list.image']:
+        for item in items[img_plugin]:
             if check(item):
                 peer_files.append(item.url)
 
@@ -101,7 +103,8 @@ def handler(xfile):
             xfile.display_width = xfile.width
             xfile.display_height = xfile.height
 
-    except:
+    except Exception, e:
+        print e
         xfile.width = default_width
         xfile.height = default_height
 

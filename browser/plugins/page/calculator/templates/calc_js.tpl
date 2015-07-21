@@ -40,9 +40,9 @@ window.onload=function(){
         % udefault = item['config']['display']['units']['default']
         % usi = item['config']['display']['units']['si']
         mc.{{ item['id'] }}.u.display={udefault:'{{ udefault }}',si:'{{ usi }}'};
+        mc.{{ item['id'] }}.u.unit='{{ udefault }}';
         % end
         mc.{{ item['id'] }}.u.cat='{{ item['config']['category'] }}';
-        mc.{{ item['id'] }}.u.unit='{{ udefault }}';
         mc._html_calc_unit_options('{{ item['id'] }}');
 
     % elif item['type'] == 'choice':

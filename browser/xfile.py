@@ -19,7 +19,6 @@
 ##############################################################################
 
 import os
-from bottle import request
 from markdown import markdown
 from browser.settings import desc_ext, data_path
 

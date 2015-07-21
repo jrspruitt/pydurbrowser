@@ -148,7 +148,7 @@ class rules(object):
 
         Adds any new rules found in config file.
         """
-        rules = self.parse_xml(path)
+        rules = parse_xml(path)
 
         if rules is None:
             # Full panic, shutdown rules initiated.
@@ -172,56 +172,68 @@ class rules(object):
                 self.ignore_filehandlers = ignore
 
 
-    
-    def parse_xml(self, path):
-        """Parse XML config file for rules.
+   
+def parse_xml(path):
+    """Parse XML config file for rules.
 
-        Args:
-            Str:path      Path to config file.
+    Args:
+        Str:path      Path to config file.
 
-        Return:
-            Dict:rules    Dict of various rules.
-        """
-        ret = {'dirs':{'exclude':{'regex':[]},
-                       'ignore':{'regex':[]}},
-               'files':{'exclude':{'regex':[]},
-                        'ignore':{'regex':[]},
-                        'show_raw':{'regex':[]}},
-               }
+    Return:
+        Dict:rules    Dict of various rules.
+    """
+    ret = {'dirs':{'exclude':{'regex':[]},
+                   'ignore':{'regex':[]}},
+           'files':{'exclude':{'regex':[]},
+                    'ignore':{'regex':[]},
+                    'show_raw':{'regex':[]}},
+           }
 
+    try:
         try:
             root = etree.parse(path).getroot().find('rules')
-            
-            if root is None: # TODO: This will need to be removed, once configs are converted
-                root = etree.parse(path).getroot()
-
-            excluded = root.find('dirs/exclude')
-            if excluded is not None:
-                for exclude in excluded.iterfind('regex'):
-                    ret['dirs']['exclude']['regex'].append(exclude.text)
-    
-            ignored = root.find('dirs/ignore')
-            if ignored is not None:
-                for ignore in ignored.iterfind('regex'):
-                    ret['dirs']['ignore']['regex'].append(ignore.text)
-    
-            excludef = root.find('files/exclude')
-            if excludef is not None:
-                for exclude in excludef.iterfind('regex'):
-                    ret['files']['exclude']['regex'].append(exclude.text)
-    
-            ignoref = root.find('files/ignore')
-            if ignoref is not None:
-                for ignore in ignoref.iterfind('regex'):
-                    ret['files']['ignore']['regex'].append(ignore.text)
-    
-            ignorefh = root.find('files/show_raw')
-            if ignorefh is not None:
-                for ignore in ignorefh.iterfind('regex'):
-                    ret['files']['show_raw']['regex'].append(ignore.text)
-
+        except:
+            ret['dirs']['exclude']['regex'].append('*')
+            ret['files']['exclude']['regex'].append('*')
             return ret
 
-        except Exception, e:
-            print 'Bad page config: %s %s' % (path, e)
-            abort(500, 'Bad page config.')
+        excluded = root.find('dirs/exclude')
+        if excluded is not None:
+            for exclude in excluded.iterfind('regex'):
+                if not exclude.text:
+                    continue
+                ret['dirs']['exclude']['regex'].append(exclude.text)
+
+        ignored = root.find('dirs/ignore')
+        if ignored is not None:
+            for ignore in ignored.iterfind('regex'):
+                if not ignore.text:
+                    continue
+                ret['dirs']['ignore']['regex'].append(ignore.text)
+
+        excludef = root.find('files/exclude')
+        if excludef is not None:
+            for exclude in excludef.iterfind('regex'):
+                if not exclude.text:
+                    continue
+                ret['files']['exclude']['regex'].append(exclude.text)
+
+        ignoref = root.find('files/ignore')
+        if ignoref is not None:
+            for ignore in ignoref.iterfind('regex'):
+                if not ignore.text:
+                    continue
+                ret['files']['ignore']['regex'].append(ignore.text)
+
+        show_raw = root.find('files/show_raw')
+        if show_raw is not None:
+            for show_raw in show_raw.iterfind('regex'):
+                if not show_raw.text:
+                    continue
+                ret['files']['show_raw']['regex'].append(show_raw.text)
+
+        return ret
+
+    except Exception, e:
+        print 'Bad page config: %s %s' % (path, e)
+        abort(500, 'Bad page config.')

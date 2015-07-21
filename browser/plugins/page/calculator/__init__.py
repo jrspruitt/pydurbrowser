@@ -38,7 +38,7 @@ def handler(page):
         if plugin['name'] in items:
             page.items += items[plugin['name']]
 
-    calc = calc_load(page.config.files[0])
+    calc = calc_load(os.path.join(page.config.path, '_calc/calc.xml'))
     calc_items = []
 
     if calc:
@@ -73,7 +73,7 @@ def handler(page):
 
 def calc_load(path):
     try:
-        root = etree.parse(path).getroot().find('page/calc')
+        root = etree.parse(path).getroot()
         rounding = int(root.findtext('rounding')) if root.findtext('rounding') else 0
 
         data = {'rounding':rounding, 'measures':{}, 'items':[]}

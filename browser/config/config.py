@@ -20,10 +20,10 @@
 
 import os
 from lxml import etree
-from bottle import request, template, abort
-from browser.settings import config_filename, data_path
+from bottle import abort
+from browser.settings import config_filename, data_path, readme_default
 from browser.config.rules import rules
-from browser.plugins import full_plugin_paths, load_plugin_list
+from browser.plugins import load_plugins
 
 def get_config(url):
     """Get config object
@@ -37,27 +37,29 @@ def get_config(url):
     Config object contains all info for current path.
 
     Config object attributes:
-    uid                Unique ID (future use?).
     url                Requested URL.
     path               Abs path of requested item, parent dir if file.
-    rules              Rules object.
     files              List of all config files in path.
-    type               Page type, default, img_gallery, etc.
+    is_parent          If config found is parent.
+    parent_url         Title link URL.
+    show_nav           If to show Up link URL.
+    head_img_link      Directory of head_img having config file.
+
+    uid                Unique ID (future use?).
+    rules              Rules object.
+    page               {'type':'default, img_gallery, 'src':'filename'}
+
     inherit            Should sub dirs inherit from this config.
     list_plugins       List plugins.
     display_plugins    Display plugins.
     title              Title from config.
     head_img           Heading image path.
-    head_img_link      Directory of head_img having config file.
     desc               Description from config.
     meta               Additional meta data from config.
     css                Additional css.
     js                 Additional javascript.
     script             Javascript to go in script tags
-    style             CSS to go in a style tag
-    is_parent          If config found is parent.
-    link               Up link URL.
-    show_nav           If to show Up link URL.
+    style              CSS to go in a style tag
     readme             Readme file name.
     """
 
@@ -69,10 +71,9 @@ def get_config(url):
     if not os.path.isdir(config.path):
         config.path = os.path.dirname(config.path)
 
-    _gather_configs(config.path, config)
-
+    config.files = gather_configs(config.path, [])
     config.rules = rules(config.files)
-    config.link = os.path.dirname(config.files[0]).replace(data_path(), '') or '/'
+    config.parent_url = os.path.dirname(config.files[0]).replace(data_path(), '') or '/'
     config.show_nav = config.path != data_path()
     config.is_parent = config.files[0] == os.path.join(config.path, config_filename)
     cxml = parse_xml(config.files[0], config.is_parent)
@@ -82,26 +83,26 @@ def get_config(url):
             config.head_img = ''
             config.head_img_link = ''
         else:
-            link_path = config.link or '/'
-            config.head_img = os.path.abspath(os.path.join(link_path , cxml['head_img']))
-            config.head_img_link = link_path
+            config.head_img = os.path.abspath(os.path.join(config.parent_url , cxml['head_img']))
+            config.head_img_link = config.parent_url
     else:
         config.head_img, config.head_img_link = _get_head_img(config.files)
-
 
     config.title = cxml['title']
     config.desc = cxml['desc']
     config.readme = cxml['readme']
     config.inherit = cxml['inherit']
-    config.type = cxml['type']
-    config.page_xml = cxml['page_xml']
+    config.page = cxml['page']
     config.meta = cxml['heading']['meta']
     config.js = cxml['heading']['js']
     config.script = cxml['heading']['script']
     config.css = cxml['heading']['css']
-    config.style = cxml['heading']['style']
-    config.list_plugins = load_plugin_list(cxml['list']['plugins'])
-    config.display_plugins = load_plugin_list(cxml['display']['plugins'])
+    config.style = cxml['heading']['style']        
+    config.list_plugins = load_plugins(cxml['list']['plugins'], 'list')
+    config.display_plugins = load_plugins(cxml['display']['plugins'], 'display')
+
+    if config.page['src'] != '':
+        config.page['src'] = os.path.join(config.path, config.page['src'])
 
     if config.url:
         config.nav_link = '/%s' % os.path.dirname(config.url)
@@ -109,21 +110,6 @@ def get_config(url):
         config.nav_link = ''
 
     return config
-
-
-def _gather_configs(path, config):
-    path = path.rstrip('/')
-
-    if path.startswith(data_path()):
-        config_path = os.path.join(path, config_filename)
-    
-        if os.path.exists(config_path) and os.access(config_path, os.R_OK):
-            config.files.append(config_path)
-    
-        parent_path = os.path.dirname(path)
-    
-        if parent_path:
-            _gather_configs(parent_path, config)
 
 
 def _get_head_img(files):
@@ -169,9 +155,8 @@ def parse_xml(path, is_parent = True):
            'head_img':'',
            'desc':'Site Description',
            'readme':'',
-           'inherit':False,
-           'type':'default',
-           'page_xml': None,
+           'inherit':'0',
+           'page':{'src': '', 'type':'default'},
            'list':{'plugins':[]},
            'display':{'plugins':[]},
            'heading':{'meta':[],
@@ -183,8 +168,9 @@ def parse_xml(path, is_parent = True):
     try:
         root = etree.parse(path).getroot()
     except:
-        print 'Bad page config: %s' % path
-        abort(500, 'Bad page config.')
+        return ret
+        #print 'Bad page config: %s' % path
+        #abort(500, 'Bad page config.')
 
     if root.find('title') is not None:
         ret['title'] = root.find('title').text or ''
@@ -196,17 +182,21 @@ def parse_xml(path, is_parent = True):
         ret['desc'] = root.find('desc').text or ''
 
     if root.find('readme') is not None:
-        ret['readme'] = root.find('readme').text or ''
+        ret['readme'] = root.find('readme').text or readme_default
 
     if root.find('inherit') is not None:
-        ret['inherit'] = root.find('inherit').text.lower() in ['true', '1']
+        ret['inherit'] =  root.find('inherit').text or '0'
 
-    if root.find('page') is not None:
-        ret['page_xml'] = root.find('page')
  
     if ret['inherit'] or is_parent:
-        if root.find('type') is not None:
-            ret['type'] = root.find('type').text
+        page = root.find('page')
+
+        if page is not None:
+            if page.find('type') is not None:
+                ret['page']['type'] = page.find('type').text
+    
+            if page.find('src') is not None:
+                ret['page']['src'] = page.find('src').text or ''
 
         listp = root.find('list')
         if listp is not None:
@@ -217,18 +207,12 @@ def parse_xml(path, is_parent = True):
             if len(ret['list']['plugins']) == 0:
                 ret['list']['plugins'] = ['dir', 'file']
 
-            ret['list']['plugins'] = full_plugin_paths(ret['list']['plugins'], 'list')
-
         display = root.find('display')
         if display is not None:
             for plugin in display.iterfind('plugin'):
                 if plugin.text is not None:
                     ret['display']['plugins'].append(plugin.text)
-    
-        ret['display']['plugins'] = full_plugin_paths(ret['display']['plugins'], 'display')
-    else:
-        ret['display']['plugins'] = full_plugin_paths([], 'display')
-        ret['list']['plugins'] = full_plugin_paths([], 'list')
+
         
     heading = root.find('heading')
     if heading is not None:
@@ -238,17 +222,17 @@ def parse_xml(path, is_parent = True):
 
         if heading.find('js') is not None:
             for js_src in heading.iterfind('js'):
-                ret['heading']['js'].append(js_src.text)
+                ret['heading']['js'].append(js_src.text or '')
 
         if heading.find('script') is not None:
-            ret['heading']['script'] = heading.find('script').text
+            ret['heading']['script'] = heading.find('script').text or ''
 
         if heading.find('css') is not None:
             for css_src in heading.iterfind('css'):
-                ret['heading']['css'].append(css_src.text)
+                ret['heading']['css'].append(css_src.text or '')
 
         if heading.find('style') is not None:
-            ret['heading']['style'] = heading.find('style').text
+            ret['heading']['style'] = heading.find('style').text or ''
 
     return ret
 
@@ -268,6 +252,7 @@ class _config(object):
                  'script',
                  'style',
                  'meta',
+                 'logged_in',
                  ]
 
         for name in attrs:
@@ -279,8 +264,27 @@ class _config(object):
         self.styles = []
         self.scripts = []
         self.meta = []
+        self.page = {}
 
     def __iter__(self):
         for key in dir(self):
             if not key.startswith('_'):
                 yield key, getattr(self, key)
+
+
+
+def gather_configs(path, files):
+    path = path.rstrip('/')
+
+    if path.startswith(data_path()):
+        config_path = os.path.join(path, config_filename)
+    
+        if os.path.exists(config_path) and os.access(config_path, os.R_OK):
+            files.append(config_path)
+    
+        parent_path = os.path.dirname(path)
+    
+        if parent_path:
+            gather_configs(parent_path, files)
+
+    return files

@@ -56,11 +56,8 @@ function mechcalc(){
 		
 		this.valid = new t._valid(t, this);
 
-		var select = document.getElementById('mcalc_' + this.id + '_unit_select');
-		if(select){
-			this.u.elem = select;
-			t._html_calc_add_events(t, this)
-		}
+		this.u.elem = document.getElementById('mcalc_' + this.id + '_unit_select');
+		t._html_calc_add_events(t, this)
 	}
 
 	/*
@@ -265,8 +262,16 @@ function mechcalc(){
 	 * inp - input objec to us.
 	 */
 	this._html_calc_add_events = function(t, inp){
-		inp.u.elem.addEventListener('change', function(){t.control_units_conv(inp.id);});
-		document.getElementById('mcalc_' + inp.id + '_btn').addEventListener('click',function(){t.cur_item=inp.id;t['calc_' + inp.id]();});
+		if(inp.u.elem != null){
+			inp.u.elem.addEventListener('change', function(){t.control_units_conv(inp.id);});
+		}
+
+		var btn = document.getElementById('mcalc_' + inp.id + '_btn')
+
+		if(btn != null){
+			btn.addEventListener('click',function(){t.cur_item=inp.id;t['calc_' + inp.id]();});
+		}
+
 	}
 
 	/*

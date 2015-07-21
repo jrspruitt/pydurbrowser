@@ -20,7 +20,7 @@
 
 import os
 
-def load_plugin_list(plugins):
+def load_plugins(plugins, ptype='list'):
     """Return references to provided plugins
 
     Args:
@@ -29,6 +29,7 @@ def load_plugin_list(plugins):
     Returns:
         List    Of dicts, name=plugin name, plugin=plugin reference
     """
+    plugins = get_dot_paths(plugins, ptype)
     modules = []
 
     for plugin in plugins:
@@ -41,7 +42,7 @@ def load_plugin_list(plugins):
     return modules
 
 
-def full_plugin_paths(plugins, ptype='list'):
+def get_dot_paths(plugins, ptype):
     """ Get full module dot paths from plugin name list
 
     Args:

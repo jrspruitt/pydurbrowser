@@ -22,12 +22,13 @@ import os
 from bottle import template
 from browser.items import get_items
 from browser.settings import get_css
-from browser.plugins import load_plugin_list
+from browser.plugins import load_plugins
+from browser.plugins.page.img_gallery import item
 
 def handler(page):
     img_plugin = 'browser.plugins.page.img_gallery.item'
 
-    page.config.list_plugins.append(load_plugin_list([img_plugin])[0])
+    page.config.list_plugins.append({'name':img_plugin, 'plugin':item})
 
     page.config.rules.ignore_dirs = "/_thumbnails$"
 

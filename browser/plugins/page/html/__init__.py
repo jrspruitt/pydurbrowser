@@ -31,10 +31,10 @@ def handler(page):
         if plugin['name'] in items:
             page.items += items[plugin['name']]
 
-    html_src = page.config.page_xml.find('html_src')
+    html_src = page.config.page['src']
 
-    if html_src is not None:
-        html_path = os.path.join(page.config.path, html_src.text)
+    if html_src:
+        html_path = os.path.join(page.config.path, html_src)
 
         if os.path.exists(html_path):
             with open(html_path, 'r') as f:

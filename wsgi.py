@@ -26,13 +26,52 @@ sys.path.append(os.path.dirname(__file__))
 os.chdir(os.path.dirname(__file__))
 
 import bottle
+from beaker.middleware import SessionMiddleware
+from cork import Cork
 
-from browser.settings import display_prefix, data_path
-from browser.config.parse import get_config
+from browser.settings import display_prefix, data_path, session_key
+from browser.config.config import get_config
 from browser.page import page
 from browser.xfile import xfile
-from browser.dataport import dataport
+#from browser.dataport import dataport
+from browser.editor import cfg_editor, cfg_update
 
+    
+# Use users.json and roles.json in the local example_conf directory
+aaa = Cork('auth', email_sender='', smtp_url='')
+
+# alias the authorization decorator with defaults
+authorize = aaa.make_auth_decorator(fail_redirect="/login", role="user")
+
+def post_get(name, default=''):
+    return bottle.request.POST.get(name, default).strip()
+
+@bottle.post('/login')
+def login():
+    """Authenticate users"""
+    username = post_get('username')
+    password = post_get('password')
+    aaa.login(username, password, success_redirect='/', fail_redirect='/login')
+
+@bottle.route('/logout')
+def logout():
+    aaa.logout(success_redirect='/', fail_redirect='/login')
+
+@bottle.route('/login')
+@bottle.view('login_form')
+def login_form():
+    """Serve login form"""
+    return {}
+
+@authorize()
+@bottle.route('/cfg_edit/<url:path>')
+def cfg_edit_page(url=''):
+    return cfg_editor(url)
+
+@authorize()
+@bottle.post('/cfg_update/<url:path>')
+def cfg_update_page(url=''):
+    return cfg_update(url)
 
 @bottle.route('/favicon.ico')
 def favicon():
@@ -48,14 +87,14 @@ def robots():
 def assets(path):
     return bottle.static_file(path, root=os.path.join(os.path.dirname(__file__), 'assets'))
 
-
+"""
 @bottle.route('/dataport/<url:path>')
 def dataport_entry(url=''):
     if url:
         return dataport(url, bottle.request)
     else:
         bottle.abort(404, 'No such file.')
-
+"""
 
 @bottle.route('/%s<url:path>' % display_prefix)
 def show_display(url=''):
@@ -77,7 +116,6 @@ def show_display(url=''):
 
     bottle.abort(404, 'No such file.')
 
-   
 @bottle.route('/')
 @bottle.route('/<url:path>')
 def index(url=''):
@@ -89,6 +127,12 @@ def index(url=''):
     url = url.rstrip('/')
     path = path.rstrip('/')
     cfg = get_config(url)
+
+    try:
+        aaa.current_user
+        cfg.logged_in = True
+    except:
+        cfg.logged_in = False
 
     if not os.path.exists(path):
         bottle.abort(404, 'Bad path.')
@@ -105,3 +149,13 @@ def index(url=''):
     bottle.abort(404, 'Bad path.')
 
 application = bottle.default_app()
+session_opts = {
+    'session.cookie_expires': True,
+    'session.encrypt_key': session_key,
+    'session.httponly': True,
+    'session.timeout': 3600 * 24,  # 1 day
+    'session.type': 'cookie',
+    'session.validate_key': True,
+}
+application = SessionMiddleware(application, session_opts)
+

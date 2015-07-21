@@ -33,3 +33,4 @@ local.properties
 # My Additions
 *.pyc
 browser/settings.py
+auth/*.json
