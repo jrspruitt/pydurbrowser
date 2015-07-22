@@ -1,0 +1,8 @@
+run create_user.py <username> <password> to create the
+admin account for editing config files.
+ 
+Make sure this directory and the *.json files
+are readable and writable by the web server user or group.
+
+Log in at https://<domain>/login
+

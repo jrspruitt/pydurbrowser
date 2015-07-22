@@ -20,7 +20,6 @@
 
 import os
 from lxml import etree
-from bottle import abort
 from browser.settings import config_filename, data_path, readme_default
 from browser.config.rules import rules
 from browser.plugins import load_plugins
