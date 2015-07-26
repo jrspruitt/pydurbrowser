@@ -27,6 +27,9 @@ desc_ext = '.desc'
 display_prefix = 'display/'
 asset_path = '/assets'
 
+# Use random secure number, and keep secret!
+session_key = 'CHANGE THIS!!!'
+
 # function call because request isn't available on import
 def data_path():
     return bottle.request.get('DOCUMENT_ROOT')
