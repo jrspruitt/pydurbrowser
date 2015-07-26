@@ -44,7 +44,7 @@ function mechcalc(){
 	 * elem - input element.
 	 */
 	this._input = function(t, id, elem){
-		this.type = t.type_choice;
+		this.type = t.type_calc;
 		this.id = id;
 		this.elem = elem;
 		this.value = elem.value;
@@ -58,6 +58,16 @@ function mechcalc(){
 
 		this.u.elem = document.getElementById('mcalc_' + this.id + '_unit_select');
 		t._html_calc_add_events(t, this)
+
+		this.value_as = function(unit){
+			var ret = t._conversion(this.value, this.u.cat, t.units[this.u.cat].convert_to, unit);
+			
+			if(t.is_number(ret)){
+				return ret;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	/*
@@ -181,9 +191,8 @@ function mechcalc(){
 	 */
 	this._html_graph_add_events = function(elem, id){
 		var t = this;
-        elem.addEventListener('mousemove', function(event){t.i[id].xyfloat(event)}, false)
-        elem.addEventListener('click', function(event){t.i[id].xyfloat_enable(event)}, false)
-        elem.addEventListener('mouseout', function(event){t.i[id].xyfloat_off()}, false)
+        elem.addEventListener('mousemove', function(event){t.i[id]._xyfloat(event)}, false)
+        elem.addEventListener('mouseout', function(event){t.i[id]._xyfloat_off()}, false)
 
         var btn_elem = document.getElementById('mcalc_graph_btn_' + id);
         btn_elem.addEventListener('click', function(){t['graph_' + id]()}, false);
@@ -364,7 +373,7 @@ function mechcalc(){
 	 *    
 	 * inp - Input object.
 	 * gui - True show gui errors/valid (default), false do not show.
-	 * Return: True errors, false on errors.
+	 * Return: True if no errors, false on errors.
 	 */
 	this.get = function(inp, gui){
 		if(typeof(gui) == 'undefined'){ var gui = true; };
@@ -405,7 +414,7 @@ function mechcalc(){
 			return true;
 		}
 	}
-
+	
 	/*
 	 * Set input object's GUI input box to input.value and clean up.
 	 *     Will convert back to GUI selected units.
@@ -880,13 +889,18 @@ function mechcalc(){
 		
 	}
 
-	///////////////////////////////////////////////////////////////////////////////
-	////// graphic functions
+	/**********************************************************
+	 * Graphing functions
+	 */
 
 	this.graph = function(t, id, elem){
+		/************************
+		 * Init
+		 */
 		this.id = id;
 		this.elem = elem;
-		t._html_showhide_add_event(this.id);
+        this.t = t
+		this.t._html_showhide_add_event(this.id);
 		this.enabled = true;
 
 		if(!(this.elem.getContext && this.elem.getContext('2d'))){
@@ -896,115 +910,32 @@ function mechcalc(){
 			return false;
 		}
 
-		t._html_graph_add_events(this.elem, this.id);
+		this.t._html_graph_add_events(this.elem, this.id);
+		this._xyfloater = document.getElementById('mcalc_xy_floater');
 		this.ctx = this.elem.getContext('2d')
 		this.grid = {};
-		
-		this.xyfloater = document.getElementById('mcalc_xy_floater');
+		this.grid.t = this;
+		this.plot = {};
+		this.plot.t = this;
+        this.plot.items = {}
+		this.log = {};
 
-		// user defined parameters/functions
-		this.grid.xmin = 0;
-		this.grid.xmax = 1000;
-		this.grid.ymin = 0;
-		this.grid.ymax = 1000;
+        /************************
+		 * Internally defined and calculated options
+		 */
+		this.log.min = 0;
+		this.log.max = 0;
+		this.log.range = 0;
 
-		this.grid.type = 'normal';
-		this.grid.align = 'left';
-
-		this.grid.xlines = 10;
-		this.grid.ylines = 10;
-
-		this.grid.center_major_y0 = false;
-		this.grid.center_major_x0 = false;
-
-		this.xrange = function(){ return this.grid.xmax-this.grid.xmin; }
-		this.yrange = function(){ return this.grid.ymax-this.grid.ymin; }
-
-		this.short_num_round = 1;
-		this.grid.skip_xlabels = 1;
-		this.grid.skip_ylabels = 1;
-
-		this.clear = function(){
-			this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-			this.ctx.clearRect(this.grid.xstart-13, 0, this.elem.width, this.elem.height-10);
-		}
-
-		this.clear_all = function(){
-			this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-			this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
-		}
-
-		// graph mouse over events and processing
-		this.xyfloat_enabled = true;
-		this.xyfloat_enable = function(e){
-			this.xyfloat_enabled = !this.xyfloat_enabled;
-			if(this.xyfloat_enabled){
-				this.xyfloat(e);
-			}else{
-				this.xyfloater.style.display = 'none';
-			}
-		}
-
-		this.xyfloat_off = function(){
-			this.xyfloater.style.display = 'none';
-		}
-
-		this.xyfloat = function(e){
-			e = e || window.e;
-			total_offset_x = 0;
-			total_offset_y = 0;
-			graph_x = 0;
-			graph_y = 0;
-			posx = 0;
-			posy = 0;
-			elem = this.elem;
-			if (!e) var e = window.event;
-
-			if (e.pageX || e.pageY) 	{
-				posx = e.pageX;
-				posy = e.pageY;
-			}
-			else if (e.clientX || e.clientY) 	{
-				posx = e.clientX + document.body.scrollLeft	+ document.documentElement.scrollLeft;
-				posy = e.clientY + document.body.scrollTop	+ document.documentElement.scrollTop;
-			}
-
-			do{
-				total_offset_x += elem.offsetLeft;
-				total_offset_y += elem.offsetTop;
-			}
-			while(elem = elem.offsetParent)
-
-			graph_x = posx - total_offset_x
-			graph_y = posy - total_offset_y
-
-			if(this.xoff_grid(graph_x) || !this.xyfloat_enabled){this.xyfloat_off(); return false;}
-			if(this.yoff_grid(graph_y) || !this.xyfloat_enabled){this.xyfloat_off(); return false;}
-
-			if(this.grid.type == 'log' && (graph_x) != 0){
-				adjx = Math.pow(10,((graph_x-this.plot.xcenter-2)/this.grid.width)*this.log_range+this.log_min);
-			}else{
-				adjx = ((graph_x-this.plot.xcenter-2)/this.xpixel);
-			}
-
-			adjy =  ((this.plot.ycenter-graph_y+2)/this.ypixel);
-
-			this.xyfloater.style.display = 'block';
-			this.xyfloater.style.top = posy+15+ 'px';
-			this.xyfloater.style.left = posx+15 + 'px';
-			this.xyfloater.innerHTML = this.xlabel_text+'<br />'+adjx+'<br /><br />'+this.ylabel_text+'<br />'+adjy;
-		}
-
-		// internally defined parameters
 		this.grid.xstart = 30;
 		this.grid.ystart = this.elem.height - 50;
-
+		this.grid.xmin = 0;
+		this.grid.xmax = 0;
+		this.grid.ymin = 0;
+		this.grid.ymax = 0;
 		this.grid.margin = 10;
 		this.grid.height = this.grid.ystart - this.grid.margin;
 		this.grid.width = this.elem.width - this.grid.xstart - this.grid.margin;
-
-		this.xpixel = 1;
-		this.ypixel = 1;
 
 		if(this.grid.align == 'center'){
 			this.grid.xcenter = this.grid.xstart + this.grid.width/2;
@@ -1014,152 +945,151 @@ function mechcalc(){
 			this.grid.ycenter = this.grid.ystart;
 		}
 
-		this.plot = {};
+		this.xpixel = 1;
+		this.ypixel = 1;
+
 		this.plot.xcenter = this.grid.xcenter;
 		this.plot.ycenter = this.grid.ycenter;
+		this.plot.edge = this.grid.xstart;
 
-		this.xlabel_text = '';
+        this.plot.colors = {'red':[255,0,0,1],
+        					'green':[0,255,0,1],
+        					'blue':[0,0,255,1],
+        					'yellow':[255,255,0,1],
+        					'orange':[255,127,0,1],
+        					'purple':[127,0,127,1],
+        					'pink':[255,0,255,1],
+        					'aqua':[0,255,255,1],
+        					'gray':[127,127,127,1],
+        						}
+
+		/************************
+		 * User calc.xml options
+		 */
+        /*
+         * type - 'log' (x-axis) or 'normal'
+         * align - 'left' or 'center' major grid line locations (normal only)
+         */
+		this.grid.type = 'normal';
+		this.grid.align = 'left';
+
+		/*
+		 * if this.grid.align == 'center' these will center the major grid line
+		 * on the label with a value of 0.
+		 */
+		this.grid.center_major_y0 = false;
+		this.grid.center_major_x0 = false;
+
+		/************************
+		 * User runtime options and functions
+		 */
+
+		/*
+		 * Graph labels running along the left and bottom sides respectively.
+		 */
 		this.xlabel = function(label){
-			this.xlabel_text = label;
-			this.ctx.fillStyle='#000000';
+			this.ctx.fillStyle='rgba(0, 0, 0, 255)';
 			this.ctx.fillText(label, (this.elem.width/2) - (label.toString().length/2)*5, this.elem.height-2);
 		}
-		this.ylabel_text = '';
+
 		this.ylabel = function(label){
-			this.ylabel_text = label;
-			this.ctx.fillStyle='#000000';
-			this.draw_ytext(label, ((this.elem.width/2) - (label.toString().length/2)*3), 20);
+			this.ctx.fillStyle='rgba(0, 0, 0, 255)';
+			this._draw_ytext(label, ((this.elem.width/2) - (label.toString().length/2)*3), 20);
 		}
 
-		// log graph specific params/functions
-		this.log_min = 0;
-		this.log_max = 0;
-		this.log_range = 0;
+		/*
+		 * Min/Max values to use for grid labels.
+		 * In betweens will be calculated by xmax/xlines
+		 */
+		this.grid.labels = function(xmin, xmax, ymin, ymax){
+			this.xmin = xmin;
+			this.xmax = xmax;
+			this.ymin = ymin;
+			this.ymax = ymax;
 
-		this.set_log_values = function(){
-				if(this.grid.xmin <= 0){
-					this.log_min = 0;
-				}else{
-					this.log_min = Math.round(Math.log(this.grid.xmin)/Math.LN10);
-				}
-				if(this.grid.xmax <= 0){
-					this.log_max = 0;
-				}else{
-					this.log_max = Math.round(Math.log(this.grid.xmax)/Math.LN10);
-				}
-				this.log_range = Math.round((this.log_max - this.log_min));
-		}
-
-		// x,y conversion to grid xy
-		this.convertx = function(x){
-			if(this.grid.type == 'log' && x != 0){
-				return this.plot.xcenter + Math.round(((Math.log(x)/Math.LN10-this.log_min) / this.log_range) * this.grid.width);
-			}
-			return this.plot.xcenter + (this.xpixel * x);
-		}
-
-		this.converty = function(y){
-			return this.plot.ycenter - (this.ypixel * y);
-		}
-
-		// set aspect ratio
-		this.set_grid_pixel_size = function(){
-			this.xpixel = this.grid.width/(this.grid.xmax-this.grid.xmin);
-			this.ypixel = this.grid.height/(this.grid.ymax-this.grid.ymin);
-		}
-
-		// convert numbers to 1k 2k etc for grid labels
-		this.short_num = function(num){
-			sign = false;
-			if(num==0){return num;}
-			if(num<0){sign = true;}
-
-			snum = Math.abs(num);
-			if(snum<0.01){
-				return num.toExponential();
-			}
-
-			if(snum<1000){ return num; }
-
-			if(snum<1000000 && (snum/1000)>=1){
-				snum = Math.round((snum/1000)*this.short_num_round)/this.short_num_round + 'K';
-				if(sign){snum = '-'+snum;}
-				return snum
-			}
-			if(snum<1000000000 && (snum/1000000)>=1){
-				snum = Math.round((snum/1000000)*this.short_num_round)/this.short_num_round + 'M';
-				if(sign){snum = '-'+snum;}
-				return snum
-			}
-			if(snum<1000000000000 && (snum/1000000000)>=1){
-				snum = Math.round((snum/1000000000)*this.short_num_round)/this.short_num_round + 'G';
-				if(sign){snum = '-'+snum;}
-				return snum
-			}
-			if((snum/1000000000000)>=1){
-				snum = Math.round((snum/1000000000000)*this.short_num_round)/this.short_num_round + 'T';
-				if(sign){snum = '-'+snum;}
-				return snum
-			}			
-			return num;
-		}
-		// check if converted xy is off the grid
-		this.xoff_grid = function(x){
-			if(x < this.grid.xstart-2 || x > this.grid.xstart+this.grid.width+2){
-				return true;
-			}else{
-				return false;
-			}				
-		}
-
-		this.yoff_grid = function(y){
-			if(y < this.grid.margin-2 || y > this.grid.height+this.grid.margin+2){
-				return true;
-			}else{
-				return false;
+			if(this.type == 'log'){
+				this.t.log.init(this.xmin, this.xmax);
 			}
 		}
 
-		// convienence draw functions
-		this.draw_line = function(mx, my, lx, ly, color){
-			mxc = this.convertx(mx);			
-			if(this.xoff_grid(mxc)){return false;}
+		/*
+		 * Number of divisions per given axis.
+		 */
+		this.grid.xlines = 10;
+		this.grid.ylines = 10;
 
-			myc = this.converty(my);
-			if(this.yoff_grid(myc)){return false;}
 
-			lxc = this.convertx(lx);
-			if(this.xoff_grid(lxc)){return false;}
+		/*
+		 * This will skip ever Nth label, used if spacing gets tight and labels overlap.
+		 */
+		this.grid.skip_xlabels = 1;
+		this.grid.skip_ylabels = 1;
 
-			lyc = this.converty(ly);
-			if(this.yoff_grid(lyc)){return false;}
+		/*
+		 * Used for rounding grid label numbers, 10 = 0.1, 100 = 0.01 etc
+		 */
+		this.grid.label_rounding = 1;
 
-			this.ctx.beginPath();
-			this.ctx.strokeStyle=color;
-			this.ctx.moveTo(mxc, myc);
-			this.ctx.lineTo(lxc, lyc);
-			this.ctx.stroke();
+		/*
+		 * Creates an item to plot on the graph
+		 * label - Name displayed color keyed on graph and a reference for drawing.
+		 * yunits - Y Axis units. (for hover over box)
+		 * xunits - X Axis units. (for hover over box)
+		 * color - red, green, blue, yellow, orange, purple, pink, aqua, gray
+		 */
+
+		this.plot.add_item = function(label, xunits, yunits, color){
+        	var rgba = this.colors[color];
+        	var rgba_str = 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+',1)';
+            this.items[label] = [label, yunits, xunits, rgba, rgba_str];
+			this.t.ctx.fillStyle=rgba_str;
+			this.t.ctx.fillText(label, this.edge + 10, this.t.grid.ystart+25);
+			this.edge += label.toString().length * 7;
+			this.t.ctx.fillStyle='rgba(0, 0, 0, 1)';
+		}
+
+		/*
+		 * Draw from fx,fy to tx,ty, for plot item 'label'
+		 */
+		this.plot.draw = function(fx, fy, tx, ty, label){
+			var color =  this.items[label][4];
+			fxc = this.t._convertx(fx);			
+			if(this.t._xoff_grid(fxc)){return false;}
+
+			fyc = this.t._converty(fy);
+			if(this.t._yoff_grid(fyc)){return false;}
+
+			txc = this.t._convertx(tx);
+			if(this.t._xoff_grid(txc)){return false;}
+
+			tyc = this.t._converty(ty);
+			if(this.t._yoff_grid(tyc)){return false;}
+
+			this.t.ctx.clearRect(fxc, fyc, 1, 1);
+
+			this.t.ctx.beginPath();
+			this.t.ctx.strokeStyle=color;
+			this.t.ctx.moveTo(fxc, fyc);
+			this.t.ctx.lineTo(txc, tyc);
+			this.t.ctx.stroke();
 			return true;
 		}
 
-		this.draw_ytext = function(text, x, y){
-			this.ctx.save();
-			this.ctx.translate((this.elem.width/2),(this.elem.height/2))
-			this.ctx.rotate(270*Math.PI/180);
-			this.ctx.fillStyle='#000000';
-			this.ctx.fillText(text, x-(this.elem.width/2), y-(this.elem.height/2));
-			this.ctx.restore()
+		/*
+		 * Clear graph functions.
+		 * clear erases the graph portion itself.
+		 * clear_all erases entire canvas element.
+		 */
+		this.clear = function(){
+			this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+			this.ctx.clearRect(0, 0, this.elem.width, this.elem.height);
 		}
 
-		this.draw_grid_line = function(mx, my, lx, ly, color){
-			this.ctx.beginPath();
-			this.ctx.strokeStyle=color;
-			this.ctx.moveTo(this.grid.xstart + mx, this.grid.ystart - my);
-			this.ctx.lineTo(this.grid.xstart + lx, this.grid.ystart - ly);
-			this.ctx.stroke();
-		}
-
-		// indexers for skipping to the next pixel
+		/*
+		 * Loop index helpers.
+		 * Greatly reduces calculations, as it returns the index of the next
+		 * pixel. If each pixel accounts for 500 units, the step is 500.
+		 */
 		this.xindexer = function(x){
 			if(this.grid.type == 'log'){
 				dif = (Math.floor(Math.log(this.grid.xmax)/Math.LN10)-Math.ceil(Math.log(x)/Math.LN10));
@@ -1173,59 +1103,177 @@ function mechcalc(){
 			return 1/this.ypixel;
 		}
 
-		// grid builder
-		this.grid_builder = function(){
-			this.set_grid_pixel_size();
+		/************************
+		 * Internal fuctions
+		 */
+		
+		/*
+		 * Convert x or y absolute position to relative to grid position
+		 */
+		this._convertx = function(x){
+			if(this.grid.type == 'log' && x != 0){
+				return this.plot.xcenter + Math.round(((Math.log(x)/Math.LN10-this.log.min) / this.log.range) * this.grid.width);
+			}
+			return this.plot.xcenter + (this.xpixel * x);
+		}
 
-			this.plot.edge = this.grid.xstart; // reset
+		this._converty = function(y){
+			return this.plot.ycenter - (this.ypixel * y);
+		}
 
-			grid_yline_space = this.grid.height/this.grid.ylines;
-			grid_xline_space = this.grid.width/this.grid.xlines;
+		/*
+		 * Calculate unit size of pixel based against grid units width
+		 */
+		this.grid.set_pixel_size = function(){
+			this.t.xpixel = this.width/(this.xmax-this.xmin);
+			this.t.ypixel = this.height/(this.ymax-this.ymin);
+		}
 
-			// draw log x grid
-			w = 0;
+		/*
+		 * Convert numbers to K M G or T for grid labels
+		 */
+		this._short_num = function(num){
+			var sign = false;
+			if(num==0){return num;}
+			if(num<0){sign = true;}
 
-			if(this.grid.type == 'log'){
-				this.set_log_values();
+			var snum = Math.abs(num);
+			if(snum<0.01){
+				return num.toExponential();
+			}
 
-				kfactor = this.grid.width/this.log_range;
+			if(snum<1000){ return num; }
 
-				for(k=this.log_min; k<=this.log_max; k++){
-					kf = kfactor * (k-this.log_min);
+			if(snum<1000000 && (snum/1000)>=1){
+				snum = Math.round((snum/1000)*this.grid.label_rounding)/this.grid.label_rounding + 'K';
+				if(sign){snum = '-'+snum;}
+				return snum
+			}
+			if(snum<1000000000 && (snum/1000000)>=1){
+				snum = Math.round((snum/1000000)*this.grid.label_rounding)/this.grid.label_rounding + 'M';
+				if(sign){snum = '-'+snum;}
+				return snum
+			}
+			if(snum<1000000000000 && (snum/1000000000)>=1){
+				snum = Math.round((snum/1000000000)*this.grid.label_rounding)/this.grid.label_rounding + 'G';
+				if(sign){snum = '-'+snum;}
+				return snum
+			}
+			if((snum/1000000000000)>=1){
+				snum = Math.round((snum/1000000000000)*this.grid.label_rounding)/this.grid.label_rounding + 'T';
+				if(sign){snum = '-'+snum;}
+				return snum
+			}			
+			return num;
+		}
+
+		/*
+		 * Check if x or y input is off the grid or not.
+		 */
+		this._xoff_grid = function(x){
+			if(x < this.grid.xstart-2 || x > this.grid.xstart+this.grid.width+2){
+				return true;
+			}else{
+				return false;
+			}				
+		}
+
+		this._yoff_grid = function(y){
+			if(y < this.grid.margin-2 || y > this.grid.height+this.grid.margin+2){
+				return true;
+			}else{
+				return false;
+			}
+		}
+
+		/*
+		 * log graph specific functions.
+		 */
+
+		this.log.init = function(gxmin, gxmax){
+				if(this.xmin <= 0){
+					this.min = 0;
+				}else{
+					this.min = Math.round(Math.log(gxmin)/Math.LN10);
+				}
+				if(gxmax <= 0){
+					this.max = 0;
+				}else{
+					this.max = Math.round(Math.log(gxmax)/Math.LN10);
+				}
+				this.range = Math.round((this.max - this.min));
+		}
+
+		/************************
+		 * Drawing fuctions
+		 */
+
+		this._draw_ytext = function(text, x, y){
+			this.ctx.save();
+			this.ctx.translate((this.elem.width/2),(this.elem.height/2))
+			this.ctx.rotate(270*Math.PI/180);
+			this.ctx.fillStyle='rgba(0, 0, 0, 255)';
+			this.ctx.fillText(text, x-(this.elem.width/2), y-(this.elem.height/2));
+			this.ctx.restore()
+		}
+
+		this.grid.draw = function(mx, my, lx, ly, color){
+			this.t.ctx.beginPath();
+			this.t.ctx.strokeStyle=color;
+			this.t.ctx.moveTo(this.xstart + mx, this.ystart - my);
+			this.t.ctx.lineTo(this.xstart + lx, this.ystart - ly);
+			this.t.ctx.stroke();
+		}
+
+		/*
+		 * Grid builder, called after all this.graph.grid.*
+		 * user config options are set and before plotting begins.
+		 */
+		this.grid.build = function(){
+			this.set_pixel_size();
+			this.t.plot.edge = this.xstart;
+			var grid_yline_space = this.height/this.ylines;
+			var grid_xline_space = this.width/this.xlines;
+			var w = 0;
+
+			if(this.type == 'log'){
+				var kfactor = this.width/this.t.log.range;
+
+				for(k=this.t.log.min; k<=this.t.log.max; k++){
+					var kf = kfactor * (k-this.t.log.min);
 					
-					if((w % this.grid.skip_xlabels) === 0){
-						this.ctx.fillText(this.short_num(Math.pow(10, k)), (this.grid.xstart+kf)* 0.95, this.grid.ystart+10)
+					if((w % this.skip_xlabels) === 0){
+						this.t.ctx.fillText(this.t._short_num(Math.pow(10, k)), (this.xstart+kf)* 0.95, this.ystart+10)
 					}
 
 					w++;
 
 					for(i=1; i<=10; i++){
 						ilog = kf+((Math.log(i)/Math.LN10)*kfactor)
-						this.draw_grid_line(ilog, 0, ilog, this.grid.height, '#CCCCCC');
+						this.draw(ilog, 0, ilog, this.height, 'rgba(0, 0, 0, 0.2)');
 					}
 				}
 
 			}else{
-				// draw normal x grid
 				w = 0;
-				last_label = 0;
-				label_spacing = this.xrange()/this.grid.xlines;
-				roundto = Math.round(1/Math.pow(10, Math.round(Math.log(this.xrange())/Math.LN10)-1));
+				var last_label = 0;
+				var label_spacing = (this.xmax-this.xmin)/this.xlines;
+				var roundto = Math.round(1/Math.pow(10, Math.round(Math.log((this.xmax-this.xmin))/Math.LN10)-1));
 
 				if(roundto<1){roundto = 1;}
 
-				for(i=0; i<=this.grid.width+2; i+=grid_xline_space){
-					label = Math.round((label_spacing * w + this.grid.xmin)*roundto)/roundto;
+				for(i=0; i<=this.width+2; i+=grid_xline_space){
+					var label = Math.round((label_spacing * w + this.xmin)*roundto)/roundto;
 
 					if(label==0){
-						this.plot.xcenter = this.grid.xstart + i;
+						this.t.plot.xcenter = this.xstart + i;
 					}else if((last_label < 0 && label > 0) || (last_label + label) == 0){
 						pix_adj = grid_xline_space/Math.abs(last_label - label);
-						this.plot.xcenter = this.grid.xstart + i - (pix_adj*label);
+						this.t.plot.xcenter = this.xstart + i - (pix_adj*label);
 					}
 
 					last_label = label
-					label = this.short_num(label)
+					label = this.t._short_num(label)
 
 					if(i == 0){
 						label_width = 0;
@@ -1233,87 +1281,148 @@ function mechcalc(){
 						label_width = (label.toString().length  * 7)/2;
 					}
 
-					if((w % this.grid.skip_xlabels) === 0){
-						this.ctx.fillText(label, this.grid.xstart+i-label_width, this.grid.ystart+10);
+					if((w % this.skip_xlabels) === 0){
+						this.t.ctx.fillText(label, this.xstart+i-label_width, this.ystart+10);
 					}
 
 					w++;
-					this.draw_grid_line(i, 0, i, this.grid.height, '#CCCCCC');
+					this.draw(i, 0, i, this.height, 'rgba(0, 0, 0, 0.2)');
 				}
 			}
 
-			// draw  y grid
 			w = 0;
-			l = true;
-			label_spacing = this.yrange()/this.grid.ylines;
-			last_label = 0;
-			roundto = Math.round(1/Math.pow(10, Math.round(Math.log(this.yrange())/Math.LN10)-1));
+			var l = true;
+			var label_spacing = (this.ymax-this.ymin)/this.ylines;
+			var last_label = 0;
+			var roundto = Math.round(1/Math.pow(10, Math.round(Math.log((this.ymax-this.ymin))/Math.LN10)-1));
 
 			if(roundto<1){roundto = 1;}
 
-			for(i=0; i<=this.grid.height+2; i+=grid_yline_space){
-				label = Math.round((label_spacing * w + this.grid.ymin)*roundto)/roundto;
+			for(i=0; i<=this.height+2; i+=grid_yline_space){
+				var label = Math.round((label_spacing * w + this.ymin)*roundto)/roundto;
 				if(label==0){
-					this.plot.ycenter = this.grid.ystart - i;
+					this.t.plot.ycenter = this.ystart - i;
 				}else if((last_label < 0 && label > 0) || (last_label + label) == 0){
 						pix_adj = grid_yline_space/Math.abs(last_label - label);
-						this.plot.ycenter = this.grid.ystart - i + (pix_adj*label);
+						this.t.plot.ycenter = this.ystart - i + (pix_adj*label);
 				}
+
 				last_label = label
-				label = this.short_num(label)
+				label = this.t._short_num(label)
+
 				if(i == 0){
 					label_width = 5;
 				}else{
 					label_width = (label.toString().length  * 8)/2;
 				}
 
-				if((w % this.grid.skip_ylabels) === 0){
-					this.draw_ytext(label, (this.grid.xstart+i-label_width+15), 33);
+				if((w % this.skip_ylabels) == 0){
+					this.t._draw_ytext(label, (this.xstart+i-label_width+15), 33);
 				}
+
 				w++;
-				this.draw_grid_line(0, i, this.grid.width, i, '#CCCCCC');
+				this.draw(0, i, this.width, i, 'rgba(0, 0, 0, 0.2)');
 			}
 
-			// draw dark grid border
-			if(this.grid.align == 'center'){
-				if(this.grid.center_major_y0 == true){
-					ystart = this.grid.height-this.plot.ycenter+this.grid.margin;
-					this.draw_grid_line(0, ystart, this.grid.width, ystart, '#000000');
+			if(this.align == 'center'){
+				if(this.center_major_y0 == true){
+					var ystart = this.height-this.t.plot.ycenter+this.margin;
+					this.draw(0, ystart, this.width, ystart, 'rgba(0,0,0,1)');
 				}else{
-					this.draw_grid_line(0, this.grid.height/2, this.grid.width, this.grid.height/2, '#000000');
+					this.draw(0, this.height/2, this.width, this.height/2, 'rgba(0, 0, 0, 1)');
 				}
 
-				if(this.grid.center_major_x0 == true){
-					xstart = this.plot.xcenter-this.grid.xstart;
-					this.draw_grid_line(xstart, 0, xstart, this.grid.height, '#000000');
+				if(this.center_major_x0 == true){
+					var xstart = this.t.plot.xcenter-this.xstart;
+					this.draw(xstart, 0, xstart, this.height, 'rgba(0, 0, 0, 1)');
 				}else{
-					this.draw_grid_line(this.grid.width/2, 0, this.grid.width/2, this.grid.height, '#000000');
+					this.draw(this.width/2, 0, this.width/2, this.height, 'rgba(0, 0, 0, 1)');
 				}
 
 			}else{
-				this.draw_grid_line(0, 0, this.grid.width, 0, '#000000');
-				this.draw_grid_line(0, 0, 0, this.grid.height, '#000000');
+				this.draw(0, 0, this.width, 0, 'rgba(0, 0, 0, 1)');
+				this.draw(0, 0, 0, this.height, 'rgba(0, 0, 0, 1)');
+			}
+		}
+
+
+		/*
+		 * Floating box over graph lines functions.
+		 */
+
+		this._xyfloat_off = function(){
+			this._xyfloater.style.display = 'none';
+		}
+
+        this._xyfloat_color_check = function(rgba, against) {
+            for (var i = 0; i<rgba.length-1; i++) {
+                if ( rgba[i] < against[i]-5 || rgba[i] > against[i]+5) { return false; }
+            }
+            return true;
+        }
+
+		this._xyfloat = function(e){
+            if(this.plot.items.length < 1) {return false; }
+			var e = e || window.e;
+			var total_offset_x = 0;
+			var total_offset_y = 0;
+			var graph_x = 0;
+			var graph_y = 0;
+			var posx = 0;
+			var posy = 0;
+			var elem = this.elem;
+
+			if (!e) var e = window.event;
+
+			if (e.pageX || e.pageY) 	{
+				posx = e.pageX;
+				posy = e.pageY;
+			}else if (e.clientX || e.clientY) 	{
+				posx = e.clientX + document.body.scrollLeft	+ document.documentElement.scrollLeft;
+				posy = e.clientY + document.body.scrollTop	+ document.documentElement.scrollTop;
 			}
 
+			do{
+				total_offset_x += elem.offsetLeft;
+				total_offset_y += elem.offsetTop;
+			}
+			while(elem = elem.offsetParent)
 
-		}
+			graph_x = posx - total_offset_x
+			graph_y = posy - total_offset_y
 
-		// plotting functions
-		this.plot_line = function(fx, fy, tx, ty, color){
-			return this.draw_line(fx, fy, tx, ty, color);
-		}
+			if(this._xoff_grid(graph_x)){this._xyfloat_off(); return false;}
+			if(this._yoff_grid(graph_y)){this._xyfloat_off(); return false;}
 
-		this.plot.edge = this.grid.xstart;
+            var rgba = this.ctx.getImageData(graph_x, graph_y, 1, 1).data;
 
-		this.plot_label = function(label, color){
-			this.ctx.fillStyle=color;
-			this.ctx.fillText(label, this.plot.edge + 10, this.grid.ystart+25);
-			this.plot.edge += label.toString().length * 7;
-			this.ctx.fillStyle='#000000';
+            if(this._xyfloat_color_check(rgba, [0,0,0])) {this._xyfloat_off(); return false; }
+
+            var plot_item = '';
+
+            for(pitem in this.plot.items){
+                if (this._xyfloat_color_check(rgba, this.plot.items[pitem][3])) {
+                    plot_item = this.plot.items[pitem];
+                }
+            }
+ 
+            if(plot_item == ''){ return false; }
+
+			if(this.grid.type == 'log' && (graph_x) != 0){
+				adjx = this.t._format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.log.range+this.log.min));
+			}else{
+				adjx = this.t._format_rounder(((graph_x-this.plot.xcenter)/this.xpixel));
+			}
+
+			adjy =  this.t._format_rounder((this.plot.ycenter-graph_y+2)/this.ypixel);
+
+			this._xyfloater.style.display = 'block';
+			this._xyfloater.style.top = posy+15+ 'px';
+			this._xyfloater.style.left = posx+15 + 'px';
+			this._xyfloater.innerHTML = plot_item[0]+'<br /><hr>'+adjy+plot_item[1]+'<br />'+adjx+plot_item[2];
 		}
 	}
 
-	
 	/**********************************************************
 	 * GUI Control Functions 	
 	 */

@@ -123,13 +123,13 @@ def calc_load(path):
                 iconfig = item.find('config')
                 gtype = iconfig.findtext('type') if iconfig.findtext('type') else 'normal'
                 galign = iconfig.findtext('align') if iconfig.findtext('align') else 'left'
-                gxlabel = iconfig.findtext('xlabel') if iconfig.findtext('xlabel') else ''
-                gylabel = iconfig.findtext('ylabel') if iconfig.findtext('ylabel') else ''
+                gcenterX0 = iconfig.findtext('centerX0') if iconfig.findtext('centerX0') else '0'
+                gcenterY0 = iconfig.findtext('centerY0') if iconfig.findtext('centerY0') else '0'
 
                 items.append({'id':iid, 'type':itype, 'label':label, 'config':{'type':gtype,
                                                                             'align':galign,
-                                                                            'xlabel':gxlabel,
-                                                                            'ylabel':gylabel}})
+                                                                            'centerX0':gcenterX0,
+                                                                            'centerY0':gcenterY0}})
 
             elif itype == 'diagram':
                 iconfig = item.find('config')

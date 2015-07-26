@@ -36,7 +36,6 @@ def check(xfile):
 
 def handler(xfile):
     xfile.config.css.append(get_css('media.css'))
-    xfile.desc = ''
     xfile.width = 720
     try:
         xfile.mtime = time.ctime(os.path.getmtime(xfile.path))

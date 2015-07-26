@@ -27,8 +27,8 @@ window.onload=function(){
     % if item['type'] == 'graph':
         mc.{{ item['id'] }}.grid.type='{{ item['config']['type'] }}';
         mc.{{ item['id'] }}.grid.align='{{ item['config']['align'] }}';
-        mc.{{ item['id'] }}.xlabel('{{ item['config']['xlabel'] }}');
-        mc.{{ item['id'] }}.ylabel('{{ item['config']['ylabel'] }}');
+        mc.{{ item['id'] }}.grid.center_major_x0={{ 'true' if item['config']['centerX0']=='1' else 'false' }};
+        mc.{{ item['id'] }}.grid.center_major_y0={{ 'true' if item['config']['centerY0']=='1' else 'false' }};
 
     % elif item['type'] == 'calc':
         % if item['config']['display']['value'] == '':

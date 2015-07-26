@@ -153,7 +153,7 @@ def parse_xml(path, is_parent = True):
     ret = {'title':'Site Title',
            'head_img':'',
            'desc':'Site Description',
-           'readme':'',
+           'readme':readme_default,
            'inherit':'0',
            'page':{'src': '', 'type':'default'},
            'list':{'plugins':[]},
@@ -182,7 +182,7 @@ def parse_xml(path, is_parent = True):
 
     if root.find('readme') is not None:
         ret['readme'] = root.find('readme').text or readme_default
-
+  
     if root.find('inherit') is not None:
         ret['inherit'] =  root.find('inherit').text or '0'
 
