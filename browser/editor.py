@@ -23,7 +23,7 @@ def cfg_update(url):
     path = os.path.join(data_path(), url)
 
     if _cfg_save(path):
-        return bottle.redirect('/%s' % (os.path.dirname(url) or '/'))
+        return bottle.redirect('/%s' % (os.path.dirname(url)))
     else:
         return "Failed to save config."
 
