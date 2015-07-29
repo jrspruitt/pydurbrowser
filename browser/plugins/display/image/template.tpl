@@ -21,7 +21,9 @@
 		    </a>
 	    </div>
     </div>
+    % if xfile.desc:
     <div class="display_desc">{{! xfile.desc }}</div>
+    % end
     <div class="display_desc single">
         <span class="first_color">Name:</span> <span class="second_color">{{ xfile.name }}</span><br />
         <span class="first_color">Size:</span> <span class="second_color">{{ xfile.size }}</span><br />

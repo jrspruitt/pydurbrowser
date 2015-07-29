@@ -43,6 +43,7 @@ def get_config(url):
     parent_url         Title link URL.
     show_nav           If to show Up link URL.
     head_img_link      Directory of head_img having config file.
+    logged_in          If user is logged in or not.
 
     uid                Unique ID (future use?).
     rules              Rules object.

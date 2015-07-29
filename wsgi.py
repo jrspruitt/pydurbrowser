@@ -29,12 +29,12 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from cork import Cork
 
-from browser.settings import display_prefix, data_path, session_key
+from browser.settings import display_prefix, editor_prefix, updater_prefix, data_path, session_key
 from browser.config.config import get_config
 from browser.page import page
 from browser.xfile import xfile
 #from browser.dataport import dataport
-from browser.editor import cfg_editor, cfg_update
+from browser.editors import editor, updater
 
     
 # Use users.json and roles.json in the local example_conf directory
@@ -47,31 +47,31 @@ def post_get(name, default=''):
     return bottle.request.POST.get(name, default).strip()
 
 @bottle.post('/login')
-def login():
+def adm_login():
     """Authenticate users"""
     username = post_get('username')
     password = post_get('password')
     aaa.login(username, password, success_redirect='/', fail_redirect='/login')
 
 @bottle.route('/logout')
-def logout():
+def adm_logout():
     aaa.logout(success_redirect='/', fail_redirect='/login')
 
 @bottle.route('/login')
 @bottle.view('login_form')
-def login_form():
+def adm_login_form():
     """Serve login form"""
     return {}
 
 @authorize()
-@bottle.route('/cfg_edit/<url:path>')
-def cfg_edit_page(url=''):
-    return cfg_editor(url)
+@bottle.route('/%s<url:path>' % editor_prefix)
+def adm_editor(url=''):
+    return editor(url)
 
 @authorize()
-@bottle.post('/cfg_update/<url:path>')
-def cfg_update_page(url=''):
-    return cfg_update(url)
+@bottle.post('/%s<url:path>' % updater_prefix)
+def adm_updater(url=''):
+    return updater(url)
 
 @bottle.route('/favicon.ico')
 def favicon():
@@ -100,6 +100,12 @@ def dataport_entry(url=''):
 def show_display(url=''):
     path = os.path.join(data_path(), url)
     cfg = get_config(url)
+
+    try:
+        aaa.current_user
+        cfg.logged_in = True
+    except:
+        cfg.logged_in = False
 
     if not os.path.isdir(path) and os.path.exists(path):
         if cfg.rules.ignore_filehandler(url):

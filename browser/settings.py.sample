@@ -25,6 +25,8 @@ import bottle
 config_filename = 'pdb_config.xml'
 desc_ext = '.desc'
 display_prefix = 'display/'
+editor_prefix = 'editor/'
+updater_prefix = 'updater/'
 asset_path = '/assets'
 
 # Use random secure number, and keep secret!

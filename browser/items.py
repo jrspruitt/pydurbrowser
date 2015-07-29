@@ -20,9 +20,8 @@
 
 import os
 import time
-from markdown import markdown
 from browser.utils import get_filesize
-from browser.settings import desc_ext
+from browser.description import get_desc
 
 class item_desc(object):
     """Item object
@@ -98,7 +97,7 @@ def _create_item(name, url, path, config):
     item.path = path
     item.name = name
     item.url = url
-    item.desc = ''
+    item.desc = get_desc(item, config)
 
     try:
         item.mtime = time.ctime(os.path.getmtime(path))
@@ -106,16 +105,6 @@ def _create_item(name, url, path, config):
     except:
         item.mtime = ''
         item.size = ''
-
-    desc_path = '%s%s' % (item.path, desc_ext)
-
-    if os.path.exists(desc_path):
-        with open(desc_path, 'r') as f:
-            try:
-                item.desc = markdown(f.read().decode('utf-8'), ['tables'])
-            except:
-                f.seek(0)
-                item.desc = f.read()
 
     for module in config.list_plugins:
         plugin = module['plugin']

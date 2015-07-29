@@ -10,5 +10,7 @@
         <span class="first_color">Size:</span> <span class="second_color">{{ xfile.size }}</span><br />
         <span class="first_color">Modified Date:</span> <span class="second_color">{{ xfile.mtime }}</span><br />
     </div>
+    % if xfile.desc:
     <div class="display_desc">{{! xfile.desc }}</div>
+    % end
 </div>

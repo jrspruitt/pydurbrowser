@@ -19,8 +19,8 @@
 ##############################################################################
 
 import os
-from markdown import markdown
-from browser.settings import desc_ext, data_path
+from browser.description import get_desc
+from browser.settings import data_path
 
 class xfile(object):
     """Create file object
@@ -49,16 +49,8 @@ class xfile(object):
         self.path = os.path.join(data_path(), self.url)
         self.name = os.path.basename(self.path)
         self.display = None
-        self.desc = 'No description available.'
+        self.desc = get_desc(self, config)
 
-        desc_path = '%s%s' % (self.path, desc_ext)
-        if os.path.exists(desc_path):
-            with open(desc_path, 'r') as f:
-                try:
-                    self.desc = markdown(f.read())
-                except:
-                    f.seek(0)
-                    self.desc = f.read()
 
         for module in config.display_plugins:
             plugin = module['plugin']
