@@ -1,7 +1,7 @@
 ##############################################################################
 #    PyDurBrowser
 #
-#    Copyright (c) 2014 Jason Pruitt <jrspruitt@gmail.com>
+#    Copyright (c) 2015 Jason Pruitt <jrspruitt@gmail.com>
 #
 #    This file is part of PyDurBrowser.
 #    PyDurBrowser is free software: you can redistribute it and/or modify
@@ -17,30 +17,30 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyDurBrowser.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
-
 import os
-from lxml import etree
-from bottle import template
-from browser.utils import display_url
-from browser.settings import display_prefix
+import bottle
+from browser.plugins import load_plugins
 
-name = 'bookmarks'
-weight = 100
+def editor(url):
+    filename = os.path.basename(url)
+    modules = load_plugins(['all'], 'editors')
 
-def check(item):
-    return item.name.startswith('pdb_bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)
+    for module in modules:
+        plugin = module['plugin']
 
-def handler(item, config):
-    root = etree.parse(item.path).getroot()
-    title = '' 
+        if plugin.check(filename):
+            return plugin.editor(url)
 
-    if root.find('channel/title') is not None:
-        title = root.find('channel/title').text or item.name.replace('pdb_bookmarks', '').replace('.xml', '')
-    
-    if 'bookmarks' not in title.lower():
-        title = '%s Bookmarks' % (title)
+    bottle.abort(404)
 
-    item.name = title
-    item.url = display_url(item.url)
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item, config=config)
+def updater(url):
+    filename = os.path.basename(url)
+    modules = load_plugins(['all'], 'editors')
+
+    for module in modules:
+        plugin = module['plugin']
+
+        if plugin.check(filename):
+            return plugin.updater(url)
+
+    bottle.abort(404)

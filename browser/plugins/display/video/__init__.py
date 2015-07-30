@@ -25,6 +25,8 @@ from bottle import template
 from browser.utils import get_filesize
 from browser.settings import get_css
 
+weight = 100
+
 def check(xfile):
     ext = os.path.splitext(xfile.name)[1]
     exts = ['ogv', 'm4v', 'mp4', 'webmv']

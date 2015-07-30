@@ -39,6 +39,12 @@ def load_plugins(plugins, ptype='list'):
         except Exception, e:
             print '%s failed to load: %s' % (plugin, e)
 
+    try:
+        modules.sort(key=lambda x: x['plugin'].weight, reverse=True)
+    except Exception, e:
+        print e
+        pass
+
     return modules
 
 
@@ -55,30 +61,18 @@ def get_dot_paths(plugins, ptype):
     Notes: If plugin name prefixed with - and all is in list.
            That plugin will not be added.
     """
-    default = []
-    blacklist = []
+
     mod_dot = 'browser.plugins.%s' % ptype
     plugin_path = 'browser/plugins/%s' % ptype
-
-    if ptype == 'list':
-        default = ['dir', 'file']
-
     plugin_list = []
 
-    if not plugins:
-        for plugin in default:
-            plugin_list.append('%s.%s' % (mod_dot, plugin))
-
-    elif 'all' in plugins:
+    if 'all' in plugins:
         del plugins[plugins.index('all')]
-        temp_list = default
+        temp_list = []
         for item in os.listdir(plugin_path):
             temp_list.append(os.path.splitext(item)[0])
 
         for item in temp_list:
-            if item in blacklist:
-                continue
-
             if item.startswith('_'):
                 continue
 

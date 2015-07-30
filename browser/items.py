@@ -110,9 +110,10 @@ def _create_item(name, url, path, config):
         plugin = module['plugin']
         mod_name = module['name']
 
-        if plugin.name not in ['dir', 'file'] and plugin.check(item):
+        if plugin.check(item):
             plugin.handler(item, config)
             return [mod_name, item]
+    """
     else:
         # These run last, because so greedy.
         for module in config.list_plugins:
@@ -122,5 +123,5 @@ def _create_item(name, url, path, config):
             if plugin.name in ['dir', 'file'] and plugin.check(item):
                 plugin.handler(item, config)
                 return [mod_name, item]
-
+    """
     return [None, None]

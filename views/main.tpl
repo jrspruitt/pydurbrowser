@@ -1,4 +1,6 @@
-% from browser.settings import tracking_code, editor_prefix
+% import os
+% from browser.page import page
+% from browser.settings import tracking_code, editor_prefix, config_filename
 <!DOCTYPE html>
 <html>
     <head>
@@ -32,9 +34,9 @@
     </script>
     </head>
 <body>
-    % if item.config.logged_in:
+    % if item.config.logged_in and isinstance(item, page):
     % edit = 'Edit' if item.config.is_parent else 'New'
-        <a href="{{'/%s%s' % (editor_prefix.rstrip('/'), item.config.url) }}/pdb_config.xml">{{ edit }} Config</a><br />
+        <a href="{{'/%s' % (os.path.join(editor_prefix, item.config.url, config_filename)) }}">{{ edit }} Config</a><br />
     % end
     <div class="heading_container">
     	% if item.config.head_img:

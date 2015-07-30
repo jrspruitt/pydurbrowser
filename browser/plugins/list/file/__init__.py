@@ -24,6 +24,7 @@ from browser.utils import display_url
 
 # Unique list plugin name.
 name = 'file'
+weight = 1
 
 def check(item):
     """Determine if item should be handled by this plugin.

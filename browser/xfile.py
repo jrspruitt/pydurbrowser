@@ -51,12 +51,12 @@ class xfile(object):
         self.display = None
         self.desc = get_desc(self, config)
 
-
         for module in config.display_plugins:
             plugin = module['plugin']
 
             if plugin.check(self):
                 plugin.handler(self)
+                break
 
     def __iter__(self):
         for key in dir(self):
