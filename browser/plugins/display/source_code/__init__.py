@@ -24,7 +24,7 @@ import time
 from bottle import template
 from browser.settings import config_filename
 
-weight = 2
+match = 2
 
 def check(xfile):
     if xfile.name == config_filename:

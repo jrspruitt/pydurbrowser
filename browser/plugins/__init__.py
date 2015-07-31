@@ -40,9 +40,8 @@ def load_plugins(plugins, ptype='list'):
             print '%s failed to load: %s' % (plugin, e)
 
     try:
-        modules.sort(key=lambda x: x['plugin'].weight, reverse=True)
-    except Exception, e:
-        print e
+        modules.sort(key=lambda x: x['plugin'].match, reverse=True)
+    except:
         pass
 
     return modules

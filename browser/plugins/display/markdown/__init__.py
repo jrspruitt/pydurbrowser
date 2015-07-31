@@ -25,7 +25,7 @@ from bottle import template
 from markdown import markdown
 from browser.settings import get_css
 
-weight = 100 
+match = 100 
 
 def check(xfile):
     try:

@@ -37,7 +37,7 @@ def handler(page):
     handler.
     """
     items = get_items(page.config)
-    
+
     for plugin in page.config.list_plugins:
         if plugin['name'] in items:
             page.items += items[plugin['name']]

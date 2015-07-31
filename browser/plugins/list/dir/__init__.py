@@ -24,7 +24,8 @@ from browser.config.rules import rules
 from browser.settings import config_filename
 
 name = 'dir'
-weight = 1
+match = 1
+order = 1
 
 def check(item):        
     return os.path.isdir(item.path)

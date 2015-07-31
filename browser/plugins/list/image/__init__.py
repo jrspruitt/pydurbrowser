@@ -23,7 +23,8 @@ from bottle import template
 from browser.utils import display_url
 
 name = 'image'
-weight = 100
+match = 100
+order = 1000
 
 def check(item):
     ext = os.path.splitext(item.name)[1]

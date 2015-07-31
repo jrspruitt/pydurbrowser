@@ -49,7 +49,6 @@ class page(object):
 
 
 def _open_readme(path, page):
-    print path
     try:
         with open(path, 'r') as f:
             page.readme = markdown(f.read().decode('utf-8'), ['tables'])

@@ -21,28 +21,22 @@ import os
 from lxml import etree
 import codecs
 import bottle
-from browser.settings import data_path, config_filename
+from browser.settings import data_path, config_filename, updater_prefix
 from browser.config import rules
 from browser.config import config as xconfig
 
-def check(url):
-    if url.endswith(config_filename):
+def check(filename):
+    if filename == config_filename:
         return True
     return False
 
 def editor(url):
-    if not url.endswith(config_filename):
-        bottle.abort(404)
-
     cfg_path = os.path.join(data_path(), url)
     config = xconfig.parse_xml(cfg_path)
     config['rules'] = rules.parse_xml(cfg_path)
     return _load_editor(url, config)
 
 def updater(url):
-    if not url.endswith(config_filename):
-        bottle.abort(404)
-
     path = os.path.join(data_path(), url)
 
     if _cfg_save(path):
@@ -76,7 +70,7 @@ def _load_editor(url, config):
         config['display']['plugins'] = ['all']
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url=url, plugins=plugins, config=config)
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config)
 
 def _cfg_save(path):
     try:

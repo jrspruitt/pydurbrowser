@@ -26,7 +26,8 @@ from browser.config.rules import rules
 from browser.settings import config_filename
 
 name = 'cgit'
-weight = 100
+match = 100
+order = 100
 
 def cgitrc_parser(path):
     lines = []

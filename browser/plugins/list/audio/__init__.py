@@ -22,7 +22,8 @@ import os
 from bottle import template
 
 name = 'audio'
-weight = 100
+match = 100
+order = 100
 
 def check(item):
     ext = os.path.splitext(item.name)[1]

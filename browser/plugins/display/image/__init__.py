@@ -30,7 +30,7 @@ from browser.config.config import get_config
 from browser.plugins import load_plugins
 from browser.plugins.list import image as pimage
 
-weight = 100
+match = 100
 
 def check(xfile):
     """Determine if file should be handled by this plugin.

@@ -1,4 +1,3 @@
-% from browser.settings import updater_prefix
 <html>
     <head>
     </head>
@@ -9,7 +8,7 @@
 textarea { height:250px; width:500px; }
 </style>
 <body>
-<form action="{{ '/%s%s' % (updater_prefix, url) }}" name="update" method="POST" enctype="multipart/form-data">
+<form action="{{ url }}" name="update" method="POST" enctype="multipart/form-data">
 <h2>General</h2>
 <div class="table">
     <div class="row">

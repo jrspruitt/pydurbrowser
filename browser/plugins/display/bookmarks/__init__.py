@@ -22,9 +22,9 @@ import os
 
 from lxml import etree
 from bottle import template
-from browser.settings import get_css, data_path, get_js
+from browser.settings import get_css, data_path, get_js, editor_prefix
 
-weight = 100
+match = 100
 
 def check(xfile):
     return xfile.name.startswith('pdb_bookmarks') and xfile.name.endswith('.xml') and os.path.isfile(xfile.path)
@@ -32,11 +32,12 @@ def check(xfile):
 
 def handler(xfile):
     bookmark = load_bookmark(xfile.path)
+    admin = {'url':'/%s%s' % (editor_prefix, xfile.url),'name':'Edit Bookmarks'}
     xfile.config.meta.append('<link rel="alternate" type="application/rss+xml" title="%s" href="/%s" />' % (bookmark['title'], xfile.url))
     xfile.config.js.append(get_js('list.js'))
     xfile.config.css.append(get_css('list.css'))
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile, bookmark=bookmark)
+    xfile.display = template(tpl_path, xfile=xfile, bookmark=bookmark, admin=admin)
 
 def load_bookmark(path):
     ret = {'title':'Bookmarks',

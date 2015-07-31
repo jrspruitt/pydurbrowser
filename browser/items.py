@@ -88,6 +88,11 @@ def get_items(config):
     for itype in items:
         items[itype] = sorted(items[itype], key=lambda x: x.name)
 
+    try:
+        config.list_plugins.sort(key=lambda x: x['plugin'].order)
+    except:
+        pass
+
     return items
 
 
@@ -113,15 +118,5 @@ def _create_item(name, url, path, config):
         if plugin.check(item):
             plugin.handler(item, config)
             return [mod_name, item]
-    """
-    else:
-        # These run last, because so greedy.
-        for module in config.list_plugins:
-            plugin = module['plugin']
-            mod_name = module['name']
 
-            if plugin.name in ['dir', 'file'] and plugin.check(item):
-                plugin.handler(item, config)
-                return [mod_name, item]
-    """
     return [None, None]

@@ -25,7 +25,8 @@ from browser.utils import display_url
 from browser.settings import display_prefix
 
 name = 'bookmarks'
-weight = 100
+match = 100
+order = 1000
 
 def check(item):
     return item.name.startswith('pdb_bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)

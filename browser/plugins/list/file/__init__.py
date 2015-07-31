@@ -24,7 +24,12 @@ from browser.utils import display_url
 
 # Unique list plugin name.
 name = 'file'
-weight = 1
+
+# Order in which to check plugins, lower numbers are lower on the list
+# and should be used on more ambigious checks. 
+match = 2
+# Same as match, but for order items are listed on web page lower = sooner.
+order = 2
 
 def check(item):
     """Determine if item should be handled by this plugin.
