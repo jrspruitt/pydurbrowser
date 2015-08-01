@@ -39,17 +39,14 @@ def get_config(url):
     url                Requested URL.
     path               Abs path of requested item, parent dir if file.
     files              List of all config files in path.
-    is_parent          If config found is parent.
+    is_parent          If this dir has the parent config.
     parent_url         Title link URL.
     show_nav           If to show Up link URL.
     head_img_link      Directory of head_img having config file.
     logged_in          If user is logged in or not.
-
-    uid                Unique ID (future use?).
+    inherit            If child dirs should inherit page type and list/display
     rules              Rules object.
     page               {'type':'default, img_gallery, 'src':'filename'}
-
-    inherit            Should sub dirs inherit from this config.
     list_plugins       List plugins.
     display_plugins    Display plugins.
     title              Title from config.
@@ -154,8 +151,8 @@ def parse_xml(path, is_parent = True):
     ret = {'title':'Site Title',
            'head_img':'',
            'desc':'Site Description',
-           'readme':readme_default,
            'inherit':'0',
+           'readme':readme_default,
            'page':{'src': '', 'type':'default'},
            'list':{'plugins':[]},
            'display':{'plugins':[]},
@@ -183,12 +180,11 @@ def parse_xml(path, is_parent = True):
 
     if root.find('readme') is not None:
         ret['readme'] = root.find('readme').text or readme_default
-  
-    if root.find('inherit') is not None:
-        ret['inherit'] =  root.find('inherit').text or '0'
 
- 
-    if ret['inherit'] or is_parent:
+    if root.find('inherit') is not None:
+        ret['inherit'] = root.find('inherit').text or '0'
+
+    if ret['inherit'] == '1' or is_parent:
         page = root.find('page')
 
         if page is not None:
@@ -204,16 +200,15 @@ def parse_xml(path, is_parent = True):
                 if listp.text is not None:
                     ret['list']['plugins'].append(plugin.text)
 
-            if len(ret['list']['plugins']) == 0:
-                ret['list']['plugins'] = ['dir', 'file']
-
         display = root.find('display')
         if display is not None:
             for plugin in display.iterfind('plugin'):
                 if plugin.text is not None:
                     ret['display']['plugins'].append(plugin.text)
 
-        
+    else:
+        ret['list']['plugins'] = ['dir', 'file']
+
     heading = root.find('heading')
     if heading is not None:
         if heading.find('meta') is not None:
@@ -242,10 +237,10 @@ class _config(object):
         attrs = ['is_parent',
                  'files',
                  'title',
+                 'readme',
                  'head_img',
                  'desc',
                  'inherit',
-                 'uid',
                  'nav_link',
                  'css',
                  'js',
@@ -270,8 +265,6 @@ class _config(object):
         for key in dir(self):
             if not key.startswith('_'):
                 yield key, getattr(self, key)
-
-
 
 def gather_configs(path, files):
     path = path.rstrip('/')

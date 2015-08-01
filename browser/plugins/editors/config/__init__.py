@@ -45,7 +45,12 @@ def updater(url):
         return "Failed to save config."
 
 def _load_editor(url, config):
-    if not os.access(os.path.join(data_path(), url), os.W_OK):
+    path = os.path.join(data_path(), url)
+
+    if not os.path.exists(path):
+        path = os.path.dirname(path)
+
+    if not os.access(path, os.W_OK):
         return 'Need write privleges on %s' % url
 
     plugins = {}

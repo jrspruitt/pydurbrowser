@@ -28,8 +28,7 @@ from browser.plugins.page.img_gallery import item
 def handler(page):
     img_plugin = 'browser.plugins.page.img_gallery.item'
 
-    page.config.list_plugins.append({'name':img_plugin, 'plugin':item})
-
+    page.config.list_plugins.insert(0, {'name':img_plugin, 'plugin':item})
     page.config.rules.ignore_dirs = "/_thumbnails$"
 
     items = get_items(page.config)

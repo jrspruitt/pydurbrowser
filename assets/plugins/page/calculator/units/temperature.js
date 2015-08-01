@@ -16,16 +16,6 @@
  * along with Mechcalc.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// temperature
-// with no easy conversion number functions are required for conv:
-// app_calc.js convert_input() check for a function, calls with id
-// if available
-
-//if(!mc.units){ mc.units = new Object();}
-//mc.units['temperature'] = new Object();
-
-// default unit for internal conversion if none specified
-//mc.units['temperature'].convert_to = 'K';
 function temperature(){
 mc.units['temperature']['K'] = {label:'', idx:0, conv: 
 function(value, to){
