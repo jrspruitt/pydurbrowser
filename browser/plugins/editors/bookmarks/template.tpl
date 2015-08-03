@@ -48,9 +48,10 @@
         <td>Description:&nbsp;&nbsp;</td><td><input type="text" name="description" value="{{ bookmarks['description'] }}" /></td>
     </tr>
     <tr>
-        <td>Link:</td><td><input type="text" name="link" value="{{ bookmarks['link'] }}" /></td>
+        <td>Link*:</td><td><input type="text" name="link" value="{{ bookmarks['link'] }}" /></td>
     </tr>
 </table>
+*Will be automatically generated if not specified.
 <br />
 <h2>Bookmarks:</h2>
 <a href="javascript:add_bookmark();">Add Bookmark</a><br /><br /><br />

@@ -31,7 +31,7 @@ def check(xfile):
 
 
 def handler(xfile):
-    bookmark = load_bookmark(xfile.path)
+    bookmark = load_bookmark(xfile)
     admin = {'url':'/%s%s' % (editor_prefix, xfile.url),'name':'Edit Bookmarks'}
     xfile.config.meta.append('<link rel="alternate" type="application/rss+xml" title="%s" href="/%s" />' % (bookmark['title'], xfile.url))
     xfile.config.js.append(get_js('list.js'))
@@ -39,7 +39,8 @@ def handler(xfile):
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
     xfile.display = template(tpl_path, xfile=xfile, bookmark=bookmark, admin=admin)
 
-def load_bookmark(path):
+def load_bookmark(xfile):
+    path = xfile.path
     ret = {'title':'Bookmarks',
            'description':'',
            'link':path.replace(data_path(), ''),
@@ -50,8 +51,10 @@ def load_bookmark(path):
         ret['title'] = root.find('channel/title').text
 
     if root.find('channel/description') is not None:
-        ret['description'] = root.find('channel/description').text
+        ret['description'] = root.find('channel/description').text or ''
 
+    if root.find('channel/link') is not None:
+        ret['link'] = root.find('channel/link').text or xfile.url 
 
     for rssxfile in root.iterfind('channel/item'):
         title = rssxfile.find('title').text
