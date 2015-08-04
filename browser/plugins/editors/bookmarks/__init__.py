@@ -22,18 +22,23 @@ import re
 from lxml import etree
 import codecs
 import bottle
-from browser.settings import data_path, config_filename, updater_prefix
-from browser.config import rules
-from browser.config import config as xconfig
+from browser.settings import data_path, updater_prefix
+from browser.editors import check_url
 
-def check(filename):
-    return filename.startswith('pdb_bookmarks') and filename.endswith('.xml')
+def check(url):
+    return os.path.basename(url).startswith('pdb_bookmarks') and url.endswith('.xml')
 
 def editor(url):
+    check_url(url)
     return _load_editor(url)
 
 def updater(url):
+    check_url(url)
     path = os.path.join(data_path(), url)
+
+    if _get_var('delete') == 'delete':
+        os.remove(path)
+        return bottle.redirect('/%s' % (os.path.dirname(url)))
 
     if _cfg_save(path):
         return bottle.redirect('/%s' % (os.path.dirname(url)))
@@ -41,31 +46,28 @@ def updater(url):
         return "Failed to save config."
 
 def _load_editor(url):
-    if not os.access(os.path.join(data_path(), url), os.W_OK):
-        return 'Need write privleges on %s' % url
-
-
     bookmarks = {'title':'Bookmarks',
                 'description':'',
                 'link':'',
                 'items':[]}
     try:
         path = os.path.join(data_path(), url)
-        root = etree.parse(path).getroot()
-
-        if root.find('channel/title') is not None:
-            bookmarks['title'] = root.find('channel/title').text or 'Bookmarks'
-
-        if root.find('channel/description') is not None:
-            bookmarks['description'] = root.find('channel/description').text or ''
-
-        if root.find('channel/link') is not None:
-            bookmarks['link'] = root.find('channel/link').text or ''
-
-        for item in root.iterfind('channel/item'):
-            bookmarks['items'].append({'title':item.find('title').text or '',
-                                       'link':item.find('link').text or '',
-                                       'description':item.find('description').text or ''})
+        if os.path.exists(path):
+            root = etree.parse(path).getroot()
+    
+            if root.find('channel/title') is not None:
+                bookmarks['title'] = root.find('channel/title').text or 'Bookmarks'
+    
+            if root.find('channel/description') is not None:
+                bookmarks['description'] = root.find('channel/description').text or ''
+    
+            if root.find('channel/link') is not None:
+                bookmarks['link'] = root.find('channel/link').text or ''
+    
+            for item in root.iterfind('channel/item'):
+                bookmarks['items'].append({'title':item.find('title').text or '',
+                                           'link':item.find('link').text or '',
+                                           'description':item.find('description').text or ''})
 
     except Exception, e:
         print e
@@ -140,7 +142,6 @@ def _cfg_save(path):
         rss_xml.append(root)
 
         xml_buf = etree.tostring(rss_xml, encoding=unicode, pretty_print=True)
-
         f = codecs.open('%s' % path, 'w', encoding="utf-8")
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n%s' % xml_buf)
         f.close()

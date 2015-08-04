@@ -32,14 +32,18 @@ def check(item):
     return item.name.startswith('pdb_bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)
 
 def handler(item, config):
-    root = etree.parse(item.path).getroot()
-    title = '' 
-
-    if root.find('channel/title') is not None:
-        title = root.find('channel/title').text or item.name.replace('pdb_bookmarks', '').replace('.xml', '')
+    try:
+        root = etree.parse(item.path).getroot()
+        title = '' 
     
-    if 'bookmarks' not in title.lower():
-        title = '%s Bookmarks' % (title)
+        if root.find('channel/title') is not None:
+            title = root.find('channel/title').text or item.name.replace('pdb_bookmarks', '').replace('.xml', '')
+        
+        if 'bookmarks' not in title.lower():
+            title = '%s Bookmarks' % (title)
+
+    except:
+        title = 'Bookmarks'
 
     item.name = title
     item.url = display_url(item.url)

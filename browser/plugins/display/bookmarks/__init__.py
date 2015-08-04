@@ -32,7 +32,16 @@ def check(xfile):
 
 def handler(xfile):
     bookmark = load_bookmark(xfile)
-    admin = {'url':'/%s%s' % (editor_prefix, xfile.url),'name':'Edit Bookmarks'}
+    admin = None
+
+    if xfile.config.logged_in:
+        try:
+            import browser.plugins.editors.bookmarks
+            admin = {'url':'/%s%s' % (editor_prefix, xfile.url),'name':'Edit Bookmarks'}
+        except ImportError, e:
+            pass
+
+
     xfile.config.meta.append('<link rel="alternate" type="application/rss+xml" title="%s" href="/%s" />' % (bookmark['title'], xfile.url))
     xfile.config.js.append(get_js('list.js'))
     xfile.config.css.append(get_css('list.css'))
@@ -43,23 +52,25 @@ def load_bookmark(xfile):
     path = xfile.path
     ret = {'title':'Bookmarks',
            'description':'',
-           'link':path.replace(data_path(), ''),
+           'link':xfile.url,
            'items':[]}
-
-    root = etree.parse(path).getroot()
-    if root.find('channel/title') is not None:
-        ret['title'] = root.find('channel/title').text
-
-    if root.find('channel/description') is not None:
-        ret['description'] = root.find('channel/description').text or ''
-
-    if root.find('channel/link') is not None:
-        ret['link'] = root.find('channel/link').text or xfile.url 
-
-    for rssxfile in root.iterfind('channel/item'):
-        title = rssxfile.find('title').text
-        link = rssxfile.find('link').text
-        desc = rssxfile.find('description').text
-        ret['items'].append({'title':title, 'link':link, 'description':desc})
+    try:
+        root = etree.parse(path).getroot()
+        if root.find('channel/title') is not None:
+            ret['title'] = root.find('channel/title').text
+    
+        if root.find('channel/description') is not None:
+            ret['description'] = root.find('channel/description').text or ''
+    
+        if root.find('channel/link') is not None:
+            ret['link'] = root.find('channel/link').text or xfile.url 
+    
+        for rssxfile in root.iterfind('channel/item'):
+            title = rssxfile.find('title').text
+            link = rssxfile.find('link').text
+            desc = rssxfile.find('description').text
+            ret['items'].append({'title':title, 'link':link, 'description':desc})
+    except:
+        pass
 
     return ret

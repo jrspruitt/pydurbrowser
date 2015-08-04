@@ -20,33 +20,27 @@
 import os
 import bottle
 from browser.settings import data_path, desc_ext, updater_prefix
-from browser.config import rules
-from browser.config import config as xconfig
+from browser.editors import check_url
 
 def check(url):
-    if url.endswith(desc_ext):
+    if os.path.splitext(url)[1][1:] in ['md','markdown','mkd','mkdown', desc_ext]:
         return True
     return False
 
 def editor(url):
-    if not url.endswith(desc_ext):
-        bottle.abort(404)
-
+    check_url(url)
     path = os.path.join(data_path(), url)
     text = ''
 
     if os.path.exists(path):
         with open(path, 'r') as f:
             text = f.read()
-    
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
     return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
 
 def updater(url):
-    if not url.endswith(desc_ext):
-        bottle.abort(404)
-
+    check_url(url)
     path = os.path.join(data_path(), url)
     text = '%s' % bottle.request.POST.get('text', '')
 
@@ -58,7 +52,7 @@ def updater(url):
             with open(path, 'w') as f:
                 f.write(text)
 
-    except Exception, e:
+    except:
         return "Failed to save file."
 
     return bottle.redirect('/%s' % (os.path.dirname(url)))

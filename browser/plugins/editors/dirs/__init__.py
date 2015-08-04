@@ -17,46 +17,30 @@
 #    You should have received a copy of the GNU General Public License
 #    along with PyDurBrowser.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
-
 import os
 import bottle
-from browser.plugins import load_plugins
 from browser.settings import data_path
+from browser.editors import check_url
 
-def _check_perms(url):
-    path = os.path.join(data_path(), url)
-    tpath = path
-    if not os.path.exists(path):
-        tpath = os.path.dirname(path)
+def check(url):
+    if url.startswith('createdirectory'):
+        return True
+    return False
 
-    if not os.access(tpath, os.W_OK):
-        bottle.abort(403, 'Need write privileges.')
-
-def check_url(url):
-    _check_perms(url)
-    path = os.path.join(data_path(), url)
-
-    if not os.path.abspath(path).startswith(data_path()):
-        bottle.abort(403, 'This path is outside my comfort zone.')
-    
 def editor(url):
-    modules = load_plugins(['all'], 'editors')
+    url = url[len('createdirectory/'):]
+    check_url(url)
+    path = os.path.join(data_path(), url)
 
-    for module in modules:
-        plugin = module['plugin']
+    if os.path.exists(path):
+        bottle.abort(403, 'Path already exists.')
 
-        if plugin.check(url):
-            return plugin.editor(url)
+    try:
+        os.mkdir(path)
+    except:
+        bottle.abort(403, 'Problem creating directory.')
 
-    bottle.abort(403, 'Bad action requested.')
+    return bottle.redirect('/%s' % (os.path.dirname(url)))
 
 def updater(url):
-    modules = load_plugins(['all'], 'editors')
-
-    for module in modules:
-        plugin = module['plugin']
-
-        if plugin.check(url):
-            return plugin.updater(url)
-
-    bottle.abort(403, 'Bad action requested.')
+    return bottle.redirect('/%s' % (os.path.dirname(url)))

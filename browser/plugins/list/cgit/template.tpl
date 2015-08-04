@@ -1,9 +1,13 @@
+% from browser.settings import editor_prefix
        <div class="tr">
             <div class="items item_name td item_file">
                 <a href="/git/{{ item.url }}/">{{ item.name }}</a>
                 % if hasattr(item, 'repo') or item.desc:
 	                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')">[+]</a>
 	                <div id="{{ item.name }}" class="desc">
+	                   % if config.logged_in:
+	                   <a href="/{{ editor_prefix }}{{ item.url }}">Edit CGit</a><br />
+	                   % end
 					    % if item.desc:
 					    	{{! item.desc }}<br /><br />
 					    % end

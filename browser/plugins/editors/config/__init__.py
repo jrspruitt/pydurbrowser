@@ -24,20 +24,27 @@ import bottle
 from browser.settings import data_path, config_filename, updater_prefix
 from browser.config import rules
 from browser.config import config as xconfig
+from browser.editors import check_url
 
-def check(filename):
-    if filename == config_filename:
+def check(url):
+    if os.path.basename(url) == config_filename:
         return True
     return False
 
 def editor(url):
+    check_url(url)
     cfg_path = os.path.join(data_path(), url)
     config = xconfig.parse_xml(cfg_path)
     config['rules'] = rules.parse_xml(cfg_path)
     return _load_editor(url, config)
 
 def updater(url):
+    check_url(url)
     path = os.path.join(data_path(), url)
+
+    if _get_var('delete') == 'delete':
+        os.remove(path)
+        return bottle.redirect('/%s' % (os.path.dirname(url)))
 
     if _cfg_save(path):
         return bottle.redirect('/%s' % (os.path.dirname(url)))
@@ -45,14 +52,6 @@ def updater(url):
         return "Failed to save config."
 
 def _load_editor(url, config):
-    path = os.path.join(data_path(), url)
-
-    if not os.path.exists(path):
-        path = os.path.dirname(path)
-
-    if not os.access(path, os.W_OK):
-        return 'Need write privleges on %s' % url
-
     plugins = {}
     plugins['page'] = []
     plugins['list'] = []

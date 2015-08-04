@@ -7,7 +7,11 @@ def get_desc(item, config):
         dtext = ''
 
         if config.logged_in:
-            dtext = '<a href="/%s%s%s">Edit</a><br />' % (editor_prefix, item.url, desc_ext)
+            try:
+                import browser.plugins.editors.markdown
+                dtext = '<a href="/%s%s%s">Edit</a><br />' % (editor_prefix, item.url, desc_ext)
+            except ImportError, e:
+                pass
 
         if os.path.exists(desc_path):
             with open(desc_path, 'r') as f:

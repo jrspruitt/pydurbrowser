@@ -131,4 +131,4 @@ def handler(item, config):
         pass
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item)
+    item.display = template(tpl_path, item=item, config=config)

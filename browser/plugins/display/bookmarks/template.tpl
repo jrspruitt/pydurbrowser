@@ -18,7 +18,7 @@
             </ul>
             % end
         <br />
-        % if xfile.config.logged_in:
+        % if admin:
         <div><a href="{{ admin['url'] }}">{{ admin['name'] }}</a></div>
         % end
         </div>

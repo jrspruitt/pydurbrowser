@@ -23,16 +23,11 @@ import time
 
 from bottle import template
 from markdown import markdown
-from browser.settings import get_css
+from browser.settings import get_css, editor_prefix
 
 match = 100 
 
 def check(xfile):
-    try:
-        import markdown
-    except ImportError, e:
-        return False
-
     ext = os.path.splitext(xfile.name)[1]
     exts = ['md','markdown','mkd','mkdown']
 
@@ -50,5 +45,11 @@ def handler(xfile):
             print e
             xfile.text = 'Load error.'
 
+    try:
+        import browser.plugins.editors.markdown
+        admin = {'url':'/%s%s' % (editor_prefix, xfile.url)}
+    except ImportError, e:
+        admin = None
+
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile)
+    xfile.display = template(tpl_path, xfile=xfile, admin=admin)

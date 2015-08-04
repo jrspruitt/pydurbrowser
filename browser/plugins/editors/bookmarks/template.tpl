@@ -75,6 +75,7 @@
 % i += 1
 % end
 </div>
+Delete File:<input type="checkbox" name="delete" value="delete" /><br />
 <input type="submit" value="submit" />
 </form>
 </body>

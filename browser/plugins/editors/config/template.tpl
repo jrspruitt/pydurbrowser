@@ -1,12 +1,13 @@
 <html>
     <head>
+        <title>Config Editor</title>
+        <style>
+        .table { display:table; padding:10px; border-collapse: seperate; border-spacing:10px; border:solid 1px black; }
+        .row { display:table-row; padding:10px; }
+        .cell { display:table-cell;}
+        textarea { height:250px; width:500px; }
+        </style>
     </head>
-<style>
-.table { display:table; padding:10px; border-collapse: seperate; border-spacing:10px; border:solid 1px black; }
-.row { display:table-row; padding:10px; }
-.cell { display:table-cell;}
-textarea { height:250px; width:500px; }
-</style>
 <body>
 <form action="{{ url }}" name="update" method="POST" enctype="multipart/form-data">
 <h2>General</h2>
@@ -159,6 +160,7 @@ textarea { height:250px; width:500px; }
         % end
     </div>
 </div>
+Delete File:<input type="checkbox" name="delete" value="delete" /><br />
 <input type="submit" value="submit" />
 </form>
 </body>
