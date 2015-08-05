@@ -20,7 +20,7 @@
 
 import os
 import time
-from PIL import Image
+import Image
 
 from bottle import template
 from browser.utils import get_filesize
