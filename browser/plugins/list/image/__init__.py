@@ -20,7 +20,7 @@
 
 import os
 from bottle import template
-from browser.utils import display_url
+from browser.utils import display_url, process_thumbnail
 
 name = 'image'
 match = 100
@@ -34,19 +34,11 @@ def check(item):
     return False
 
 def handler(item, config):
-    thumbs_dir = '_thumbnails'
-    turl = os.path.dirname(item.url)
-    tpath = os.path.dirname(item.path)
-    thumb_url = os.path.join(turl, thumbs_dir, item.name)
-    thumb_path = os.path.join(tpath, thumbs_dir, item.name)
-
-    if os.path.exists(thumb_path):
-        item.thumb_url = thumb_url
-    else:
-        item.thumb_url = item.url
+    process_thumbnail(item)
 
     if not config.rules.ignore_filehandler(item.path):
         item.url = display_url(item.url)    
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
     item.display = template(tpl_path, item=item)
+

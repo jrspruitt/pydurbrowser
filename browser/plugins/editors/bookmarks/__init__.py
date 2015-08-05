@@ -38,10 +38,10 @@ def updater(url):
 
     if _get_var('delete') == 'delete':
         os.remove(path)
-        return bottle.redirect('/%s' % (os.path.dirname(url)))
+        return bottle.redirect('/%s' % (url))
 
     if _cfg_save(path):
-        return bottle.redirect('/%s' % (os.path.dirname(url)))
+        return bottle.redirect('/%s' % (url))
     else:
         return "Failed to save config."
 

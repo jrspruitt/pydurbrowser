@@ -19,7 +19,7 @@
 ##############################################################################
 import os
 import bottle
-from browser.settings import data_path, desc_ext, updater_prefix
+from browser.settings import data_path, desc_ext, updater_prefix, display_prefix
 from browser.editors import check_url
 
 def check(url):
@@ -43,11 +43,13 @@ def updater(url):
     check_url(url)
     path = os.path.join(data_path(), url)
     text = '%s' % bottle.request.POST.get('text', '')
+    redirect_url = '/%s%s' % (display_prefix, url)
 
     try:
         if text == '':
             if os.path.exists(path) and os.path.isfile(path):
                 os.remove(path)
+                redirect_url = '/%s' % (os.path.dirname(url))
         else:
             with open(path, 'w') as f:
                 f.write(text)
@@ -55,6 +57,6 @@ def updater(url):
     except:
         return "Failed to save file."
 
-    return bottle.redirect('/%s' % (os.path.dirname(url)))
+    return bottle.redirect(redirect_url)
 
     

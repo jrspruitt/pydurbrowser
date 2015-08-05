@@ -19,6 +19,7 @@
 ##############################################################################
 
 import os
+from PIL import Image
 from browser.settings import display_prefix
 
 def display_url(path):
@@ -47,4 +48,42 @@ def get_filesize(path):
     except:
         return ''
         
-    
+
+def process_thumbnail(item):
+    twidth = 320
+    theight = 240
+    thumbs_dir = os.path.join(os.path.dirname(item.path), '_thumbnails')
+    thumb_path = os.path.join(thumbs_dir, item.name)
+    thumb_url = os.path.join(os.path.dirname(item.url), '_thumbnails', item.name)
+    item.thumb_url = thumb_url
+
+    if not os.path.exists(thumbs_dir):
+        try:
+            os.mkdir(thumbs_dir)
+        except:
+            return
+
+
+    try:
+        im = Image.open(item.path)
+        width = im.size[0]
+        height = im.size[1]
+
+        if height > width:
+            width = int((float(theight) / float(height)) * width)
+            height = int(theight)
+        else:
+            height = int((float(twidth) / float(width)) * height)
+            width = twidth
+
+        item.width = width
+        item.height = height
+
+        if os.path.exists(thumb_path):
+            return
+
+        size = (width, height)
+        im_resize = im.resize(size, Image.ANTIALIAS)
+        im_resize.save(thumb_path)
+    except:
+        item.thumb_url = item.url
