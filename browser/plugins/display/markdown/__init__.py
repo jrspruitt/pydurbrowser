@@ -46,8 +46,10 @@ def handler(xfile):
             xfile.text = 'Load error.'
 
     try:
-        import browser.plugins.editors.markdown
-        admin = {'url':'/%s%s' % (editor_prefix, xfile.url)}
+        admin = None
+        if xfile.config.logged_in:
+            import browser.plugins.editors.markdown
+            admin = {'url':'/%s%s' % (editor_prefix, xfile.url)}
     except ImportError, e:
         admin = None
 

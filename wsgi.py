@@ -35,16 +35,25 @@ from browser.page import page
 from browser.xfile import xfile
 #from browser.dataport import dataport
 from browser.editors import editor, updater
-
     
 # Use users.json and roles.json in the local example_conf directory
 aaa = Cork('auth', email_sender='', smtp_url='')
 
 # alias the authorization decorator with defaults
-authorize = aaa.make_auth_decorator(fail_redirect="/login", role="user")
+authorize = aaa.make_auth_decorator(fail_redirect="/login", role="admin")
 
 def post_get(name, default=''):
     return bottle.request.POST.get(name, default).strip()
+
+@bottle.route('/%s<url:path>' % editor_prefix)
+@authorize()
+def adm_editor(url=''):
+    return editor(url)
+
+@bottle.post('/%s<url:path>' % updater_prefix)
+@authorize()
+def adm_updater(url=''):
+    return updater(url)
 
 @bottle.post('/login')
 def adm_login():
@@ -62,16 +71,6 @@ def adm_logout():
 def adm_login_form():
     """Serve login form"""
     return {}
-
-@authorize()
-@bottle.route('/%s<url:path>' % editor_prefix)
-def adm_editor(url=''):
-    return editor(url)
-
-@authorize()
-@bottle.post('/%s<url:path>' % updater_prefix)
-def adm_updater(url=''):
-    return updater(url)
 
 @bottle.route('/favicon.ico')
 def favicon():
@@ -154,14 +153,15 @@ def index(url=''):
 
     bottle.abort(404, 'Bad path.')
 
+
+
 application = bottle.default_app()
 session_opts = {
     'session.cookie_expires': True,
-    'session.encrypt_key': session_key,
+    'session.encrypt_key': "1", #session_key,
     'session.httponly': True,
-    'session.timeout': 3600 * 24,  # 1 day
+    'session.timeout': 3600 * 24,   #1 day
     'session.type': 'cookie',
     'session.validate_key': True,
 }
 application = SessionMiddleware(application, session_opts)
-
