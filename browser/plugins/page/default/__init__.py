@@ -43,6 +43,6 @@ def handler(page):
             page.items += items[plugin['name']]
 
     page.config.js.append(get_js('list.js'))
-    page.config.css.append(get_css('list.css'))
+    page.config.css.append(get_css('list.css', page))
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
     page.display = template(tpl_path, page=page)

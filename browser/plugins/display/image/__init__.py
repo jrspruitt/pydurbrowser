@@ -68,7 +68,7 @@ def handler(xfile):
     img_plugin = 'browser.plugins.list.image'
     default_width = 800
     default_height = 600
-    xfile.config.css.append(get_css('media.css'))
+    xfile.config.css.append(get_css('media.css', xfile))
     config = get_config(os.path.dirname(xfile.url))
     config.list_plugins = [{'name':img_plugin, 'plugin':pimage}]
     items = get_items(config)

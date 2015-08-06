@@ -55,7 +55,7 @@ def check(item):
     if not os.path.isdir(item.path):
         return False
 
-    ret = os.system('git rev-parse --resolve-git-dir %s 2>&1 >/dev/null' % item.path)
+    ret = os.system('git rev-parse --resolve-git-dir "%s" 2>&1 >/dev/null' % item.path)
     if ret == 0:        
         return True
     else:

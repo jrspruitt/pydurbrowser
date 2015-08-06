@@ -1,0 +1,35 @@
+@charset "utf-8";
+.item_heading{
+    background-color:#EEEEEE;
+}
+.items{
+    padding:.1em;
+    padding-left:.2em;
+    border-bottom:solid .1em #EEEEEE;
+}
+.item_name{
+}
+.item_size{
+    min-width:5.5em;
+    width:5em;
+    border-left:solid .1em #000000;
+}
+.item_date{
+    min-width:14em;
+    width:11em;
+    border-left:solid .1em #000000;
+    padding-right:0em;
+}
+.item_dir{
+}
+.item_file{
+}
+
+.desc{
+	padding:.5em;
+	margin:.5em;
+	margin-left:.8em;
+    border:solid .1em #EEEEEE;
+    box-shadow:1px 1px 1px 1px #888888;
+	display:none;
+}

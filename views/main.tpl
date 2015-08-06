@@ -9,7 +9,7 @@
     % for meta in item.config.meta:
         {{! meta }}
     % end
-        <link href="/assets/css/site.css" rel="stylesheet" type="text/css">
+        <link href="/assets/css/{{ item.config.theme }}/site.css" rel="stylesheet" type="text/css">
     % for css in item.config.css:
         <link href="{{ css }}" rel="stylesheet" type="text/css">
     % end

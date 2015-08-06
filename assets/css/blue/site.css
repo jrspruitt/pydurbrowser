@@ -59,7 +59,7 @@ BODY {
     color:#000000;
 }
 .second_color{
-    color:#FF0000;
+    color:#0000FF;
 }
 
 .table{display:table;}
@@ -67,7 +67,7 @@ BODY {
 .td{ display:table-cell;}
 
 a {
-    color:#FF0000;
+    color:#0000FF;
     text-decoration:none;
 } 
 a:hover {
@@ -99,7 +99,7 @@ td {
     padding-left:0.5em;
     border-bottom:1px solid #EEEEEE;
 }
-.tab{
+.tab {
 	padding-left:2.5em
 }
-}
+

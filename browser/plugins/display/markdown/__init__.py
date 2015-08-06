@@ -37,7 +37,7 @@ def check(xfile):
 
 
 def handler(xfile):
-    xfile.config.css.append(get_css('media.css'))
+    xfile.config.css.append(get_css('media.css', xfile))
     with open(xfile.path, 'r') as f:
         try:
             xfile.text = markdown(f.read().decode('utf-8'), ['tables'])

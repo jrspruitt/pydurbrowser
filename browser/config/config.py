@@ -75,16 +75,6 @@ def get_config(url):
     config.is_parent = config.files[0] == os.path.join(config.path, config_filename)
     cxml = parse_xml(config.files[0], config.is_parent)
 
-    if cxml['head_img']:
-        if cxml['head_img'].lower() == 'none':
-            config.head_img = ''
-            config.head_img_link = ''
-        else:
-            config.head_img = os.path.abspath(os.path.join(config.parent_url , cxml['head_img']))
-            config.head_img_link = config.parent_url
-    else:
-        config.head_img, config.head_img_link = _get_head_img(config.files)
-
     config.title = cxml['title']
     config.desc = cxml['desc']
     config.readme = cxml['readme']
@@ -97,6 +87,21 @@ def get_config(url):
     config.style = cxml['heading']['style']        
     config.list_plugins = load_plugins(cxml['list']['plugins'], 'list')
     config.display_plugins = load_plugins(cxml['display']['plugins'], 'display')
+
+    if cxml['head_img']:
+        if cxml['head_img'].lower() == 'none':
+            config.head_img = ''
+            config.head_img_link = ''
+        else:
+            config.head_img = os.path.abspath(os.path.join(config.parent_url , cxml['head_img']))
+            config.head_img_link = config.parent_url
+    else:
+        config.head_img, config.head_img_link = _get_head_img(config.files)
+
+    if cxml['theme'] == '':
+        config.theme = _get_theme(config.files)
+    else:
+        config.theme = cxml['theme']
 
     if config.page['src'] != '':
         config.page['src'] = os.path.join(config.path, config.page['src'])
@@ -133,9 +138,33 @@ def _get_head_img(files):
             return [head_img, head_img_link]
 
         return ['','']
-    except Exception, e:
-        print e
+    except:
         return ['','']
+
+def _get_theme(files):
+    """Look through config files for parent theme.
+    
+    Args:
+        List:files    list of config files.
+    Returns:
+        Str            Theme name
+    """
+    try:
+        for cfg in files:
+            root = etree.parse(cfg).getroot()
+            theme = root.find('theme')
+
+            if theme is None:
+                continue
+
+            if theme.text is None or theme.text == '':
+                continue
+
+            return theme.text
+
+        return 'default'
+    except:
+        return ''
 
 
 def parse_xml(path, is_parent = True):
@@ -151,6 +180,7 @@ def parse_xml(path, is_parent = True):
     ret = {'title':'Site Title',
            'head_img':'',
            'desc':'Site Description',
+           'theme':'',
            'inherit':'0',
            'readme':readme_default,
            'page':{'src': '', 'type':'default'},
@@ -162,12 +192,11 @@ def parse_xml(path, is_parent = True):
                       'css':[],
                       'style':''},
        }
+
     try:
         root = etree.parse(path).getroot()
     except:
         return ret
-        #print 'Bad page config: %s' % path
-        #abort(500, 'Bad page config.')
 
     if root.find('title') is not None:
         ret['title'] = root.find('title').text or ''
@@ -180,6 +209,9 @@ def parse_xml(path, is_parent = True):
 
     if root.find('readme') is not None:
         ret['readme'] = root.find('readme').text or readme_default
+
+    if root.find('theme') is not None:
+        ret['theme'] = root.find('theme').text or ''
 
     if root.find('inherit') is not None:
         ret['inherit'] = root.find('inherit').text or '0'
@@ -238,6 +270,7 @@ class _config(object):
                  'files',
                  'title',
                  'readme',
+                 'theme',
                  'head_img',
                  'desc',
                  'inherit',

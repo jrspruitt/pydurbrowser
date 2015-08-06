@@ -50,6 +50,20 @@
    </div>
    <div class="row">
         <div class="cell">
+            Theme:
+        </div>
+        
+        <div class="cell">
+            <select name=theme>
+                <option value=""{{ ' selected=selected' if config['theme'] == '' else '' }}>Inherit</option>
+            % for theme in themes:
+                <option value="{{ theme }}"{{ ' selected=selected' if theme == config['theme'] else '' }}>{{ theme }}</option>
+            % end
+            </select>
+        </div>
+   </div>
+   <div class="row">
+        <div class="cell">
             % checked = 'checked="checked"' if config['inherit'] == '1' else ''
             Inherit:
         </div>

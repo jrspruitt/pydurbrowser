@@ -57,8 +57,8 @@ def handler(page):
         for js in ext_js:
             page.config.js.append('/assets/plugins/page/calculator/units/%s' % js)
             
-        page.config.css.append(get_css('media.css'))
-        page.config.css.append(get_css('list.css'))
+        page.config.css.append(get_css('media.css', page))
+        page.config.css.append(get_css('list.css', page))
     
         calc_tpl = os.path.join(os.path.dirname(__file__), 'templates/calc_js.tpl')
         page.config.script = template(calc_tpl, config=calc, ext_js=ext_js)

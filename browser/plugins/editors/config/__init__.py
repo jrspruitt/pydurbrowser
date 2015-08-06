@@ -21,7 +21,7 @@ import os
 from lxml import etree
 import codecs
 import bottle
-from browser.settings import data_path, config_filename, updater_prefix
+from browser.settings import data_path, config_filename, updater_prefix, css_path
 from browser.config import rules
 from browser.config import config as xconfig
 from browser.editors import check_url
@@ -73,8 +73,13 @@ def _load_editor(url, config):
     if len(config['display']['plugins']) == len(plugins['display']):
         config['display']['plugins'] = ['all']
 
+    themes = []
+    abs_css_path = os.path.join(os.getcwd(), css_path.lstrip('/'))
+    for item in os.listdir(abs_css_path):
+        themes.append(item)
+
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config)
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config, themes=themes)
 
 def _cfg_save(path):
     try:
@@ -91,6 +96,10 @@ def _cfg_save(path):
         head_img = etree.Element('head_img')
         head_img.text = _get_var('head_img')
         root.append(head_img)
+
+        theme = etree.Element('theme')
+        theme.text = _get_var('theme')
+        root.append(theme)
 
         readme = etree.Element('readme')
         readme.text = _get_var('readme')
