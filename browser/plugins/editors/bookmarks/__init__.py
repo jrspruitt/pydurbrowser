@@ -22,7 +22,7 @@ import re
 from lxml import etree
 import codecs
 import bottle
-from browser.settings import data_path, updater_prefix
+from browser.settings import data_path, updater_prefix, display_prefix
 from browser.editors import check_url
 
 def check(url):
@@ -38,10 +38,10 @@ def updater(url):
 
     if _get_var('delete') == 'delete':
         os.remove(path)
-        return bottle.redirect('/%s' % (url))
+        return bottle.redirect('/%s' % (os.path.dirname(url)))
 
     if _cfg_save(path):
-        return bottle.redirect('/%s' % (url))
+        return bottle.redirect('/%s%s' % (display_prefix, url))
     else:
         return "Failed to save config."
 
