@@ -160,6 +160,7 @@ def calc_load(path):
                 category = iconfig.findtext('category') if iconfig.findtext('category') != '' else 'None'
                 display = {}
                 display['value'] = iconfig.findtext('display/value') if iconfig.findtext('display/value') else ''
+                display['radix'] = iconfig.findtext('display/radix') if iconfig.findtext('display/radix') else 0
 
                 if iconfig.find('display/static') is not None:
                     display['static'] = iconfig.findtext('display/static') if iconfig.findtext('display/static') else ''

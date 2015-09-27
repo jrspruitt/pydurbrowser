@@ -20,6 +20,10 @@ function mechcalc(){
 	this.i = new Object();
 	this.units = new Object();
 	this.rounding = 0;
+    this.rad_dec = 0;
+    this.rad_bin = 1;
+    this.rad_hex = 2;
+    this.radix = this.rad_dec;
 	this.cur_item = '';
 	this.type_calc = 'calc';
 	this.type_choice = 'choice';
@@ -49,6 +53,7 @@ function mechcalc(){
 		this.elem = elem;
 		this.value = elem.value;
 		this.dvalue = '';
+        this.radix = t.rad_dec
 		this.u = {'cat':'', 'unit':'', 'elem':''};
 		this.u.display = {'udefault':'', 'si':''};
 		this.error_msg = '';
@@ -629,7 +634,15 @@ function mechcalc(){
 		if(!this.is_number(inp.value)){
 			inp.elem.value = inp.value;
 		} else {
-			inp.elem.value = this._format_rounder(inp.value);
+            rounded = this._format_rounder(inp.value);
+
+            if (inp.radix == this.rad_dec) {
+                inp.elem.value = rounded;
+            } else if (inp.radix == this.rad_bin){
+                inp.elem.value = '0b' + rounded.toString(2);
+            } else if (inp.radix == this.rad_hex){
+                inp.elem.value = '0x' + rounded.toString(16);
+            }
 		}
 	}
 

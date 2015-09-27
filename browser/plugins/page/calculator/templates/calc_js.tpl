@@ -36,6 +36,7 @@ window.onload=function(){
         % else:
         mc.{{ item['id'] }}.dvalue={{ item['config']['display']['value'] }};
         % end
+        mc.{{ item['id'] }}.radix={{ item['config']['display']['radix'] }};
         % if 'units' in item['config']['display']:
         % udefault = item['config']['display']['units']['default']
         % usi = item['config']['display']['units']['si']
