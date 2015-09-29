@@ -20,7 +20,7 @@
         % end
         </style>
     % end
-	<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?page.config=TeX-AMS-MML_HTMLorMML"></script>
+	<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     % for js in item.config.js:
         <script type="text/javascript" src="{{! js }}"></script>
