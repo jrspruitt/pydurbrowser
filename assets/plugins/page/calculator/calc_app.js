@@ -34,6 +34,12 @@ function mechcalc(){
 	this.no_category = 'None';
 	this.err_val = 'error';
 	this.err_num = 'Must be a number.';
+    this.gt = 'gt';
+    this.gteq = 'gteq';
+    this.lt = 'lt';
+    this.lteq = 'lteq';
+    this.eq = 'eq';
+    this.not = 'not';
 
 
 	/**********************************************************
