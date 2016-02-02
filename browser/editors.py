@@ -19,9 +19,34 @@
 ##############################################################################
 
 import os
+import shutil
 import bottle
 from browser.plugins import load_plugins
-from browser.settings import data_path
+from browser.settings import data_path, editor_plugins
+
+def name_process(url, name_formatter):
+    path = os.path.join(data_path(), url)
+    name = '%s' % bottle.request.POST.get('name', '')
+    origname = '%s' % bottle.request.POST.get('origname', '')
+
+    if not name:
+        return 'No filename provided.'
+
+    name = name_formatter(name)
+
+    # Dealing with a dir path, so creating new file, append file name
+    if os.path.isdir(path):
+        path = os.path.join(path, name)
+        url = os.path.join(url, name)
+    # path is a file, but we have a file name mismatch, rename file.
+    # and set new url and paths to the new name
+    elif origname and name != origname and os.path.isfile(path):
+        dir_path = os.path.dirname(path)
+        shutil.move(os.path.join(dir_path, origname), os.path.join(dir_path, name))
+        path = os.path.join(dir_path, name)
+        url = os.path.join(os.path.dirname(url), name)
+
+    return url, path
 
 def _check_perms(url):
     path = os.path.join(data_path(), url)
@@ -38,9 +63,23 @@ def check_url(url):
 
     if not os.path.abspath(path).startswith(data_path()):
         bottle.abort(403, 'This path is outside my comfort zone.')
-    
+
+def _get_plugin(url):
+    _check_perms(url)
+    plugin_name = bottle.request.POST.get('etype', '')
+
+    if plugin_name in editor_plugins:
+        module = load_plugins([plugin_name], 'editors')
+        return module[0]['plugin']
+
+    bottle.abort(403, 'Bad action requested.')
+
+def creator(url):
+        plugin = _get_plugin(url)
+        return plugin.creator(url)
+
 def editor(url):
-    modules = load_plugins(['all'], 'editors')
+    modules = load_plugins(editor_plugins, 'editors')
 
     for module in modules:
         plugin = module['plugin']
@@ -51,12 +90,5 @@ def editor(url):
     bottle.abort(403, 'Bad action requested.')
 
 def updater(url):
-    modules = load_plugins(['all'], 'editors')
-
-    for module in modules:
-        plugin = module['plugin']
-
-        if plugin.check(url):
-            return plugin.updater(url)
-
-    bottle.abort(403, 'Bad action requested.')
+        plugin = _get_plugin(url)
+        return plugin.updater(url)

@@ -40,6 +40,9 @@
 <body>
 <form name="texteditor" action="{{ url }}" method="POST" enctype="multipart/form-data">
 <h2>RSS Feed Info</h2>
+<input type="hidden" value="bookmarks" name="etype" />
+<input type="hidden" value="{{ name }}" name="origname" />
+File Name: <input type="text" value="{{ name }}" name="name" /><br />
 <table>
     <tr>
         <td>Title:</td><td><input type="text" name="title" value="{{ bookmarks['title'] }}" /></td>

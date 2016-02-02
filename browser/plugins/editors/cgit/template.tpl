@@ -4,6 +4,7 @@
     </head>
 <body>
 <form name="cgiteditor" action="{{ url }}" method="POST" enctype="multipart/form-data">
+<input type="hidden" value="cgit" name="etype" />
 <table>
     <tr>
         <td>CGit Name:</td>

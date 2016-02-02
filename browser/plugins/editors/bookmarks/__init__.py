@@ -23,18 +23,34 @@ from lxml import etree
 import codecs
 import bottle
 from browser.settings import data_path, updater_prefix, display_prefix
-from browser.editors import check_url
+from browser.editors import check_url, name_process
 
 def check(url):
-    return os.path.basename(url).startswith('pdb_bookmarks') and url.endswith('.xml')
+    return os.path.basename(url).startswith('pdb_bookmarks_') and url.endswith('.xml')
 
-def editor(url):
+def name_formatter(name):
+    if check(name):
+        return name
+
+    if not name.startswith('pdb_bookmarks_'):
+        name = 'pdb_bookmarks_%s' % name
+
+    if not name.endswith('.xml'):
+        name = '%s.xml' % name
+
+    return name
+
+def creator(url):
     check_url(url)
     return _load_editor(url)
 
+def editor(url):
+    check_url(url)
+    return _load_editor(url, os.path.basename(url))
+
 def updater(url):
     check_url(url)
-    path = os.path.join(data_path(), url)
+    url, path = name_process(url, name_formatter)
 
     if _get_var('delete') == 'delete':
         os.remove(path)
@@ -45,7 +61,7 @@ def updater(url):
     else:
         return "Failed to save config."
 
-def _load_editor(url):
+def _load_editor(url, name=''):
     bookmarks = {'title':'Bookmarks',
                 'description':'',
                 'link':'',
@@ -73,7 +89,7 @@ def _load_editor(url):
         print e
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), bookmarks=bookmarks)
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), bookmarks=bookmarks, name=name)
 
 def _cfg_save(path):
     try:

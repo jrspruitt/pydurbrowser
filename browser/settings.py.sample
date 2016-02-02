@@ -27,7 +27,13 @@ desc_ext = '.desc'
 display_prefix = 'display/'
 editor_prefix = 'editor/'
 updater_prefix = 'updater/'
+creator_prefix = 'creator/'
 asset_path = '/assets'
+
+# available editor plugins.
+editor_plugins = ['bookmarks', 'cgit', 'config', 'description', 'markdown']
+# Display create in admin portion of page
+show_editors = ['bookmarks', 'markdown']
 
 # Use random secure number, and keep secret!
 session_key = 'CHANGE THIS!!!'
@@ -37,19 +43,16 @@ def data_path():
     return bottle.request.get('DOCUMENT_ROOT')
 
 # readme (case insensative) for page displaying
-readme_names = ['readme.md']
-# alternate paths to look for readme, relative to page root
-readme_alt_paths = ['_WORK', '_NOTES']
+readme_default = 'readme.md'
 
 css_path = os.path.join(asset_path, 'css')
-def get_css(name):
+def get_css(name, item):
     """Create CSS path"""
-    return os.path.join(css_path, name)
+    return os.path.join(css_path, item.config.theme, name)
 
 js_path = os.path.join(asset_path, 'js')
 def get_js(name):
     """Create Javascript path"""
     return os.path.join(js_path, name)
 
-# If present will be written to bottom of main.tpl
 tracking_code = ''

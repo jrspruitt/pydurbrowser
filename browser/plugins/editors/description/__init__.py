@@ -19,28 +19,50 @@
 ##############################################################################
 import os
 import bottle
-from browser.settings import data_path
+from browser.settings import data_path, desc_ext, updater_prefix, display_prefix
 from browser.editors import check_url
 
 def check(url):
-    if url.startswith('createdirectory'):
+    if os.path.splitext(url)[1] == desc_ext:
         return True
     return False
 
+def creator(url):
+    check_url(os.path.dirname(url))
+    text = ''
+    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
+
 def editor(url):
-    url = url[len('createdirectory/'):]
     check_url(url)
     path = os.path.join(data_path(), url)
+    text = ''
 
     if os.path.exists(path):
-        bottle.abort(403, 'Path already exists.')
+        with open(path, 'r') as f:
+            text = f.read()
 
-    try:
-        os.mkdir(path)
-    except:
-        bottle.abort(403, 'Problem creating directory.')
-
-    return bottle.redirect('/%s' % (os.path.dirname(url)))
+    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
 
 def updater(url):
-    return bottle.redirect('/%s' % (os.path.dirname(url)))
+    check_url(url)
+    path = os.path.join(data_path(), url)
+    text = '%s' % bottle.request.POST.get('text', '')
+    redirect_url = '/%s%s' % (display_prefix, url[0:len(url) - len(desc_ext)])
+
+    try:
+        if text == '':
+            if os.path.exists(path) and os.path.isfile(path):
+                os.remove(path)
+                redirect_url = '/%s' % (os.path.dirname(url))
+        else:
+            with open(path, 'w') as f:
+                f.write(text)
+
+    except:
+        return "Failed to save file."
+
+    return bottle.redirect(redirect_url)
+
+    

@@ -5,11 +5,12 @@
         .table { display:table; padding:10px; border-collapse: seperate; border-spacing:10px; border:solid 1px black; }
         .row { display:table-row; padding:10px; }
         .cell { display:table-cell;}
-        textarea { height:250px; width:500px; }
+        textarea { height:45px; width:500px; }
         </style>
     </head>
 <body>
 <form action="{{ url }}" name="update" method="POST" enctype="multipart/form-data">
+<input type="hidden" value="config" name="etype" />
 <h2>General</h2>
 <div class="table">
     <div class="row">

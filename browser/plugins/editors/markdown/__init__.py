@@ -18,14 +18,26 @@
 #    along with PyDurBrowser.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 import os
+import shutil
 import bottle
-from browser.settings import data_path, desc_ext, updater_prefix, display_prefix
-from browser.editors import check_url
+from browser.settings import data_path, updater_prefix, display_prefix
+from browser.editors import check_url, name_process
 
 def check(url):
-    if os.path.splitext(url)[1][1:] in ['md','markdown','mkd','mkdown', desc_ext]:
+    if os.path.splitext(url)[1] in ['.md','.markdown','.mkd','.mkdown']:
         return True
     return False
+
+def name_formatter(name):
+    if check(name):
+        return name
+    else:
+        return '%s.md' % name
+
+def creator(url):
+    check_url(url)
+    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text='', name='')
 
 def editor(url):
     check_url(url)
@@ -37,12 +49,12 @@ def editor(url):
             text = f.read()
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
+    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text, name=os.path.basename(path))
 
 def updater(url):
     check_url(url)
-    path = os.path.join(data_path(), url)
     text = '%s' % bottle.request.POST.get('text', '')
+    url, path = name_process(url, name_formatter)
     redirect_url = '/%s%s' % (display_prefix, url)
 
     try:
@@ -54,7 +66,8 @@ def updater(url):
             with open(path, 'w') as f:
                 f.write(text)
 
-    except:
+    except Exception, e:
+        print e
         return "Failed to save file."
 
     return bottle.redirect(redirect_url)

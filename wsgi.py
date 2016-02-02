@@ -29,12 +29,12 @@ import bottle
 from beaker.middleware import SessionMiddleware
 from cork import Cork
 
-from browser.settings import display_prefix, editor_prefix, updater_prefix, data_path, session_key
+from browser.settings import *
 from browser.config.config import get_config
 from browser.page import page
 from browser.xfile import xfile
 #from browser.dataport import dataport
-from browser.editors import editor, updater
+from browser import editors
     
 # Use users.json and roles.json in the local example_conf directory
 aaa = Cork('auth', email_sender='', smtp_url='')
@@ -48,12 +48,19 @@ def post_get(name, default=''):
 @bottle.route('/%s<url:path>' % editor_prefix)
 @authorize()
 def adm_editor(url=''):
-    return editor(url)
+    return editors.editor(url)
 
+@bottle.post('/%s' % updater_prefix)
 @bottle.post('/%s<url:path>' % updater_prefix)
 @authorize()
 def adm_updater(url=''):
-    return updater(url)
+    return editors.updater(url)
+
+@bottle.post('/%s' % creator_prefix)
+@bottle.post('/%s<url:path>' % creator_prefix)
+@authorize()
+def adm_creator(url=''):
+    return editors.creator(url)
 
 @bottle.post('/login')
 def adm_login():
@@ -115,8 +122,10 @@ def show_display(url=''):
                 return bottle.template('main.tpl', item=xf)
 
             if mimetypes.guess_type(path)[0] or mimetypes.guess_type(path)[1]:
+                print 'HERERERERERERER'
                 return bottle.static_file(url, root=data_path())
             else:
+                print 'WHYHERHERHEHRE', mimetypes.guess_type(path)
                 return bottle.static_file(url, root=data_path(), mimetype='application/octet-stream', download=True)
 
     bottle.abort(404, 'No such file.')
