@@ -46,5 +46,4 @@ def handler(xfile):
         xfile.mtime = ''
         xfile.size = ''
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile)
+    xfile.display = template('display/video.tpl', xfile=xfile)

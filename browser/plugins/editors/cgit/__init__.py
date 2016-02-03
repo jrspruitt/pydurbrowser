@@ -44,7 +44,7 @@ def editor(url):
         
 
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), name=name, desc=desc)
+    return bottle.template('editors/cgit.tpl', url='/%s%s' % (updater_prefix, url), name=name, desc=desc)
 
 def updater(url):
     check_url(url)

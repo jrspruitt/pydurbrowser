@@ -67,5 +67,4 @@ def handler(xfile):
         xfile.code = f.read().decode('ISO-8859-1')
 
     xfile.config.js.append('https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=sunburst')
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile)
+    xfile.display = template('display/source_code.tpl', xfile=xfile)

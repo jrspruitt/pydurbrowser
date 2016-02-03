@@ -78,8 +78,7 @@ def _load_editor(url, config):
     for item in os.listdir(abs_css_path):
         themes.append(item)
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config, themes=themes)
+    return bottle.template('edtiors/config.tpl', url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config, themes=themes)
 
 def _cfg_save(path):
     try:

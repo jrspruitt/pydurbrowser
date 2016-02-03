@@ -48,8 +48,7 @@ def editor(url):
         with open(path, 'r') as f:
             text = f.read()
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text, name=os.path.basename(path))
+    return bottle.template('editors/markdown.tpl', url='/%s%s' % (updater_prefix, url), text=text, name=os.path.basename(path))
 
 def updater(url):
     check_url(url)

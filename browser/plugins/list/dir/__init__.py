@@ -52,5 +52,4 @@ def handler(item, config):
     
     item.size = '%s Items' % subitems
     item.name = '%s/' % item.name.rstrip('/')
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item)
+    item.display = template('lists/directory.tpl', item=item)

@@ -88,8 +88,7 @@ def _load_editor(url, name=''):
     except Exception, e:
         print e
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), bookmarks=bookmarks, name=name)
+    return bottle.template('editors/bookmarks.tpl', url='/%s%s' % (updater_prefix, url), bookmarks=bookmarks, name=name)
 
 def _cfg_save(path):
     try:

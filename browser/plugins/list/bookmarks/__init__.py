@@ -47,5 +47,4 @@ def handler(item, config):
 
     item.name = title
     item.url = display_url(item.url)
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item, config=config)
+    item.display = template('lists/bookmarks.tpl', item=item, config=config)

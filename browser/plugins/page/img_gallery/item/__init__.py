@@ -40,5 +40,4 @@ def handler(item, config):
     if not config.rules.ignore_filehandler(item.path):
         item.url = display_url(item.url)
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item)
+    item.display = template("pages/img_gallery_item.tpl", item=item)

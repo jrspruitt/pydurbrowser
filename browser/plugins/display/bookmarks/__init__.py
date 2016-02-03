@@ -45,8 +45,7 @@ def handler(xfile):
     xfile.config.meta.append('<link rel="alternate" type="application/rss+xml" title="%s" href="/%s" />' % (bookmark['title'], xfile.url))
     xfile.config.js.append(get_js('list.js'))
     xfile.config.css.append(get_css('list.css', xfile))
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile, bookmark=bookmark, admin=admin)
+    xfile.display = template('display/bookmarks.tpl', xfile=xfile, bookmark=bookmark, admin=admin)
 
 def load_bookmark(xfile):
     path = xfile.path

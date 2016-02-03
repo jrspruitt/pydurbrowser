@@ -42,5 +42,5 @@ def handler(page):
 
     page.config.js.append(get_js('list.js'))
     page.config.css.append(get_css('list.css', page))
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    page.display = template(tpl_path, page=page, html=html)
+
+    page.display = template('pages/html.tpl', page=page, html=html)

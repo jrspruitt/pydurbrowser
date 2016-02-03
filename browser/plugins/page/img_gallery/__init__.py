@@ -48,5 +48,4 @@ def handler(page):
 
     page.config.css.append(get_css('list.css', page))
     page.config.css.append(get_css('media.css', page))
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    page.display = template(tpl_path, page=page)
+    page.display = template("pages/img_gallery.tpl", page=page)

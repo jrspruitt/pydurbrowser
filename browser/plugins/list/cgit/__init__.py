@@ -130,5 +130,4 @@ def handler(item, config):
     except:
         pass
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item, config=config)
+    item.display = template('lists/cgit.tpl', item=item, config=config)

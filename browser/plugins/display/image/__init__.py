@@ -117,5 +117,4 @@ def handler(xfile):
         xfile.mtime = ''
         xfile.size = ''
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile, next=nexti, prev=prev)
+    xfile.display = template('display/image.tpl', xfile=xfile, next=nexti, prev=prev)

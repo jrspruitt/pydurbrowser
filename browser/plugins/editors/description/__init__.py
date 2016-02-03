@@ -31,7 +31,7 @@ def creator(url):
     check_url(os.path.dirname(url))
     text = ''
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
+    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text)
 
 def editor(url):
     check_url(url)
@@ -42,8 +42,7 @@ def editor(url):
         with open(path, 'r') as f:
             text = f.read()
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text=text)
+    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text)
 
 def updater(url):
     check_url(url)

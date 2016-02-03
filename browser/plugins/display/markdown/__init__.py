@@ -53,5 +53,4 @@ def handler(xfile):
     except ImportError, e:
         admin = None
 
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    xfile.display = template(tpl_path, xfile=xfile, admin=admin)
+    xfile.display = template('display/markdown.tpl', xfile=xfile, admin=admin)

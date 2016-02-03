@@ -33,5 +33,4 @@ def check(item):
     return False
 
 def handler(item, config):
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    item.display = template(tpl_path, item=item)
+    item.display = template('lists/audio.tpl', item=item)
