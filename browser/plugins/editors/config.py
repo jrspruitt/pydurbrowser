@@ -64,8 +64,8 @@ def _load_editor(url, config):
             continue
 
         for item in os.listdir(path):
-            if os.path.isdir(os.path.join(path, item)):
-                plugins[plugin].append(item)
+            if os.path.isfile(os.path.join(path, item)) and item != '__init__.py':
+                plugins[plugin].append(os.path.splitext(item)[0])
 
     if len(config['list']['plugins']) == len(plugins['list']):
         config['list']['plugins'] = ['all']
@@ -78,7 +78,7 @@ def _load_editor(url, config):
     for item in os.listdir(abs_css_path):
         themes.append(item)
 
-    return bottle.template('edtiors/config.tpl', url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config, themes=themes)
+    return bottle.template('editors/config.tpl', url='/%s%s' % (updater_prefix, url), plugins=plugins, config=config, themes=themes)
 
 def _cfg_save(path):
     try:

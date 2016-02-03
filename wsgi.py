@@ -122,10 +122,8 @@ def show_display(url=''):
                 return bottle.template('main.tpl', item=xf)
 
             if mimetypes.guess_type(path)[0] or mimetypes.guess_type(path)[1]:
-                print 'HERERERERERERER'
                 return bottle.static_file(url, root=data_path())
             else:
-                print 'WHYHERHERHEHRE', mimetypes.guess_type(path)
                 return bottle.static_file(url, root=data_path(), mimetype='application/octet-stream', download=True)
 
     bottle.abort(404, 'No such file.')

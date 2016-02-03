@@ -19,7 +19,7 @@
 ##############################################################################
 
 import os
-from markdown import markdown
+import markdown as md
 
 class page(object):
     """Page object
@@ -51,7 +51,7 @@ class page(object):
 def _open_readme(path, page):
     try:
         with open(path, 'r') as f:
-            page.readme = markdown(f.read().decode('utf-8'), ['tables'])
+            page.readme = md.markdown(f.read().decode('utf-8'), ['tables'])
     except:
         page.readme = ''
 
@@ -70,7 +70,8 @@ def _load_page_config(page):
     try:
         mod = __import__(module, globals(), locals(), [page.config.page['type']], -1)
         handler = getattr(mod, page.config.page['type'])
-    except:
+    except Exception, e:
+        print e
         try:
             mod = __import__(module, globals(), locals(), ['default'], -1)
             handler = getattr(mod, 'default')

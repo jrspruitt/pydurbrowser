@@ -1,5 +1,5 @@
 import os
-from markdown import markdown
+import markdown as md
 from browser.settings import desc_ext, editor_prefix, creator_prefix
 
 def get_desc(item, config):
@@ -21,7 +21,7 @@ def get_desc(item, config):
         if os.path.exists(desc_path):
             with open(desc_path, 'r') as f:
                 try:
-                    dtext += markdown(f.read().decode('utf-8'), ['tables'])
+                    dtext += md.markdown(f.read().decode('utf-8'), ['tables'])
                 except:
                     f.seek(0)
                     dtext += f.read()

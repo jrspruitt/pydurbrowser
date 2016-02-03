@@ -22,7 +22,7 @@ import os
 import time
 
 from bottle import template
-from markdown import markdown
+import markdown as md
 from browser.settings import get_css, editor_prefix
 
 match = 100 
@@ -40,7 +40,7 @@ def handler(xfile):
     xfile.config.css.append(get_css('media.css', xfile))
     with open(xfile.path, 'r') as f:
         try:
-            xfile.text = markdown(f.read().decode('utf-8'), ['tables'])
+            xfile.text = md.markdown(f.read().decode('utf-8'), ['tables'])
         except Exception, e:
             print e
             xfile.text = 'Load error.'
