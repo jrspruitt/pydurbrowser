@@ -26,7 +26,7 @@ import sqlite3 as sqlite
 from browser.settings import get_css, get_js
 
 def item_display(item, measures):
-    disp_tpl = os.path.join(os.path.dirname(__file__), 'templates/items/%s.tpl' % item['type'])
+    disp_tpl = os.path.join(os.path.dirname(__file__), 'calculator/templates/items/%s.tpl' % item['type'])
     return template(disp_tpl, item=item, measures=measures)
     
 
@@ -60,14 +60,14 @@ def handler(page):
         page.config.css.append(get_css('media.css', page))
         page.config.css.append(get_css('list.css', page))
     
-        calc_tpl = os.path.join(os.path.dirname(__file__), 'templates/calc_js.tpl')
+        calc_tpl = os.path.join(os.path.dirname(__file__), 'calculator/templates/calc_js.tpl')
         page.config.script = template(calc_tpl, config=calc, ext_js=ext_js)
 
-        tpl_path = os.path.join(os.path.dirname(__file__), 'templates/template.tpl')
+        tpl_path = os.path.join(os.path.dirname(__file__), 'calculator/templates/template.tpl')
         page.display = template(tpl_path, page=page, calc_items=calc_items, rounding=calc['rounding'])
 
     else:
-        tpl_path = os.path.join(os.path.dirname(__file__), 'templates/template.tpl')
+        tpl_path = os.path.join(os.path.dirname(__file__), 'calculator/templates/template.tpl')
         page.display = template(tpl_path, page=page, calc_items=calc_items, rounding=0)
 
 
@@ -192,7 +192,7 @@ def calc_load(path):
 class db():
     def __init__(self):
         self._db_con = None
-        self._data_path = os.path.join(os.path.dirname(__file__), 'units.db')
+        self._data_path = os.path.join(os.path.dirname(__file__), 'calculator/units.db')
         self._sql_select_all = "SELECT * FROM %s"
         self._data = ""
 

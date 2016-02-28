@@ -18,11 +18,14 @@
 #    along with PyDurBrowser.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
+# Fixes markdown name conflict.
+from __future__ import absolute_import
+
 import os
 import time
 
 from bottle import template
-import markdown as md
+from markdown import markdown as md
 from browser.settings import get_css, editor_prefix
 
 match = 100 
@@ -40,7 +43,7 @@ def handler(xfile):
     xfile.config.css.append(get_css('media.css', xfile))
     with open(xfile.path, 'r') as f:
         try:
-            xfile.text = md.markdown(f.read().decode('utf-8'), ['tables'])
+            xfile.text = md(f.read().decode('utf-8'), ['tables'])
         except Exception, e:
             print e
             xfile.text = 'Load error.'
