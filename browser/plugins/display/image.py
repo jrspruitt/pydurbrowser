@@ -20,14 +20,14 @@
 
 import os
 import time
-import Image
+from PIL import Image
+from PIL import ExifTags
 
 from bottle import template
 from browser.utils import get_filesize
 from browser.settings import get_css, display_prefix
 from browser.items import get_items
 from browser.config.config import get_config
-from browser.plugins import load_plugins
 from browser.plugins.list import image as pimage
 
 match = 100
@@ -97,6 +97,11 @@ def handler(xfile):
         image = Image.open(xfile.path)
         xfile.width = image.size[0]
         xfile.height = image.size[1]
+        exif = {
+            ExifTags.TAGS[k]: v
+            for k, v in image._getexif().items()
+            if k in ExifTags.TAGS
+        }
 
         if xfile.width > default_width:
             xfile.display_width = default_width
@@ -117,4 +122,4 @@ def handler(xfile):
         xfile.mtime = ''
         xfile.size = ''
 
-    xfile.display = template('display/image.tpl', xfile=xfile, next=nexti, prev=prev)
+    xfile.display = template('display/image.tpl', xfile=xfile, next=nexti, prev=prev, exif=exif)

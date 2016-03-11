@@ -19,7 +19,7 @@
 ##############################################################################
 
 import os
-import Image
+from PIL import Image
 from browser.settings import display_prefix
 
 def display_url(path):
