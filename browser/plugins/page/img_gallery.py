@@ -28,12 +28,7 @@ def handler(page):
     img_plugin = 'browser.plugins.page.img_gallery_items.item'
 
     page.config.list_plugins.insert(0, {'name':img_plugin, 'plugin':img_gallery_item})
-    page.config.rules.ignore_dirs = "/_thumbnails$"
     items = get_items(page.config)
-
-    # No idea what this is for, could be old broken useless...
-    #if 'desc' in items:
-    #    del items['desc']
 
     for plugin in page.config.list_plugins:
         if plugin['name'] in items and plugin['name'] != img_plugin:

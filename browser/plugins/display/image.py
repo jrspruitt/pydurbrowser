@@ -24,7 +24,7 @@ from PIL import Image
 from PIL import ExifTags
 
 from bottle import template
-from browser.utils import get_filesize
+from browser.utils import get_filesize, process_displayimg
 from browser.settings import get_css, display_prefix
 from browser.items import get_items
 from browser.config.config import get_config
@@ -64,10 +64,8 @@ def handler(xfile):
     Get xfile object ready and put into template associated with this
     handler.
     """
-
+    process_displayimg(xfile)
     img_plugin = 'browser.plugins.list.image'
-    default_width = 800
-    default_height = 600
     xfile.config.css.append(get_css('media.css', xfile))
     config = get_config(os.path.dirname(xfile.url))
     config.list_plugins = [{'name':img_plugin, 'plugin':pimage}]
@@ -75,6 +73,7 @@ def handler(xfile):
     peer_files = []
     nexti = None
     prev = None
+    exif = {}
 
     if 'browser.plugins.list.image' in items:
         for item in items[img_plugin]:
@@ -94,26 +93,23 @@ def handler(xfile):
 
 
     try:
-        image = Image.open(xfile.path)
-        xfile.width = image.size[0]
-        xfile.height = image.size[1]
-        exif = {
-            ExifTags.TAGS[k]: v
-            for k, v in image._getexif().items()
-            if k in ExifTags.TAGS
-        }
+        with Image.open(xfile.path) as im:
+            xfile.width = im.size[0]
+            xfile.height = im.size[1]
+            try:
+                exif = {
+                    ExifTags.TAGS[k]: v
+                    for k, v in im._getexif().items()
+                    if k in ExifTags.TAGS
+                }
+            except:
+                pass
 
-        if xfile.width > default_width:
-            xfile.display_width = default_width
-            xfile.display_height = int((float(default_width)/float(image.size[0])) * image.size[1])
-        else:
-            xfile.display_width = xfile.width
-            xfile.display_height = xfile.height
-
+        with Image.open(xfile.resized_img_path) as rim:
+            xfile.display_width = rim.width
+            xfile.display_height = rim.height
     except Exception, e:
         print e
-        xfile.width = default_width
-        xfile.height = default_height
 
     try:
         xfile.mtime = time.ctime(os.path.getmtime(xfile.path))

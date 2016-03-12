@@ -50,40 +50,32 @@ def get_filesize(path):
         
 
 def process_thumbnail(item):
-    twidth = 320
-    theight = 240
-    thumbs_dir = os.path.join(os.path.dirname(item.path), '_thumbnails')
-    thumb_path = os.path.join(thumbs_dir, item.name)
-    thumb_url = os.path.join(os.path.dirname(item.url), '_thumbnails', item.name)
-    item.thumb_url = thumb_url
+    _process_image(item, 320, 240, '_thumbnails')
 
-    if not os.path.exists(thumbs_dir):
+def process_displayimg(item):
+    _process_image(item, 800, 600, '_displayimgs')
+
+def _process_image(item, rwidth, rheight, img_dir):
+    rimg_dir = os.path.join(os.path.dirname(item.path), img_dir)
+    rimg_path = os.path.join(rimg_dir, item.name)
+    rimg_url = os.path.join(os.path.dirname(item.url), img_dir, item.name)
+    item.resized_img_url = rimg_url
+    item.resized_img_path = rimg_path
+
+    if os.path.exists(rimg_path):
+        return
+
+    if not os.path.exists(rimg_dir):
         try:
-            os.mkdir(thumbs_dir)
+            os.mkdir(rimg_dir)
         except:
             return
 
-
     try:
-        im = Image.open(item.path)
-        width = im.size[0]
-        height = im.size[1]
-
-        if height > width:
-            width = int((float(theight) / float(height)) * width)
-            height = int(theight)
-        else:
-            height = int((float(twidth) / float(width)) * height)
-            width = twidth
-
-        item.width = width
-        item.height = height
-
-        if os.path.exists(thumb_path):
-            return
-
-        size = (width, height)
-        im_resize = im.resize(size, Image.ANTIALIAS)
-        im_resize.save(thumb_path)
-    except:
-        item.thumb_url = item.url
+        with Image.open(item.path) as im:
+            im.thumbnail([rwidth, rheight], Image.ANTIALIAS)
+            im.save(rimg_path)
+    except Exception as e:
+        print e
+        item.resized_img_url = item.url
+        item.resized_img_path = item.path

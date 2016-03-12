@@ -1,7 +1,7 @@
     <div class="tr">
         <div class="items item_name td item_file">
             <a href="/{{ item.url }}">
-                <img class="group" src="/{{ item.thumb_url }}" width="100" /> {{ item.name }}                
+                <img class="group" src="/{{ item.resized_img_url }}" width="100" /> {{ item.name }}                
             </a>
             % if item.desc:
             <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')">[+]</a>

@@ -17,7 +17,7 @@
 		</div>
 		<div>
 		    <a href="/{{ xfile.url }}">
-		        <img class="single" src="/{{ xfile.url }}" width="{{ xfile.display_width }} height="{{ xfile.display_height }}" />
+		        <img class="single" src="/{{ xfile.resized_img_url }}" width="{{ xfile.display_width }}" height="{{ xfile.display_height }}" />
 		    </a>
 	    </div>
     </div>

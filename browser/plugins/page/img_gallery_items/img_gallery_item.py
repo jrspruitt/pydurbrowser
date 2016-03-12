@@ -19,6 +19,7 @@
 ##############################################################################
 
 import os
+from PIL import Image
 from bottle import template
 from browser.utils import display_url, process_thumbnail
 
@@ -36,6 +37,9 @@ def check(item):
 
 def handler(item, config):
     process_thumbnail(item)
+    with Image.open(item.resized_img_path) as im:
+        item.width = im.size[0]
+        item.height = im.size[1]
 
     if not config.rules.ignore_filehandler(item.path):
         item.url = display_url(item.url)
