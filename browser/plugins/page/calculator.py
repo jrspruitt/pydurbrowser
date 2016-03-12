@@ -45,8 +45,8 @@ def handler(page):
         for item in calc['items']:
             calc_items.append(item_display(item, calc['measures']))
             
-        page.config.css.append('/assets/plugins/page/calculator/calc.css')
-        page.config.js.append('/assets/plugins/page/calculator/calc_app.js')
+        page.config.css.append(get_css('page/calculator.css', page))
+        page.config.js.append(get_js('page/calculator/calc_app.js'))
         page.config.js.append(os.path.join('/%s' % page.config.url, '_calc/calc.js'))
 
         ext_js = []

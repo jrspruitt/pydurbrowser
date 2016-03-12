@@ -21,8 +21,7 @@
 import os
 from bottle import template
 from browser.items import get_items
-from browser.settings import get_css
-from browser.plugins import load_plugins
+from browser.settings import get_css, get_js
 from browser.plugins.page.img_gallery_items import img_gallery_item
 
 def handler(page):
@@ -30,7 +29,6 @@ def handler(page):
 
     page.config.list_plugins.insert(0, {'name':img_plugin, 'plugin':img_gallery_item})
     page.config.rules.ignore_dirs = "/_thumbnails$"
-
     items = get_items(page.config)
 
     # No idea what this is for, could be old broken useless...
@@ -47,5 +45,11 @@ def handler(page):
         page.images = []
 
     page.config.css.append(get_css('list.css', page))
+    page.config.css.append(get_css('page/img_gallery.css', page))
     page.config.css.append(get_css('media.css', page))
+    page.config.js.append(get_js('page/img_gallery.js'))
+    page.config.script += """
+    resize_event();
+    $(window).trigger( "resize" );
+    """
     page.display = template("pages/img_gallery.tpl", page=page)

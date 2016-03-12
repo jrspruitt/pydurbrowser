@@ -249,7 +249,9 @@ def parse_xml(path, is_parent = True):
 
         if heading.find('js') is not None:
             for js_src in heading.iterfind('js'):
-                ret['heading']['js'].append(js_src.text or '')
+                if js_src.text != "" and js_src.text is not None:
+                    print js_src.text
+                    ret['heading']['js'].append(js_src.text)
 
         if heading.find('script') is not None:
             ret['heading']['script'] = heading.find('script').text or ''

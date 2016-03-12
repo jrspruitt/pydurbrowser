@@ -24,8 +24,10 @@
 
 % if page.images:
 <div class="content">
-    % for image in page.images:
-        {{! image.display }}
-    % end
+    <div class="gallery">
+        % for image in page.images:
+{{! image.display }}
+        % end
+    </div>
 </div>
 % end
