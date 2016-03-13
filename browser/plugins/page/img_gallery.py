@@ -45,6 +45,6 @@ def handler(page):
     page.config.js.append(get_js('page/img_gallery.js'))
     page.config.script += """
     resize_event();
-    $(window).trigger( "resize" );
+    generate_height();
     """
     page.display = template("pages/img_gallery.tpl", page=page)
