@@ -114,7 +114,9 @@ def show_display(url=''):
         cfg.logged_in = False
 
     if not os.path.isdir(path) and os.path.exists(path):
-        if cfg.rules.ignore_filehandler(url):
+        if cfg.rules.exclude_file(path):
+            bottle.abort(404, 'No such file.')
+        elif cfg.rules.ignore_filehandler(url):
             return bottle.static_file(url, root=data_path())
         else:
             xf = xfile(url, cfg)

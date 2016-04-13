@@ -18,6 +18,7 @@
 #    along with PyDurBrowser.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 
+import os
 import re 
 from lxml import etree
 from bottle import abort
@@ -118,6 +119,10 @@ class rules(object):
 
     def exclude_file(self, path):
         """If file should be excluded."""
+        parent_dir = os.path.dirname(path)
+        if self.exclude_dir(parent_dir):
+            return True
+
         for rule in self.exclude_files:
             if rule.search(path):
                 return True
