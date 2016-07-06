@@ -102,3 +102,8 @@ td {
 .tab {
 	padding-left:2.5em
 }
+@media only screen and (max-width: 600px) {
+    body {
+        font-size:1.2em;
+    }
+}

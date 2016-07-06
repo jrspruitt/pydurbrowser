@@ -34,3 +34,4 @@ local.properties
 *.pyc
 browser/settings.py
 auth/*.json
+tools/

@@ -29,6 +29,8 @@ function mechcalc(){
 	this.type_choice = 'choice';
 	this.type_graph = 'graph';
 	this.type_label = 'label';
+    this.type_button = 'button';
+    this.type_textbox = 'textbox';
 	this.type_seperator = 'seperator';
 	this.type_diagram = 'diagram';
 	this.no_category = 'None';
@@ -105,6 +107,37 @@ function mechcalc(){
 	}
 
 	/*
+	 * Button object.
+	 * 
+	 * t - Reference to parent this.
+	 * id - input id.
+	 * elem - input element.
+	 */
+	this._button = function(t, id, elem){
+		this.type = t.type_button;
+		this.id = id;
+		this.elem = elem;
+		t._html_calc_add_events(t, this)
+	}
+
+	/*
+	 * Textbox object.
+	 * 
+	 * t - Reference to parent this.
+	 * id - input id.
+	 * elem - input element.
+	 */
+	this._textbox = function(t, id, elem){
+        console.log(id)
+		this.type = t.type_button;
+		this.id = id;
+		this.elem = elem;
+        this.value = '';
+        this.u = {'cat':t.no_category}
+		t._html_calc_add_events(t, this)
+	}
+
+	/*
 	 * Validation object for enhanced input testing.
 	 * 
 	 * t - Reference to parent this.
@@ -144,7 +177,7 @@ function mechcalc(){
 	/*
 	 * Initialize all the inputs.
 	 */
-	this.inputs_init = function(url){
+	this.inputs_init = function(){
 		this._html_rounding();
 		this._html_control_add_events();
 
@@ -164,6 +197,12 @@ function mechcalc(){
 
 			}else if(elem.className == 'mcalc_diagram'){
 				this[id] = new this._diagram(this, id, elem);
+
+			}else if(elem.className == 'mcalc_button'){
+				this[id] = new this._button(this, id, elem);
+
+			}else if(elem.className == 'mcalc_textbox'){
+				this[id] = new this._textbox(this, id, elem);
 				
 			}else{
 				this[id] = new Object();
@@ -282,7 +321,7 @@ function mechcalc(){
 	 * inp - input objec to us.
 	 */
 	this._html_calc_add_events = function(t, inp){
-		if(inp.u.elem != null){
+		if(inp.u && inp.u.elem != null){
 			inp.u.elem.addEventListener('change', function(){t.control_units_conv(inp.id);});
 		}
 

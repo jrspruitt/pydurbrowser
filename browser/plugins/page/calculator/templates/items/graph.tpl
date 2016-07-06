@@ -1,5 +1,5 @@
 <span class="mcalc_button_container">
-    <button id="mcalc_graph_btn_{{ item['id'] }}" class="mcalc_button">Graph</button>
+    <button id="mcalc_graph_btn_{{ item['id'] }}" class="mcalc_calcbutton">Graph</button>
 </span>
 <span class="mcalc_input_container">
     <span class="mcalc_showhide_label">{{ item['label'] }}</span>

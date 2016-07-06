@@ -33,3 +33,11 @@
     box-shadow:1px 1px 1px 1px #888888;
 	display:none;
 }
+@media only screen and (max-width: 600px) {
+    .item_date {
+        display:none;
+    }
+    .item_size{
+        display:none;
+    }
+}

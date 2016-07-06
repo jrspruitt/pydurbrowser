@@ -116,7 +116,8 @@ def calc_load(path):
 
             if itype == 'seperator':
                 items.append({'id':iid, 'type':itype})
-            elif itype == 'label':
+
+            elif itype in ['label', 'textbox', 'button']:
                 items.append({'id':iid, 'type':itype, 'label':label})
                 
             elif itype == 'graph':

@@ -1,6 +1,6 @@
 <span class="mcalc_button_container">
 % if item['config']['button'] == '1':
-    <button class="mcalc_button" id="mcalc_{{ item['id'] }}_btn">{{ item['label'] }}</button>
+    <button class="mcalc_calcbutton" id="mcalc_{{ item['id'] }}_btn">{{ item['label'] }}</button>
 % else:
     <span class="mcalc_nobutton_label">{{ item['label'] }}</span>
 % end

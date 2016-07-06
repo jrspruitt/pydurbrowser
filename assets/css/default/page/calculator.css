@@ -26,7 +26,7 @@
 	vertical-align:middle;
 
 }
-.mcalc_button {
+.mcalc_calcbutton {
 	font-size:.9em;
 	width:18.8em;
 }
@@ -46,6 +46,22 @@
 .mcalc_input {
 	font-size:.9em;
 	width:11.4em;
+}
+.mcalc_button {
+	font-size:.9em;
+	width:11.4em;
+}
+.mcalc_textbox_container {
+	position:relative;
+	width:34.5em;
+	margin:auto;
+	margin-top:.9em;
+	margin-bottom:.7em;
+}
+.mcalc_textbox {
+	font-size:1.1em;
+	width:inherit;
+    height:15em;
 }
 .mcalc_units_container {
 	display:inline-block;
