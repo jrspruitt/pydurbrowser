@@ -62,7 +62,6 @@ def updater(url):
         return "Failed to save config."
 
 def _load_editor(url, name=''):
-    print "GOT HERE AT LEAST"
     bookmarks = {'title':'Bookmarks',
                 'description':'',
                 'link':'',

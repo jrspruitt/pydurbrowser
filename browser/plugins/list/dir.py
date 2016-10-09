@@ -27,7 +27,7 @@ name = 'dir'
 match = 1
 order = 1
 
-def check(item):        
+def check(item):
     return os.path.isdir(item.path)
 
 def handler(item, config):

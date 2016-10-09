@@ -19,9 +19,10 @@
 ##############################################################################
 
 import os
-import re 
+import re
+from netaddr import IPNetwork, IPAddress
 from lxml import etree
-from bottle import abort
+from bottle import abort, request
 from browser.settings import config_filename, desc_ext
 
 class rules(object):
@@ -43,6 +44,7 @@ class rules(object):
     """
 
     def __init__(self, config_files):
+        self._allowed_ips = []
         self._ignore_filehandlers = []
         self._ignore_files = []
         self._ignore_dirs = []
@@ -50,10 +52,20 @@ class rules(object):
         self._exclude_files = []
         self._add_rule(config_filename, self._exclude_files)
         self._add_rule('.*\%s$' % desc_ext, self._exclude_files)
+        self._add_rule(config_filename, self._ignore_files)
+        self._add_rule('.*\%s$' % desc_ext, self._ignore_files)
         self._exclude_dirs = []
 
         for config_file in config_files:
             self.add_rules(config_file)
+
+        self._ip_allowed = self._ip_check(request.environ.get('REMOTE_ADDR'))
+
+    def _set_allow_ip(self, rule):
+        self._add_ip(rule, self._allowed_ips)
+    def _get_allow_ip(self):
+        return self._ip_allowed
+    allow_ip = property(_get_allow_ip, _set_allow_ip)
 
 
     def _set_ignore_dir(self, rule):
@@ -101,8 +113,26 @@ class rules(object):
             pass
 
 
+    def _add_ip(self, ip, ip_list):
+        try:
+            ip_list.append(IPNetwork(ip))
+        except:
+            pass
+
+    def _ip_check(self, ip):
+        """Check if user's IP is allowed to see excluded content."""
+        for allowed_ip in self._allowed_ips:
+            if IPAddress(ip) in allowed_ip:
+                return True
+        else:
+            return False
+                
+        
     def exclude_dir(self, path):
         """If directory should be excluded."""
+        if  self._ip_allowed:
+            return False
+
         for rule in self.exclude_dirs:
             if rule.search(path):
                 return True
@@ -120,11 +150,11 @@ class rules(object):
     def exclude_file(self, path):
         """If file should be excluded."""
         parent_dir = os.path.dirname(path)
-        if self.exclude_dir(parent_dir):
+        if self.exclude_dir(parent_dir) and not self._ip_allowed:
             return True
 
         for rule in self.exclude_files:
-            if rule.search(path):
+            if rule.search(path) and not self._ip_allowed:
                 return True
         return False
 
@@ -176,6 +206,9 @@ class rules(object):
             for ignore in rules['files']['show_raw']['regex']:
                 self.ignore_filehandlers = ignore
 
+            for ip in rules['ip']['allow']:
+                self.allow_ip = ip
+
 
    
 def parse_xml(path):
@@ -192,6 +225,7 @@ def parse_xml(path):
            'files':{'exclude':{'regex':[]},
                     'ignore':{'regex':[]},
                     'show_raw':{'regex':[]}},
+           'ip':{'allow':[]},
            }
 
     try:
@@ -200,6 +234,7 @@ def parse_xml(path):
         except:
             ret['dirs']['exclude']['regex'].append('*')
             ret['files']['exclude']['regex'].append('*')
+            ret['ip']['allow'] = []
             return ret
 
         excluded = root.find('dirs/exclude')
@@ -236,6 +271,13 @@ def parse_xml(path):
                 if not show_raw.text:
                     continue
                 ret['files']['show_raw']['regex'].append(show_raw.text)
+
+        allow_ip = root.find('ip')
+        if allow_ip is not None:
+            for allow_ip in allow_ip.iterfind('allow'):
+                if not allow_ip.text:
+                    continue
+                ret['ip']['allow'].append(allow_ip.text)
 
         return ret
 

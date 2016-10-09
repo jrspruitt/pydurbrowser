@@ -67,11 +67,13 @@ def adm_login():
     """Authenticate users"""
     username = post_get('username')
     password = post_get('password')
-    aaa.login(username, password, success_redirect='/', fail_redirect='/login')
+    last_page = post_get('last_page')
+    aaa.login(username, password, success_redirect='/%s' % last_page, fail_redirect='/login')
 
 @bottle.route('/logout')
 def adm_logout():
-    aaa.logout(success_redirect='/', fail_redirect='/login')
+    last_page = bottle.request.GET.get('last_page', '/').strip()
+    aaa.logout(success_redirect='/%s' % last_page, fail_redirect='/login')
 
 @bottle.route('/login')
 @bottle.view('login_form')

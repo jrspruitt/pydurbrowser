@@ -1,3 +1,4 @@
+% import bottle
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -6,9 +7,10 @@
   <div class="box">
       <h2>Login</h2>
       <p>Please insert your credentials:</p>
-      <form action="login" method="post" name="login">
+      <form action="/login" method="post" name="login">
           <input type="text" name="username" />
           <input type="password" name="password" />
+          <input type="hidden" name="last_page" value="{{ bottle.request.GET.get('last_page', '').strip() }}" />
 
           <br/><br/>
           <button type="submit" > OK </button>

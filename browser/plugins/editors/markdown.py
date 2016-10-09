@@ -36,8 +36,7 @@ def name_formatter(name):
 
 def creator(url):
     check_url(url)
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template(tpl_path, url='/%s%s' % (updater_prefix, url), text='', name='')
+    return bottle.template('editors/markdown.tpl', url='/%s%s' % (updater_prefix, url), text='', name='')
 
 def editor(url):
     check_url(url)

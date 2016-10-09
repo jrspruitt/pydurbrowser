@@ -177,7 +177,8 @@ def parse_xml(path, is_parent = True):
     Return:
         Dict:config    Dict with dicts and lists of various config params.
     """
-    ret = {'title':'Site Title',
+    ret = {'init': False,
+           'title':'Site Title',
            'head_img':'',
            'desc':'Site Description',
            'theme':'',
@@ -250,7 +251,6 @@ def parse_xml(path, is_parent = True):
         if heading.find('js') is not None:
             for js_src in heading.iterfind('js'):
                 if js_src.text != "" and js_src.text is not None:
-                    print js_src.text
                     ret['heading']['js'].append(js_src.text)
 
         if heading.find('script') is not None:
@@ -263,6 +263,7 @@ def parse_xml(path, is_parent = True):
         if heading.find('style') is not None:
             ret['heading']['style'] = heading.find('style').text or ''
 
+    ret['init'] = True
     return ret
 
 

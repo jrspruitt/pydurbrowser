@@ -128,12 +128,10 @@ function mechcalc(){
 	 * elem - input element.
 	 */
 	this._textbox = function(t, id, elem){
-        console.log(id)
 		this.type = t.type_button;
 		this.id = id;
 		this.elem = elem;
         this.value = '';
-        this.u = {'cat':t.no_category}
 		t._html_calc_add_events(t, this)
 	}
 
@@ -483,7 +481,7 @@ function mechcalc(){
 			this.cur_item = '';
 		}
 
-		if(inp.u.cat != this.no_category){
+		if(inp.u && inp.u.cat != this.no_category){
 			this._convert_input_to_selected(inp);
 		}
 
@@ -1084,9 +1082,9 @@ function mechcalc(){
 		this.grid.skip_ylabels = 1;
 
 		/*
-		 * Used for rounding grid label numbers, 10 = 0.1, 100 = 0.01 etc
+		 * Number of decimal places to display on labels.
 		 */
-		this.grid.label_rounding = 1;
+		this.grid.label_rounding = 0;
 
 		/*
 		 * Creates an item to plot on the graph
@@ -1188,7 +1186,7 @@ function mechcalc(){
 		}
 
 		/*
-		 * Convert numbers to K M G or T for grid labels
+		 * Convert numbers to K M G or T and set decimal precision for grid labels
 		 */
 		this._short_num = function(num){
 			var sign = false;
@@ -1200,25 +1198,25 @@ function mechcalc(){
 				return num.toExponential();
 			}
 
-			if(snum<1000){ return num; }
+			if(snum<1000){ return snum.toFixed(this.grid.label_rounding); }
 
 			if(snum<1000000 && (snum/1000)>=1){
-				snum = Math.round((snum/1000)*this.grid.label_rounding)/this.grid.label_rounding + 'K';
+				snum = (snum/1000).toFixed(this.grid.label_rounding) + 'K';
 				if(sign){snum = '-'+snum;}
 				return snum
 			}
 			if(snum<1000000000 && (snum/1000000)>=1){
-				snum = Math.round((snum/1000000)*this.grid.label_rounding)/this.grid.label_rounding + 'M';
+				snum = (snum/1000000).toFixed(this.grid.label_rounding) + 'M';
 				if(sign){snum = '-'+snum;}
 				return snum
 			}
 			if(snum<1000000000000 && (snum/1000000000)>=1){
-				snum = Math.round((snum/1000000000)*this.grid.label_rounding)/this.grid.label_rounding + 'G';
+				snum = (snum/1000000000).toFixed(this.grid.label_rounding) + 'G';
 				if(sign){snum = '-'+snum;}
 				return snum
 			}
 			if((snum/1000000000000)>=1){
-				snum = Math.round((snum/1000000000000)*this.grid.label_rounding)/this.grid.label_rounding + 'T';
+				snum = (snum/1000000000000).toFixed(this.grid.label_rounding) + 'T';
 				if(sign){snum = '-'+snum;}
 				return snum
 			}			
@@ -1316,12 +1314,9 @@ function mechcalc(){
 				w = 0;
 				var last_label = 0;
 				var label_spacing = (this.xmax-this.xmin)/this.xlines;
-				var roundto = Math.round(1/Math.pow(10, Math.round(Math.log((this.xmax-this.xmin))/Math.LN10)-1));
-
-				if(roundto<1){roundto = 1;}
 
 				for(i=0; i<=this.width+2; i+=grid_xline_space){
-					var label = Math.round((label_spacing * w + this.xmin)*roundto)/roundto;
+                    var label = label_spacing * w + this.xmin;
 
 					if(label==0){
 						this.t.plot.xcenter = this.xstart + i;
@@ -1331,7 +1326,7 @@ function mechcalc(){
 					}
 
 					last_label = label
-					label = this.t._short_num(label)
+					label = this.t._short_num(label_spacing * w + this.xmin)
 
 					if(i == 0){
 						label_width = 0;
@@ -1352,12 +1347,9 @@ function mechcalc(){
 			var l = true;
 			var label_spacing = (this.ymax-this.ymin)/this.ylines;
 			var last_label = 0;
-			var roundto = Math.round(1/Math.pow(10, Math.round(Math.log((this.ymax-this.ymin))/Math.LN10)-1));
-
-			if(roundto<1){roundto = 1;}
 
 			for(i=0; i<=this.height+2; i+=grid_yline_space){
-				var label = Math.round((label_spacing * w + this.ymin)*roundto)/roundto;
+                var label = label_spacing * w + this.ymin;
 				if(label==0){
 					this.t.plot.ycenter = this.ystart - i;
 				}else if((last_label < 0 && label > 0) || (last_label + label) == 0){
@@ -1366,7 +1358,7 @@ function mechcalc(){
 				}
 
 				last_label = label
-				label = this.t._short_num(label)
+				label = this.t._short_num(label_spacing * w + this.ymin)
 
 				if(i == 0){
 					label_width = 5;
