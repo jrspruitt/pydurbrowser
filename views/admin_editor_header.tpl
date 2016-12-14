@@ -20,5 +20,12 @@
     <input type="hidden" name="last_page" value="{{ item.config.url }}" />
     | <a href="#" onclick="document.getElementById('login_form').submit();">Logout</a>
     </form>
-
+    <script type="text/javascript">
+    function creator_valid() {
+        if ($("#etype").val() != "") {
+            return true;
+        }
+        return false;
+    }
+    </script>
 % end

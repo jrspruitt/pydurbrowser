@@ -1,3 +1,5 @@
+% from browser.settings import editor_prefix
+
 <div id="mcalc">
     <div id="mcalc_xy_floater" class="mcalc_xy_floater"></div>
     <div class="content singling">
@@ -24,6 +26,10 @@
             </div>
         </div>
     </div>
+</div>
+% if page.config.logged_in:
+<div>
+    <a href="/{{ editor_prefix }}{{page.config.url}}/_calc/calc.js">Edit Javascript</a>
 </div>
 % if page.readme:
 <div class="content table">

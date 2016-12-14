@@ -42,8 +42,6 @@ def editor(url):
                 elif line.startswith('desc='):
                     desc = line[len('desc='):]
         
-
-    tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
     return bottle.template('editors/cgit.tpl', url='/%s%s' % (updater_prefix, url), name=name, desc=desc)
 
 def updater(url):

@@ -23,21 +23,10 @@
     % end
 	<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     % for js in item.config.js:
         <script type="text/javascript" src="{{! js }}"></script>
     % end
     <script type="text/javascript">
-    % if item.config.logged_in and isinstance(item, page):
-    function creator_valid() {
-        if ($("#etype").val() != "") {
-            return true;
-        }
-        return false;
-    }
-    % end
-
     $( document ).ready(function(){
     % if item.config.script:
         	{{! item.config.script }}
@@ -48,7 +37,7 @@
 <body>
 % if item.config.logged_in and isinstance(item, page):
 % include('admin_editor_header.tpl')
-% elif item.config.rules.allow_ip and isinstance(item, page):
+% elif item.config.rules.allow_ip:
     <form style="display:inline" id="login_form" action="/login" method="GET">
     <input type="hidden" name="last_page" value="{{ item.config.url }}" />
     <a href="#" onclick="document.getElementById('login_form').submit();">Login</a>
