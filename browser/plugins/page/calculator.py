@@ -19,15 +19,16 @@
 ##############################################################################
 
 import os
+import json
+import sqlite3 as sqlite
 from lxml import etree
 from bottle import template
 from browser.items import get_items
-import sqlite3 as sqlite
 from browser.settings import get_css, get_js
 
-def item_display(item, measures):
+def item_display(item):
     disp_tpl = os.path.join(os.path.dirname(__file__), 'calculator/templates/items/%s.tpl' % item['type'])
-    return template(disp_tpl, item=item, measures=measures)
+    return template(disp_tpl, item=item)
     
 
 def handler(page):
@@ -43,25 +44,18 @@ def handler(page):
 
     if calc:
         for item in calc['items']:
-            calc_items.append(item_display(item, calc['measures']))
+            calc_items.append(item_display(item))
             
         page.config.css.append(get_css('page/calculator.css', page))
         page.config.js.append(get_js('page/calculator/calc_app.js'))
+        page.config.js.append(get_js('page/calculator/units.js'))
         page.config.js.append(os.path.join('/%s' % page.config.url, '_calc/calc.js'))
-
-        ext_js = []
-        for cat in calc['measures']:
-            if calc['measures'][cat]['ext_conv'] == '1':
-                ext_js.append('%s.js' % calc['measures'][cat]['name'])
-
-        for js in ext_js:
-            page.config.js.append('/assets/plugins/page/calculator/units/%s' % js)
             
         page.config.css.append(get_css('media.css', page))
         page.config.css.append(get_css('list.css', page))
     
         calc_tpl = os.path.join(os.path.dirname(__file__), 'calculator/templates/calc_js.tpl')
-        page.config.script = template(calc_tpl, config=calc, ext_js=ext_js)
+        page.config.script = template(calc_tpl, config=calc)
 
         tpl_path = os.path.join(os.path.dirname(__file__), 'calculator/templates/template.tpl')
         page.display = template(tpl_path, page=page, calc_items=calc_items, rounding=calc['rounding'])
@@ -76,36 +70,7 @@ def calc_load(path):
         root = etree.parse(path).getroot()
         rounding = int(root.findtext('rounding')) if root.findtext('rounding') else 0
 
-        data = {'rounding':rounding, 'measures':{}, 'items':[]}
-
-        mdb = db()
-        db_cats = mdb.get_categories()
-        xmeasures = root.find('units')
-        measures = {}
-
-        if xmeasures is not None:
-            for cats in xmeasures.iterfind('category'):
-                cat = cats.findtext('name')
-                if cat in db_cats:
-                    measures[cat] = {'units':[], 'convert_to':cats.findtext('convert_to'), 'name':cats.findtext('name'), 'ext_conv':db_cats[cat]['ext_conv']}
-                    iids = cats.find('types')
-                    units = []
-                    db_units = mdb.get_units(cat)
-
-                    for iid in iids.iterfind('id'):
-                        uid = iid.text if iid.text else ''
-                        label = iid.get('label') if iid.get('label') else ''
-                        
-                        if db_cats[cat]['ext_conv'] != '1':
-                            units.append({'id':uid, 'label':label, 'conv':db_units[uid]['conversion']})
-                        else:
-                            units.append({'id':uid, 'label':label})
-                            
-    
-                    measures[cats.findtext('name')]['units'] = units
-
-        data['measures'] = measures
-        
+        data = {'rounding':rounding, 'items':[]}
         xitems = root.find('items')
 
         items = []
@@ -159,6 +124,7 @@ def calc_load(path):
                 iconfig = item.find('config')
                 ibutton = iconfig.findtext('button') if iconfig.findtext('button') else 0
                 category = iconfig.findtext('category') if iconfig.findtext('category') != '' else 'None'
+                convert_to = iconfig.findtext('convert_to') if iconfig.findtext('convert_to') != '' else 'None'
                 display = {}
                 display['value'] = iconfig.findtext('display/value') if iconfig.findtext('display/value') else ''
                 display['radix'] = iconfig.findtext('display/radix') if iconfig.findtext('display/radix') else 0
@@ -168,7 +134,10 @@ def calc_load(path):
                 else:
                     d = iconfig.findtext('display/units/default') if iconfig.findtext('display/units/default') else ''
                     si = iconfig.findtext('display/units/si')if iconfig.findtext('display/units/si') else ''
-                    display['units'] = {'default':d, 'si':si}
+                    units = []
+                    for utypes in iconfig.iterfind('display/units/types/id'):
+                        units.append(utypes.text)
+                    display['units'] = {'default':d, 'si':si, 'types':units}
 
                 items.append({
                         'id':iid,
@@ -177,6 +146,7 @@ def calc_load(path):
                         'config':{
                             'button':ibutton,
                             'category':category,
+                            'convert_to':convert_to,
                              'display':display}})
 
 
@@ -270,9 +240,13 @@ class db():
     def get_all(self):
         self._db_open()
         categories = self._get_categories()
+
         for category in categories:
-            units = self._get_units(category)
-            categories[category]["units"] = {}
-            for unit in units:
-                categories[category]["units"][unit] = units[unit]
+            if categories[category]['ext_conv'] == '0':
+                units = self._get_units(category)
+                categories[category]["units"] = {}
+
+                for unit in units:
+                    categories[category]["units"][unit] = units[unit]
+
         return categories

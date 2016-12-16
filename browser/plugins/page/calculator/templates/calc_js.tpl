@@ -3,22 +3,6 @@ window.onload=function(){
     mc.rounding = {{ config['rounding'] }};
 	% items = "','".join([i['id'] for i in config['items']])
     mc.items = ['{{! items }}'];
-
-    % for cat in config['measures']:
-            % add_units = ''
-            % idx = 0
-            % for unit in config['measures'][cat]['units']:
-                % if config['measures'][cat]['ext_conv'] != '1':
-                    % add_units += '"%s":{label:"%s", conv:%s, idx:%s},' % (unit['id'], unit['label'], unit['conv'], idx)
-                    % idx += 1
-                % end
-            % end
-           mc.units["{{ config['measures'][cat]['name'] }}"]={convert_to:"{{ config['measures'][cat]['convert_to'] }}", {{! add_units }}};
-    % end
-
-% for js in ext_js:
-        {{ js.strip('.js') }}();
-% end
     
     mc.inputs_init();
     
@@ -40,10 +24,18 @@ window.onload=function(){
         % if 'units' in item['config']['display']:
         % udefault = item['config']['display']['units']['default']
         % usi = item['config']['display']['units']['si']
-        mc.{{ item['id'] }}.u.display={udefault:'{{ udefault }}',si:'{{ usi }}'};
+        % utypes = '","'.join(item['config']['display']['units']['types'])
+        mc.{{ item['id'] }}.u.display={udefault:'{{ udefault }}',si:'{{ usi }}', types:["{{! utypes }}"]};
         mc.{{ item['id'] }}.u.unit='{{ udefault }}';
         % end
         mc.{{ item['id'] }}.u.cat='{{ item['config']['category'] }}';
+        % if item['config']['category'] != 'None':
+                % if item['config']['convert_to'] != 'None':
+        mc.{{ item['id'] }}.u.convert_to='{{ item['config']['convert_to'] }}';
+                % else:
+        mc.{{ item['id'] }}.u.convert_to=mc.units.{{ item['config']['category'] }}.convert_to;
+                % end
+        % end
         mc._html_calc_unit_options('{{ item['id'] }}');
 
     % elif item['type'] == 'choice':

@@ -31,12 +31,18 @@ creator_prefix = 'creator/'
 asset_path = '/assets'
 
 # available editor plugins.
-editor_plugins = ['bookmarks', 'cgit', 'config', 'description', 'markdown']
+editor_plugins = ['bookmarks', 'cgit', 'config', 'description', 'markdown', 'calculator']
 # Display create in admin portion of page
-show_editors = ['bookmarks', 'markdown']
+show_editors = ['bookmarks', 'markdown', 'calculator']
 
 # Use random secure number, and keep secret!
 session_key = 'CHANGE THIS!!!'
+
+# Resized image settings
+img_display = '_displayimgs'
+img_display_size = (800, 600)
+img_thumbs = '_thumbnails'
+img_thumbs_size = (320, 240)
 
 # function call because request isn't available on import
 def data_path():

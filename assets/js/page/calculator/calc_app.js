@@ -20,28 +20,28 @@ function mechcalc(){
 	this.i = new Object();
 	this.units = new Object();
 	this.rounding = 0;
-    this.rad_dec = 0;
-    this.rad_bin = 1;
-    this.rad_hex = 2;
-    this.radix = this.rad_dec;
+	this.rad_dec = 0;
+	this.rad_bin = 1;
+	this.rad_hex = 2;
+	this.radix = this.rad_dec;
 	this.cur_item = '';
 	this.type_calc = 'calc';
 	this.type_choice = 'choice';
 	this.type_graph = 'graph';
 	this.type_label = 'label';
-    this.type_button = 'button';
-    this.type_textbox = 'textbox';
+	this.type_button = 'button';
+	this.type_textbox = 'textbox';
 	this.type_seperator = 'seperator';
 	this.type_diagram = 'diagram';
 	this.no_category = 'None';
 	this.err_val = 'error';
 	this.err_num = 'Must be a number.';
-    this.gt = 'gt';
-    this.gteq = 'gteq';
-    this.lt = 'lt';
-    this.lteq = 'lteq';
-    this.eq = 'eq';
-    this.not = 'not';
+	this.gt = 'gt';
+	this.gteq = 'gteq';
+	this.lt = 'lt';
+	this.lteq = 'lteq';
+	this.eq = 'eq';
+	this.not = 'not';
 
 
 	/**********************************************************
@@ -61,9 +61,9 @@ function mechcalc(){
 		this.elem = elem;
 		this.value = elem.value;
 		this.dvalue = '';
-        this.radix = t.rad_dec
-		this.u = {'cat':'', 'unit':'', 'elem':''};
-		this.u.display = {'udefault':'', 'si':''};
+		this.radix = t.rad_dec
+		this.u = {'cat':'', 'unit':'', 'elem':'', 'convert_to':''};
+		this.u.display = {'udefault':'', 'si':'', 'types':[]};
 		this.error_msg = '';
 		this.used = false;
 		
@@ -73,7 +73,7 @@ function mechcalc(){
 		t._html_calc_add_events(t, this)
 
 		this.value_as = function(unit){
-			var ret = t._conversion(this.value, this.u.cat, t.units[this.u.cat].convert_to, unit);
+			var ret = t._conversion(this.value, this.u.cat, this.u.convert_to, unit);
 			
 			if(t.is_number(ret)){
 				return ret;
@@ -131,7 +131,7 @@ function mechcalc(){
 		this.type = t.type_button;
 		this.id = id;
 		this.elem = elem;
-        this.value = '';
+		this.value = '';
 		t._html_calc_add_events(t, this)
 	}
 
@@ -239,11 +239,11 @@ function mechcalc(){
 	 */
 	this._html_graph_add_events = function(elem, id){
 		var t = this;
-        elem.addEventListener('mousemove', function(event){t.i[id]._xyfloat(event)}, false)
-        elem.addEventListener('mouseout', function(event){t.i[id]._xyfloat_off()}, false)
+		elem.addEventListener('mousemove', function(event){t.i[id]._xyfloat(event)}, false)
+		elem.addEventListener('mouseout', function(event){t.i[id]._xyfloat_off()}, false)
 
-        var btn_elem = document.getElementById('mcalc_graph_btn_' + id);
-        btn_elem.addEventListener('click', function(){t['graph_' + id]()}, false);
+		var btn_elem = document.getElementById('mcalc_graph_btn_' + id);
+		btn_elem.addEventListener('click', function(){t['graph_' + id]()}, false);
 	}
 
 	/*
@@ -296,17 +296,10 @@ function mechcalc(){
 	 */
 	this._html_calc_unit_options = function(id){
 		if(this.i[id].u.cat == this.no_category){return;}
-		var units = this.units[this.i[id].u.cat];
-		var u = [units.length-1];
 
-		for(unit in units){
-			if(unit == "convert_to"){continue;}
-			u[units[unit]['idx']] = ([unit, units[unit]['label']])
-		}
-		
-		for(var i = 0; i < u.length; i++){
-			text = u[i][1] || u[i][0];
-			this._html_create_option(this.i[id].u.elem, text, u[i][0]);
+		for (unit in this.i[id].u.display.types){
+			var name = this.i[id].u.display.types[unit];
+			this._html_create_option(this.i[id].u.elem, name, name);
 		}
 
 		this._set_select_option_by_value(this.i[id].u.elem, this.i[id].u.display.udefault);
@@ -349,7 +342,7 @@ function mechcalc(){
 
 	/*
 	 * Get all input objects values from GUI input boxes.
-	 *    See this.get() for more info.
+	 *	See this.get() for more info.
 	 *
 	 * list - List of inputs to get.
 	 * gui - True show gui errors/valid (default), false do not show.
@@ -378,8 +371,8 @@ function mechcalc(){
 
 	/*
 	 * Get all input objects values from GUI input boxes.
-	 *    Except this.cur_item which is set by calc button.
-	 *    See this.get() for more info.
+	 *	Except this.cur_item which is set by calc button.
+	 *	See this.get() for more info.
 	 *
 	 * gui - True show gui errors/valid (default), false do not show.
 	 * Returns: True no errors, false on at least one error.
@@ -413,12 +406,12 @@ function mechcalc(){
 
 	/*
 	 * Get input objects value from GUI input box
-	 *    Choice type input is assumed valid and there is no conversion. 
-	 *    Clears gui decoration regardless of gui setting.
-	 *    Clears previous error_msg.
-	 *    Validation errors are first come first serve, starting with NaN
-	 *        and checking the this.valid() object in order.
-	 *    
+	 *	Choice type input is assumed valid and there is no conversion. 
+	 *	Clears gui decoration regardless of gui setting.
+	 *	Clears previous error_msg.
+	 *	Validation errors are first come first serve, starting with NaN
+	 *		and checking the this.valid() object in order.
+	 *	
 	 * inp - Input object.
 	 * gui - True show gui errors/valid (default), false do not show.
 	 * Return: True if no errors, false on errors.
@@ -465,11 +458,11 @@ function mechcalc(){
 	
 	/*
 	 * Set input object's GUI input box to input.value and clean up.
-	 *     Will convert back to GUI selected units.
-	 *     Triggers loop that marks all the valid inputs used. (green box)
-	 *     Unless input is provided, then no valid gui decorating
-	 *     Clears decoration on input box that it sets.
-	 *     Error gui decorating works regardless.
+	 *	 Will convert back to GUI selected units.
+	 *	 Triggers loop that marks all the valid inputs used. (green box)
+	 *	 Unless input is provided, then no valid gui decorating
+	 *	 Clears decoration on input box that it sets.
+	 *	 Error gui decorating works regardless.
 	 * 
 	 * inp - Input object (optional will use cur_item if not specified).
 	 */
@@ -677,15 +670,15 @@ function mechcalc(){
 		if(!this.is_number(inp.value)){
 			inp.elem.value = inp.value;
 		} else {
-            rounded = this._format_rounder(inp.value);
+			rounded = this._format_rounder(inp.value);
 
-            if (inp.radix == this.rad_dec) {
-                inp.elem.value = rounded;
-            } else if (inp.radix == this.rad_bin){
-                inp.elem.value = '0b' + rounded.toString(2);
-            } else if (inp.radix == this.rad_hex){
-                inp.elem.value = '0x' + rounded.toString(16);
-            }
+			if (inp.radix == this.rad_dec) {
+				inp.elem.value = rounded;
+			} else if (inp.radix == this.rad_bin){
+				inp.elem.value = '0b' + rounded.toString(2);
+			} else if (inp.radix == this.rad_hex){
+				inp.elem.value = '0x' + rounded.toString(16);
+			}
 		}
 	}
 
@@ -702,7 +695,7 @@ function mechcalc(){
 	 * Returns: Converted value or conversion error string on fail.
 	 */
 	this.convert_value_to_selected = function(inp, value){
-		return this._conversion(value, inp.u.cat, this.units[inp.u.cat].convert_to, inp.u.unit);
+		return this._conversion(value, inp.u.cat, inp.u.convert_to, inp.u.unit);
 	}
 
 	/*
@@ -713,7 +706,7 @@ function mechcalc(){
 	 * Returns: Converted value or conversion error string on fail.
 	 */
 	this.convert_value_to_default = function(inp, value){
-		return this._conversion(value, inp.u.cat, inp.u.unit, this.units[inp.u.cat].convert_to);
+		return this._conversion(value, inp.u.cat, inp.u.unit, inp.u.convert_to);
 	}
 
 	/*
@@ -723,7 +716,7 @@ function mechcalc(){
 	 * Return: True success, false failure.
 	 */
 	this._convert_input_to_default = function(inp){
-		return this._convert_input(inp, inp.u.unit, this.units[inp.u.cat].convert_to);
+		return this._convert_input(inp, inp.u.unit, inp.u.convert_to);
 	}
 
 	/*
@@ -733,7 +726,7 @@ function mechcalc(){
 	 * Return: true success, false failure
 	 */
 	this._convert_input_to_selected = function(inp){
-		return this._convert_input(inp, this.units[inp.u.cat].convert_to, inp.u.unit);
+		return this._convert_input(inp, inp.u.convert_to, inp.u.unit);
 	}
 
 	/* Convert input to specified units within inputs unit category.
@@ -808,8 +801,8 @@ function mechcalc(){
 
 	/*
 	 * Format input.value.
-	 *     if fraction or x10 sci notation, convert to js friendly
-	 *     if isNaN set input.value=NaN
+	 *	 if fraction or x10 sci notation, convert to js friendly
+	 *	 if isNaN set input.value=NaN
 	 *
 	 * inp - Input object
 	 */
@@ -955,7 +948,7 @@ function mechcalc(){
 		 */
 		this.id = id;
 		this.elem = elem;
-        this.t = t
+		this.t = t
 		this.t._html_showhide_add_event(this.id);
 		this.enabled = true;
 
@@ -973,10 +966,10 @@ function mechcalc(){
 		this.grid.t = this;
 		this.plot = {};
 		this.plot.t = this;
-        this.plot.items = {}
+		this.plot.items = {}
 		this.log = {};
 
-        /************************
+		/************************
 		 * Internally defined and calculated options
 		 */
 		this.log.min = 0;
@@ -1008,24 +1001,24 @@ function mechcalc(){
 		this.plot.ycenter = this.grid.ycenter;
 		this.plot.edge = this.grid.xstart;
 
-        this.plot.colors = {'red':[255,0,0,1],
-        					'green':[0,255,0,1],
-        					'blue':[0,0,255,1],
-        					'yellow':[255,255,0,1],
-        					'orange':[255,127,0,1],
-        					'purple':[127,0,127,1],
-        					'pink':[255,0,255,1],
-        					'aqua':[0,255,255,1],
-        					'gray':[127,127,127,1],
-        						}
+		this.plot.colors = {'red':[255,0,0,1],
+							'green':[0,255,0,1],
+							'blue':[0,0,255,1],
+							'yellow':[255,255,0,1],
+							'orange':[255,127,0,1],
+							'purple':[127,0,127,1],
+							'pink':[255,0,255,1],
+							'aqua':[0,255,255,1],
+							'gray':[127,127,127,1],
+								}
 
 		/************************
 		 * User calc.xml options
 		 */
-        /*
-         * type - 'log' (x-axis) or 'normal'
-         * align - 'left' or 'center' major grid line locations (normal only)
-         */
+		/*
+		 * type - 'log' (x-axis) or 'normal'
+		 * align - 'left' or 'center' major grid line locations (normal only)
+		 */
 		this.grid.type = 'normal';
 		this.grid.align = 'left';
 
@@ -1095,9 +1088,9 @@ function mechcalc(){
 		 */
 
 		this.plot.add_item = function(label, xunits, yunits, color){
-        	var rgba = this.colors[color];
-        	var rgba_str = 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+',1)';
-            this.items[label] = [label, yunits, xunits, rgba, rgba_str];
+			var rgba = this.colors[color];
+			var rgba_str = 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+',1)';
+			this.items[label] = [label, yunits, xunits, rgba, rgba_str];
 			this.t.ctx.fillStyle=rgba_str;
 			this.t.ctx.fillText(label, this.edge + 10, this.t.grid.ystart+25);
 			this.edge += label.toString().length * 7;
@@ -1316,7 +1309,7 @@ function mechcalc(){
 				var label_spacing = (this.xmax-this.xmin)/this.xlines;
 
 				for(i=0; i<=this.width+2; i+=grid_xline_space){
-                    var label = label_spacing * w + this.xmin;
+					var label = label_spacing * w + this.xmin;
 
 					if(label==0){
 						this.t.plot.xcenter = this.xstart + i;
@@ -1349,7 +1342,7 @@ function mechcalc(){
 			var last_label = 0;
 
 			for(i=0; i<=this.height+2; i+=grid_yline_space){
-                var label = label_spacing * w + this.ymin;
+				var label = label_spacing * w + this.ymin;
 				if(label==0){
 					this.t.plot.ycenter = this.ystart - i;
 				}else if((last_label < 0 && label > 0) || (last_label + label) == 0){
@@ -1404,15 +1397,15 @@ function mechcalc(){
 			this._xyfloater.style.display = 'none';
 		}
 
-        this._xyfloat_color_check = function(rgba, against) {
-            for (var i = 0; i<rgba.length-1; i++) {
-                if ( rgba[i] < against[i]-5 || rgba[i] > against[i]+5) { return false; }
-            }
-            return true;
-        }
+		this._xyfloat_color_check = function(rgba, against) {
+			for (var i = 0; i<rgba.length-1; i++) {
+				if ( rgba[i] < against[i]-5 || rgba[i] > against[i]+5) { return false; }
+			}
+			return true;
+		}
 
 		this._xyfloat = function(e){
-            if(this.plot.items.length < 1) {return false; }
+			if(this.plot.items.length < 1) {return false; }
 			var e = e || window.e;
 			var total_offset_x = 0;
 			var total_offset_y = 0;
@@ -1444,19 +1437,19 @@ function mechcalc(){
 			if(this._xoff_grid(graph_x)){this._xyfloat_off(); return false;}
 			if(this._yoff_grid(graph_y)){this._xyfloat_off(); return false;}
 
-            var rgba = this.ctx.getImageData(graph_x, graph_y, 1, 1).data;
+			var rgba = this.ctx.getImageData(graph_x, graph_y, 1, 1).data;
 
-            if(this._xyfloat_color_check(rgba, [0,0,0])) {this._xyfloat_off(); return false; }
+			if(this._xyfloat_color_check(rgba, [0,0,0])) {this._xyfloat_off(); return false; }
 
-            var plot_item = '';
+			var plot_item = '';
 
-            for(pitem in this.plot.items){
-                if (this._xyfloat_color_check(rgba, this.plot.items[pitem][3])) {
-                    plot_item = this.plot.items[pitem];
-                }
-            }
+			for(pitem in this.plot.items){
+				if (this._xyfloat_color_check(rgba, this.plot.items[pitem][3])) {
+					plot_item = this.plot.items[pitem];
+				}
+			}
  
-            if(plot_item == ''){ return false; }
+			if(plot_item == ''){ return false; }
 
 			if(this.grid.type == 'log' && (graph_x) != 0){
 				adjx = this.t._format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.log.range+this.log.min));
@@ -1506,7 +1499,7 @@ function mechcalc(){
 			if(inp.u.display[sys] != ''){
 				var units = inp.u.display[sys];
 			}else{
-				var units = this.units[inp.u.cat].convert_to;
+				var units = inp.u.convert_to;
 			}
 
 			this.get(inp, true);

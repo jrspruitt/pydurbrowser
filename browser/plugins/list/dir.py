@@ -39,17 +39,20 @@ def handler(item, config):
     else:
         dir_rules = config.rules
 
-    for subitem in os.listdir(item.path):
-        subitem_path = os.path.join(item.path, subitem)
-        if os.path.isdir(subitem_path):
-            if dir_rules.exclude_dir(subitem_path) or dir_rules.ignore_dir(subitem_path):
+    try:
+        for subitem in os.listdir(item.path):
+            subitem_path = os.path.join(item.path, subitem)
+            if os.path.isdir(subitem_path):
+                if dir_rules.exclude_dir(subitem_path) or dir_rules.ignore_dir(subitem_path):
+                    continue
+                subitems += 1
+            elif dir_rules.exclude_file(subitem_path) or dir_rules.ignore_file(subitem_path):
                 continue
-            subitems += 1
-        elif dir_rules.exclude_file(subitem_path) or dir_rules.ignore_file(subitem_path):
-            continue
-        else:
-            subitems += 1
-    
+            else:
+                subitems += 1
+    except:
+        subitems = 0
+
     item.size = '%s Items' % subitems
     item.name = '%s/' % item.name.rstrip('/')
     item.display = template('lists/directory.tpl', item=item)

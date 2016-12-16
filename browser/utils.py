@@ -20,7 +20,7 @@
 
 import os
 from PIL import Image
-from browser.settings import display_prefix
+from browser.settings import display_prefix, img_display, img_thumbs, img_display_size, img_thumbs_size
 cleanup_counter = 0
 
 def display_url(path):
@@ -51,14 +51,14 @@ def get_filesize(path):
         
 
 def process_thumbnail(item):
-    _process_image(item, 320, 240, '_thumbnails')
+    _process_image(item, img_thumbs_size[0], img_thumbs_size[1], img_thumbs)
 
 def process_displayimg(item):
-    _process_image(item, 800, 600, '_displayimgs')
+    _process_image(item, img_display_size[0], img_display_size[1], img_display)
 
 def _process_image(item, rwidth, rheight, img_dir):
     global cleanup_counter
-    if cleanup_counter < 25:
+    if cleanup_counter < 50:
         cleanup_counter += 1
     else:
         _cleanup_images(os.path.dirname(item.path))
@@ -77,14 +77,15 @@ def _process_image(item, rwidth, rheight, img_dir):
         try:
             os.mkdir(rimg_dir)
         except:
-            return
+            item.resized_img_url = item.url
+            item.resized_img_path = item.path
 
     try:
         with Image.open(item.path) as im:
             im.thumbnail([rwidth, rheight], Image.ANTIALIAS)
             im.save(rimg_path)
-    except Exception as e:
-        print e
+
+    except:
         item.resized_img_url = item.url
         item.resized_img_path = item.path
 
@@ -101,8 +102,8 @@ def _list_dir(path):
 
 def _cleanup_images(path):
     images = _list_dir(path)
-    thumbs = _list_dir(os.path.join(path, '_thumbnails'))
-    display = _list_dir(os.path.join(path, '_displayimgs'))
+    thumbs = _list_dir(os.path.join(path, img_thumbs))
+    display = _list_dir(os.path.join(path, img_display))
 
     for image in images:
         if image in thumbs:
@@ -113,14 +114,14 @@ def _cleanup_images(path):
 
     if len(thumbs):
         for t in thumbs:
-            tpath = os.path.join(path, '_thumbnails', t)
+            tpath = os.path.join(path, img_thumbs, t)
 
             if os.path.exists(tpath):
                 os.remove(tpath)
 
     if len(display):
         for d in display:
-            dpath = os.path.join(path, '_displayimgs', d)
+            dpath = os.path.join(path, img_display, d)
 
             if os.path.exists(dpath):
                 os.remove(dpath)
