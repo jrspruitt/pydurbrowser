@@ -481,7 +481,8 @@ Mechcalc.prototype._choice = function(t, item){
     Mechcalc.prototype._html_button_gui = function(t, item){
         var button = $("<button />",{class:"mcalc_calcbutton",
                                      id:"mcalc_" + item.id + "_btn",
-                                     text:item.label});
+                                     text:item.label})
+                                     .on('click',function(){t.cur_item=item.id;t['calc_' + item.id]();});;
 
         var input = $("<input />", {type:"hidden",
                                     class:"mcalc_button",
