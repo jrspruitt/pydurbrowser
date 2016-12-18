@@ -22,7 +22,7 @@ import os
 import bottle
 
 # default settings for site.
-config_filename = 'pdb_config.xml'
+config_filename = '.pdb_config.xml'
 desc_ext = '.desc'
 display_prefix = 'display/'
 editor_prefix = 'editor/'
@@ -39,9 +39,9 @@ show_editors = ['bookmarks', 'markdown', 'calculator']
 session_key = 'CHANGE THIS!!!'
 
 # Resized image settings
-img_display = '_displayimgs'
+img_display = '.imgs_display'
 img_display_size = (800, 600)
-img_thumbs = '_thumbnails'
+img_thumbs = '.imgs_thumbs'
 img_thumbs_size = (320, 240)
 
 # function call because request isn't available on import

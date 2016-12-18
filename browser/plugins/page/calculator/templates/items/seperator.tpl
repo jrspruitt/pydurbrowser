@@ -1,1 +1,0 @@
-<div id="mcalc_{{item['id']}}" class="mcalc_seperator"></div>
