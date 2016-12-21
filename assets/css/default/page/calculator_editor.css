@@ -1,0 +1,38 @@
+.table{display:table;}
+.tr{ display:table-row;}
+.td{ display:table-cell;}
+
+input{margin:4px;}
+#item_units_sort, #units_sort {
+    border: 1px solid #eee;
+    width: 142px;
+    min-height: 20px;
+    list-style-type: none;
+    margin: 0;
+    padding: 5px 0 0 0;
+    float: left;
+    margin-right: 10px;
+  }
+#item_units_sort li, #units_sort li {
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    font-size: 1.2em;
+    width: 120px;
+  }
+
+#choice_options {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+#choice_options li {
+    margin: 4px;
+    padding: 4px;
+}
+
+#choice_options li span {
+    position: absolute;
+    margin-left: -1.3em;
+}

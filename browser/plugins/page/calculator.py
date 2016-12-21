@@ -23,11 +23,6 @@ from bottle import template
 from browser.items import get_items
 from browser.settings import get_css, get_js
 
-def item_display(item):
-    disp_tpl = os.path.join(os.path.dirname(__file__), 'calculator/templates/items/%s.tpl' % item['type'])
-    return template(disp_tpl, item=item)
-    
-
 def handler(page):
     page.config.rules.exclude_dirs = '_calc'
     items = get_items(page.config)

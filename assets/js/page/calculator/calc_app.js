@@ -23,24 +23,24 @@ var Mechcalc = function(config_url){
     this.rad_bin = 1;
     this.rad_hex = 2;
     this.radix = this.rad_dec;
-    this.cur_item = '';
-    this.type_calc = 'calc';
-    this.type_choice = 'choice';
-    this.type_graph = 'graph';
-    this.type_label = 'label';
-    this.type_button = 'button';
-    this.type_textbox = 'textbox';
-    this.type_seperator = 'seperator';
-    this.type_diagram = 'diagram';
-    this.no_category = 'None';
-    this.err_val = 'error';
-    this.err_num = 'Must be a number.';
-    this.gt = 'gt';
-    this.gteq = 'gteq';
-    this.lt = 'lt';
-    this.lteq = 'lteq';
-    this.eq = 'eq';
-    this.not = 'not';
+    this.cur_item = "";
+    this.type_calc = "calc";
+    this.type_choice = "choice";
+    this.type_graph = "graph";
+    this.type_label = "label";
+    this.type_button = "button";
+    this.type_textbox = "textbox";
+    this.type_seperator = "seperator";
+    this.type_diagram = "diagram";
+    this.no_category = "None";
+    this.err_val = "error";
+    this.err_num = "Must be a number.";
+    this.gt = "gt";
+    this.gteq = "gteq";
+    this.lt = "lt";
+    this.lteq = "lteq";
+    this.eq = "eq";
+    this.not = "not";
     
     /*
      * Initialize all the inputs.
@@ -52,47 +52,47 @@ var Mechcalc = function(config_url){
         items = data.items;
 
         for(var i = 0; i < items.length; i++){
-            var id = items[i]['id'];
+            var id = items[i]["id"];
 
-            if(items[i]['type'] == t.type_calc){
+            if(items[i]["type"] == t.type_calc){
                 t._html_calc_gui(t, items[i]);
                 t[id] = new t._input(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_choice){
+            }else if(items[i]["type"] == t.type_choice){
                 t._html_choice_gui(t, items[i]);
                 t[id] = new t._choice(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_graph){
+            }else if(items[i]["type"] == t.type_graph){
                 t._html_graph_gui(t, items[i]);
                 t[id] = new t.graph(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_diagram){
+            }else if(items[i]["type"] == t.type_diagram){
                 t._html_diagram_gui(t, items[i]);
                 t[id] = new t._diagram(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_button){
+            }else if(items[i]["type"] == t.type_button){
                 t._html_button_gui(t, items[i]);
                 t[id] = new t._button(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_textbox){
+            }else if(items[i]["type"] == t.type_textbox){
                 t._html_textbox_gui(t, items[i]);
                 t[id] = new t._textbox(t, items[i]);
                 t.i[id] = t[id];
 
-            }else if(items[i]['type'] == t.type_seperator){
+            }else if(items[i]["type"] == t.type_seperator){
                 t._html_seperator_gui(t, items[i]);
 
-            }else if(items[i]['type'] == t.type_label){
+            }else if(items[i]["type"] == t.type_label){
                 t._html_label_gui(t, items[i]);
                 
             }else{
                 t[id] = new Object();
-                t[id].type = '';
+                t[id].type = "";
                 t.i[id] = t[id];
             }
         }
@@ -112,29 +112,29 @@ var Mechcalc = function(config_url){
      */
 
     Mechcalc.prototype._input = function(t, item){
-        this.type = item['type'];
-        this.id = item['id'];
-        this.elem = document.getElementById('mcalc_' + this.id);
+        this.type = item["type"];
+        this.id = item["id"];
+        this.elem = document.getElementById("mcalc_" + this.id);
         this.value = this.elem.value;
-        this.dvalue = item['config']['display']['value'];
-        this.radix = item['config']['display']['radix']
+        this.dvalue = item["config"]["display"]["value"];
+        this.radix = item["config"]["display"]["radix"]
 
-        var start_unit = '';
-        if(item['config']['category'] != 'None'){
-            start_unit = item['config']['display']['units']['udefault']
+        var start_unit = "";
+        if(item["config"]["category"] != "None"){
+            start_unit = item["config"]["display"]["units"]["udefault"]
         }
 
-        this.u = {'cat':item['config']['category'],
-                  'unit':start_unit,
-                  'elem':'',
-                  'convert_to':item['config']['convert_to']};
-        this.u.display = item['config']['display']['units'];
-        this.error_msg = '';
+        this.u = {"cat":item["config"]["category"],
+                  "unit":start_unit,
+                  "elem":"",
+                  "convert_to":item["config"]["convert_to"]};
+        this.u.display = item["config"]["display"]["units"];
+        this.error_msg = "";
         this.used = false;
         
         this.valid = new t._valid(t, this);
 
-        this.u.elem = document.getElementById('mcalc_' + this.id + '_unit_select');
+        this.u.elem = document.getElementById("mcalc_" + this.id + "_unit_select");
 
         this.value_as = function(unit){
             var ret = t._conversion(this.value, this.u.cat, this.u.convert_to, unit);
@@ -154,20 +154,20 @@ var Mechcalc = function(config_url){
      * elem - input element.
      */
 Mechcalc.prototype._choice = function(t, item){
-        this.type = item['type'];
-        this.id = item['id'];
-        this.elem = document.getElementById('mcalc_' + this.id);
-        this.cdefault = item['config']['options'][0]['value']
-        this.selected = item['config']['options'][0]['value']
+        this.type = item["type"];
+        this.id = item["id"];
+        this.elem = document.getElementById("mcalc_" + this.id);
+        this.cdefault = item["config"]["options"][0]["value"]
+        this.selected = item["config"]["options"][0]["value"]
         this.options = [];
 
-        for ( var opt in item['config']['options'] ){
-            var copt = item['config']['options'][opt];
-            this.options.push({'label':copt['label'], 'value':copt['value']});
+        for ( var opt in item["config"]["options"] ){
+            var copt = item["config"]["options"][opt];
+            this.options.push({"label":copt["label"], "value":copt["value"]});
 
-            if (copt['selected'].toLowerCase() == 'true'){
-                this.cdefault = copt['value'];
-                this.selected = copt['value'];
+            if (copt["selected"]){
+                this.cdefault = copt["value"];
+                this.selected = copt["value"];
             }
         }
         this.value = t._get_selected_value(this);
@@ -177,8 +177,8 @@ Mechcalc.prototype._choice = function(t, item){
      * Diagram object.
      */
     Mechcalc.prototype._diagram = function(t, item){
-        this.type = item['type'];
-        this.id = item['id'];
+        this.type = item["type"];
+        this.id = item["id"];
     }
 
     /*
@@ -189,9 +189,9 @@ Mechcalc.prototype._choice = function(t, item){
      * elem - input element.
      */
     Mechcalc.prototype._button = function(t, item){
-        this.type = item['type'];
-        this.id = item['id'];
-        this.elem = document.getElementById('mcalc_' + this.id);;
+        this.type = item["type"];
+        this.id = item["id"];
+        this.elem = document.getElementById("mcalc_" + this.id);;
         //t._html_calc_add_events(t, this)
     }
 
@@ -203,10 +203,10 @@ Mechcalc.prototype._choice = function(t, item){
      * elem - input element.
      */
     Mechcalc.prototype._textbox = function(t, item){
-        this.type = item['type'];
-        this.id = item['id'];
-        this.elem = document.getElementById('mcalc_' + this.id);;
-        this.value = '';
+        this.type = item["type"];
+        this.id = item["id"];
+        this.elem = document.getElementById("mcalc_" + this.id);;
+        this.value = "";
         //t._html_calc_add_events(t, this)
     }
 
@@ -224,12 +224,12 @@ Mechcalc.prototype._choice = function(t, item){
         this.eq = false;
         this.not = false;
         this.clear = function(){ this.gt = this.gteq = this.lt = this.lteq = this.eq = this.not = false; }
-        this.func_gt = function(){ this.func(inp.value > this.gt, '> than ', this.gt); };
-        this.func_gteq = function(){ this.func(inp.value >= this.gteq,  '>= to ', this.gteq); };
-        this.func_lt = function(){ this.func(inp.value  < this.lt, '< than ', this.lt); };
-        this.func_lteq = function(){ this.func(inp.value <= this.lteq, '<= to', this.lteq); };
-        this.func_eq = function(){ this.func(inp.value == this.eq || '= to ', this.eq); };
-        this.func_not = function(){ this.func(inp.value != this.not, '!= to ', this.not); };
+        this.func_gt = function(){ this.func(inp.value > this.gt, "> than ", this.gt); };
+        this.func_gteq = function(){ this.func(inp.value >= this.gteq,  ">= to ", this.gteq); };
+        this.func_lt = function(){ this.func(inp.value  < this.lt, "< than ", this.lt); };
+        this.func_lteq = function(){ this.func(inp.value <= this.lteq, "<= to", this.lteq); };
+        this.func_eq = function(){ this.func(inp.value == this.eq || "= to ", this.eq); };
+        this.func_not = function(){ this.func(inp.value != this.not, "!= to ", this.not); };
         this.func = function(exp, msg, value){
             if(!t.is_number(value)){ return false; };
             if(inp.u.cat != t.no_category){
@@ -280,13 +280,13 @@ Mechcalc.prototype._choice = function(t, item){
         $("<button />", {id:"mcalc_control_default",
                          class:"mcalc_control_menu_button",
                          text:"Default"})
-                         .on("click", function(){t.control_units_system('udefault');})
+                         .on("click", function(){t.control_units_system("udefault");})
                          .appendTo(button_span);
 
         $("<button />", {id:"mcalc_control_si",
                          class:"mcalc_control_menu_button",
                          text:"SI"})
-                         .on("click", function(){t.control_units_system('si');})
+                         .on("click", function(){t.control_units_system("si");})
                          .appendTo(button_span);
 
         var rounding_span = $("<span/>").appendTo(control_menu);
@@ -298,9 +298,9 @@ Mechcalc.prototype._choice = function(t, item){
         $("<option />", {value: 0, text:"Rounding"}).appendTo(select);
         $("<option />", {value: 0, text:"None"}).appendTo(select);
 
-        var opts = [1, 10, 100, 1000, 10000, 100000]
-        for (var opt in opts){
-            $("<option />", {value: opts[opt], text: 1/opts[opt]}).appendTo(select);
+        for (var i = 0; i < 10; i++){
+            var rounding = Math.pow(10, i);
+            $("<option />", {value: rounding, text: (1/rounding).toFixed(i)}).appendTo(select);
         }
 
         $(select).val(this.rounding);
@@ -318,16 +318,16 @@ Mechcalc.prototype._choice = function(t, item){
     Mechcalc.prototype._html_input_template = function(button, input, units){
         var container = $("<div/>",{"class": "mcalc_containers single"});
 
-        var button_span = $('<span/>', { "class":"mcalc_button_container"}).appendTo(container);
+        var button_span = $("<span/>", { "class":"mcalc_button_container"}).appendTo(container);
         button.appendTo(button_span);
 
         if(input){
-            var input_span = $('<span/>', { "class":"mcalc_input_container"}).appendTo(container);
+            var input_span = $("<span/>", { "class":"mcalc_input_container"}).appendTo(container);
             input.appendTo(input_span);
         }
 
         if(units){
-            var units_span = $('<span/>', { "class":"mcalc_units_container"}).appendTo(container);
+            var units_span = $("<span/>", { "class":"mcalc_units_container"}).appendTo(container);
             units.appendTo(units_span);
         }
 
@@ -335,18 +335,18 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'calc' GUI elements.
+     * Contstructs "calc" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
      *
      */
     Mechcalc.prototype._html_calc_gui = function(t, item){
-        if(item.config.button == '1'){
+        if(item.config.button == "1"){
             var button = $("<button />", {class:"mcalc_calcbutton",
                                           id:"mcalc_" + item.id +"_btn",
                                           text:item.label})
-                                          .on('click',function(){t.cur_item=item.id;t['calc_' + item.id]();});
+                                          .on("click",function(){t.cur_item=item.id;t["calc_" + item.id]();});
         }else{
             var button = $("<span />", {class:"mcalc_nobutton_label", "text":item.label});
         }
@@ -356,8 +356,8 @@ Mechcalc.prototype._choice = function(t, item){
                                     type:"text",
                                     value:item.config.display.value});
 
-        if( 'static' in item.config.display){
-            var units = '';
+        if(item.config.category == this.no_category){
+            var units = $("<span />", {class:"mcalc_noselect_label", text:item.config.display.static});
 
         }else{
             var units = $("<select />", {class:"mcalc_select",
@@ -377,7 +377,7 @@ Mechcalc.prototype._choice = function(t, item){
         input_line.appendTo("#mcalc_gui");
     }
     /*
-     * Contstructs 'graph' GUI elements.
+     * Contstructs "graph" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -387,7 +387,7 @@ Mechcalc.prototype._choice = function(t, item){
         var button = $("<button />", {class:"mcalc_calcbutton",
                                       id:"mcalc_" + item.id +"_btn",
                                       text:"Graph"})
-                                      .on('click',function(){t['graph_' + item.id]();});
+                                      .on("click",function(){t["graph_" + item.id]();});
 
         var label = $("<span />", {class:"mcalc_showhide_label",
                                    text:item.label});
@@ -406,8 +406,8 @@ Mechcalc.prototype._choice = function(t, item){
         var canvas = $("<canvas/>", {class:"mcalc_graph",
                                       id:"mcalc_" + item.id,
                                       text:"Your Browser Does Not Support Canvas."})
-                                      .on('mousemove', function(event){t.i[item.id]._xyfloat(event);})
-                                      .on('mouseout', function(event){t.i[item.id]._xyfloat_off();})
+                                      .on("mousemove", function(event){t.i[item.id]._xyfloat(event);})
+                                      .on("mouseout", function(event){t.i[item.id]._xyfloat_off();})
                                       .appendTo(canvas_container);
 
         canvas.prop("width", 380).prop("height", 400);
@@ -415,7 +415,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'choice' GUI elements.
+     * Contstructs "choice" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -431,7 +431,7 @@ Mechcalc.prototype._choice = function(t, item){
         for (var option in item.config.options){
             $("<option />", {value: item.config.options[option].value, text: item.config.options[option].label}).appendTo(select);
 
-            if(item.config.options[option].selected.toLowerCase() == "true") {
+            if(item.config.options[option].selected) {
                 $(select).val(item.config.options[option].value);
             }
         }
@@ -441,7 +441,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'diagram' GUI elements.
+     * Contstructs "diagram" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -472,7 +472,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'button' GUI elements.
+     * Contstructs "button" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -482,7 +482,7 @@ Mechcalc.prototype._choice = function(t, item){
         var button = $("<button />",{class:"mcalc_calcbutton",
                                      id:"mcalc_" + item.id + "_btn",
                                      text:item.label})
-                                     .on('click',function(){t.cur_item=item.id;t['calc_' + item.id]();});;
+                                     .on("click",function(){t.cur_item=item.id;t["calc_" + item.id]();});;
 
         var input = $("<input />", {type:"hidden",
                                     class:"mcalc_button",
@@ -493,7 +493,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'textbox' GUI elements.
+     * Contstructs "textbox" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -515,7 +515,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'seperator' GUI elements.
+     * Contstructs "seperator" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -529,7 +529,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Contstructs 'label' GUI elements.
+     * Contstructs "label" GUI elements.
      *
      * t - Reference to this.
      * item - item object from calc.json
@@ -554,7 +554,7 @@ Mechcalc.prototype._choice = function(t, item){
      * returns - new length of select options.
      */
     Mechcalc.prototype._html_create_option = function(select_elem, text, value){
-        var opt_elem = document.createElement('option');
+        var opt_elem = document.createElement("option");
         opt_elem.text = text;
         opt_elem.value = value;
         select_elem.add(opt_elem);
@@ -642,7 +642,7 @@ Mechcalc.prototype._choice = function(t, item){
      * Return: True if no errors, false on errors.
      */
     Mechcalc.prototype.get = function(inp, gui){
-        if(typeof(gui) == 'undefined'){ var gui = true; };
+        if(typeof(gui) == "undefined"){ var gui = true; };
 
         if(inp.type == this.type_choice){
             inp.value = this._get_selected_value(inp);
@@ -650,7 +650,7 @@ Mechcalc.prototype._choice = function(t, item){
         }
 
         if(inp.type == this.type_graph){
-            console.log('Error: get - input (' + inp + ') type is graph.')
+            console.log("Error: get - input (" + inp + ") type is graph.")
             return false;
         }
 
@@ -682,7 +682,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
     
     /*
-     * Set input object's GUI input box to input.value and clean up.
+     * Set input object"s GUI input box to input.value and clean up.
      *     Will convert back to GUI selected units.
      *     Triggers loop that marks all the valid inputs used. (green box)
      *     Unless input is provided, then no valid gui decorating
@@ -693,10 +693,10 @@ Mechcalc.prototype._choice = function(t, item){
      */
     Mechcalc.prototype.set = function(inp){
         var multi = false;
-        if(typeof(inp) == 'undefined'){
+        if(typeof(inp) == "undefined"){
             inp = this.i[this.cur_item]
             multi = true;
-            this.cur_item = '';
+            this.cur_item = "";
         }
 
         if(inp.u && inp.u.cat != this.no_category){
@@ -724,7 +724,7 @@ Mechcalc.prototype._choice = function(t, item){
             this._gui_clear_decoration(this.i[id]);
             this.i[id].used = false;
             this.i[id].valid.clear();
-            this.i[id].error_msg = '';
+            this.i[id].error_msg = "";
         }
         
     }
@@ -737,7 +737,7 @@ Mechcalc.prototype._choice = function(t, item){
     Mechcalc.prototype._reset_input = function(inp){
         this._gui_clear_decoration(inp);
         inp.used = false;
-        inp.error_msg = '';
+        inp.error_msg = "";
         inp.elem.value = inp.dvalue;
         inp.valid.clear();
     }
@@ -749,13 +749,13 @@ Mechcalc.prototype._choice = function(t, item){
     /*
      * Set all inputs to valid type and value.
      * 
-     * vtype - type of valid, 'gt', 'lt', 'eq'...
+     * vtype - type of valid, "gt", "lt", "eq"...
      * value - value to check against
      */
     Mechcalc.prototype.set_valids = function(vtype, value){
         for(id in this.i){
             if(this.i[id].type != this.type_calc){ continue; };
-            if(typeof(this.i[id].valid[vtype]) == 'undefined'){ continue; };
+            if(typeof(this.i[id].valid[vtype]) == "undefined"){ continue; };
             this.i[id].valid[vtype] = value;
         }
     }
@@ -796,9 +796,9 @@ Mechcalc.prototype._choice = function(t, item){
         var msg;
 
         for(var v in inp.valid){
-            if(typeof(inp.valid[v]) == 'function'){ continue; };
+            if(typeof(inp.valid[v]) == "function"){ continue; };
             if(inp.valid[v] === false){ continue; };
-            inp.valid['func_' + v]();
+            inp.valid["func_" + v]();
 
             if(inp.value == this.err_val){
                 return false;
@@ -843,7 +843,7 @@ Mechcalc.prototype._choice = function(t, item){
      */
     Mechcalc.prototype._gui_set_error = function(inp){
         inp.elem.value = inp.error_msg;
-        inp.elem.className += ' mcalc_input_error';
+        inp.elem.className += " mcalc_input_error";
     }
 
     /* 
@@ -852,7 +852,7 @@ Mechcalc.prototype._choice = function(t, item){
      * inp - Input object.
      */
     Mechcalc.prototype._gui_set_valid = function(inp){
-        inp.elem.className += ' mcalc_input_active';
+        inp.elem.className += " mcalc_input_active";
     }
 
     /*
@@ -873,8 +873,8 @@ Mechcalc.prototype._choice = function(t, item){
      * inp - Input object.
      */
     Mechcalc.prototype._gui_clear_decoration = function(inp){
-        inp.elem.className = inp.elem.className.replace(/(?:^|\s)mcalc_input_active(?!\S)/g , '');
-        inp.elem.className = inp.elem.className.replace(/(?:^|\s)mcalc_input_error(?!\S)/g , '');        
+        inp.elem.className = inp.elem.className.replace(/(?:^|\s)mcalc_input_active(?!\S)/g , "");
+        inp.elem.className = inp.elem.className.replace(/(?:^|\s)mcalc_input_error(?!\S)/g , "");        
     }
 
     /*
@@ -900,9 +900,9 @@ Mechcalc.prototype._choice = function(t, item){
             if (inp.radix == this.rad_dec) {
                 inp.elem.value = rounded;
             } else if (inp.radix == this.rad_bin){
-                inp.elem.value = '0b' + rounded.toString(2);
+                inp.elem.value = "0b" + rounded.toString(2);
             } else if (inp.radix == this.rad_hex){
-                inp.elem.value = '0x' + rounded.toString(16);
+                inp.elem.value = "0x" + rounded.toString(16);
             }
         }
     }
@@ -913,7 +913,7 @@ Mechcalc.prototype._choice = function(t, item){
      */
 
     /*
-     * Convert given value to input's gui selected units, input non-desctructive.
+     * Convert given value to input"s gui selected units, input non-desctructive.
      *  
      * inp - Input object.
      * value - Number to convert.
@@ -945,7 +945,7 @@ Mechcalc.prototype._choice = function(t, item){
     }
 
     /*
-     * Convert input object to units shown in it's gui select box.
+     * Convert input object to units shown in it"s gui select box.
      * 
      * inp - Input object
      * Return: true success, false failure
@@ -966,11 +966,11 @@ Mechcalc.prototype._choice = function(t, item){
             return false;
         }
 
-        if(inp.u.cat != 'None'){
+        if(inp.u.cat != "None"){
             var ret = this._conversion(inp.value, inp.u.cat, from, to);
 
             if(!this.is_number(ret)){
-                this._set_error(inp, inp.id + ' ' + ret);
+                this._set_error(inp, inp.id + " " + ret);
                 return false
             }else{
                 inp.dvalue = this._conversion(inp.dvalue, inp.u.cat, from, to);
@@ -991,29 +991,29 @@ Mechcalc.prototype._choice = function(t, item){
      */
     Mechcalc.prototype._conversion = function(value, category, from, to){
         if(!this.is_number(value)){
-            return 'Error: conversion - Input value (' + value + ') is not a number.';
+            return "Error: conversion - Input value (" + value + ") is not a number.";
         }
 
         if(!this.units[category]){
-            return 'Error: conversion - Category (' + category + ') does not exist.';
+            return "Error: conversion - Category (" + category + ") does not exist.";
         }
 
         if(!this.units[category][to]){
-            return 'Error: conversion - To units (' + to + ') does not exist.';
+            return "Error: conversion - To units (" + to + ") does not exist.";
         }
 
         if(!this.units[category][from]){
-            return 'Error: conversion - From units (' + from + ') does not exist.';
+            return "Error: conversion - From units (" + from + ") does not exist.";
         }
 
-        if(typeof(this.units[category][to].conv)=='function'){
+        if(typeof(this.units[category][to].conv)=="function"){
             var ret = this.units[category][from].conv(value, to);
         }else{
             var ret = value * (this.units[category][from].conv/this.units[category][to].conv);
         }
 
         if(!this.is_number(ret)){
-            return 'Error: conversion - return value (' + ret + ') is not a number.';
+            return "Error: conversion - return value (" + ret + ") is not a number.";
         }else{
             return ret;
         }
@@ -1033,7 +1033,7 @@ Mechcalc.prototype._choice = function(t, item){
      */
     Mechcalc.prototype._format_input_value = function(inp){
         /* trim right/left whitespace */
-        inp.value = inp.value.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+        inp.value = inp.value.replace(/^\s\s*/, "").replace(/\s\s*$/, "");
 
         var rx_frac = /^([0-9]+ ){0,1}[0-9]+\/[1-9]+$/;
         var rx_scin = /^[0-9]+[\.]{0,1}[0-9]*[ ]?x[ ]?10[ ]?[^]?[-+]?[0-9]+$/;
@@ -1047,7 +1047,7 @@ Mechcalc.prototype._choice = function(t, item){
             /* convert fractions */
             var int = 0;
             var fraction;
-            var intcheck = inp.value.split(' ');
+            var intcheck = inp.value.split(" ");
 
             if(intcheck[0] == inp.value){
                 fraction = inp.value;
@@ -1057,14 +1057,14 @@ Mechcalc.prototype._choice = function(t, item){
                 fraction = intcheck[1];
             }
 
-            var num_denom = fraction.split('/');
+            var num_denom = fraction.split("/");
             inp.value = Number(int)+(num_denom[0]/num_denom[1]);
             this._gui_set_input_value(inp);
 
         /* convert scientific notation to e notation */
         }else if(rx_scin.test(inp.value)){
-            inp.value = inp.value.replace(/ /g,'');
-            inp.value = Number(inp.value.replace(/x10[^]?/,'e'));
+            inp.value = inp.value.replace(/ /g,"");
+            inp.value = Number(inp.value.replace(/x10[^]?/,"e"));
             this._gui_set_input_value(inp);
 
         /* input is not a number of some sort, set to NaN and flag error */
@@ -1103,7 +1103,7 @@ Mechcalc.prototype._choice = function(t, item){
             return false;
         }
 
-        if(typeof(Number(value)) != 'number'){
+        if(typeof(Number(value)) != "number"){
             return false;
         }
         return true;
@@ -1172,19 +1172,19 @@ Mechcalc.prototype._choice = function(t, item){
          * Init
          */
         this.id = item.id;
-        this.elem = document.getElementById('mcalc_' + this.id);
+        this.elem = document.getElementById("mcalc_" + this.id);
         this.t = t
         this.enabled = true;
 
-        if(!(this.elem.getContext && this.elem.getContext('2d'))){
+        if(!(this.elem.getContext && this.elem.getContext("2d"))){
             this.enabled = false;
-            document.getElementById('mcalc_graph_btn_' + this.id).disabled = true
-            document.getElementById('mcalc_' + this.id + '_sh').innerHTML = '';
+            document.getElementById("mcalc_graph_btn_" + this.id).disabled = true
+            document.getElementById("mcalc_" + this.id + "_sh").innerHTML = "";
             return false;
         }
 
-        this._xyfloater = document.getElementById('mcalc_xy_floater');
-        this.ctx = this.elem.getContext('2d')
+        this._xyfloater = document.getElementById("mcalc_xy_floater");
+        this.ctx = this.elem.getContext("2d")
         this.grid = {};
         this.grid.t = this;
         this.plot = {};
@@ -1209,7 +1209,7 @@ Mechcalc.prototype._choice = function(t, item){
         this.grid.height = this.grid.ystart - this.grid.margin;
         this.grid.width = this.elem.width - this.grid.xstart - this.grid.margin;
 
-        if(this.grid.align == 'center'){
+        if(this.grid.align == "center"){
             this.grid.xcenter = this.grid.xstart + this.grid.width/2;
             this.grid.ycenter = this.grid.ystart - this.grid.height/2;
         }else{
@@ -1224,29 +1224,29 @@ Mechcalc.prototype._choice = function(t, item){
         this.plot.ycenter = this.grid.ycenter;
         this.plot.edge = this.grid.xstart;
 
-        this.plot.colors = {'red':[255,0,0,1],
-                            'green':[0,255,0,1],
-                            'blue':[0,0,255,1],
-                            'yellow':[255,255,0,1],
-                            'orange':[255,127,0,1],
-                            'purple':[127,0,127,1],
-                            'pink':[255,0,255,1],
-                            'aqua':[0,255,255,1],
-                            'gray':[127,127,127,1],
+        this.plot.colors = {"red":[255,0,0,1],
+                            "green":[0,255,0,1],
+                            "blue":[0,0,255,1],
+                            "yellow":[255,255,0,1],
+                            "orange":[255,127,0,1],
+                            "purple":[127,0,127,1],
+                            "pink":[255,0,255,1],
+                            "aqua":[0,255,255,1],
+                            "gray":[127,127,127,1],
                                 }
 
         /************************
-         * User calc.xml options
+         * User calc.json options
          */
         /*
-         * type - 'log' (x-axis) or 'normal'
-         * align - 'left' or 'center' major grid line locations (normal only)
+         * type - "log" (x-axis) or "normal"
+         * align - "left" or "center" major grid line locations (normal only)
          */
         this.grid.type = item.config.type;
         this.grid.align = item.config.align;
 
         /*
-         * if this.grid.align == 'center' these will center the major grid line
+         * if this.grid.align == "center" these will center the major grid line
          * on the label with a value of 0.
          */
         this.grid.center_major_y0 = item.config.centerY0;
@@ -1260,12 +1260,12 @@ Mechcalc.prototype._choice = function(t, item){
          * Graph labels running along the left and bottom sides respectively.
          */
         this.xlabel = function(label){
-            this.ctx.fillStyle='rgba(0, 0, 0, 255)';
+            this.ctx.fillStyle="rgba(0, 0, 0, 255)";
             this.ctx.fillText(label, (this.elem.width/2) - (label.toString().length/2)*5, this.elem.height-2);
         }
 
         this.ylabel = function(label){
-            this.ctx.fillStyle='rgba(0, 0, 0, 255)';
+            this.ctx.fillStyle="rgba(0, 0, 0, 255)";
             this._draw_ytext(label, ((this.elem.width/2) - (label.toString().length/2)*3), 20);
         }
 
@@ -1279,7 +1279,7 @@ Mechcalc.prototype._choice = function(t, item){
             this.ymin = ymin;
             this.ymax = ymax;
 
-            if(this.type == 'log'){
+            if(this.type == "log"){
                 this.t.log.init(this.xmin, this.xmax);
             }
         }
@@ -1312,16 +1312,16 @@ Mechcalc.prototype._choice = function(t, item){
 
         this.plot.add_item = function(label, xunits, yunits, color){
             var rgba = this.colors[color];
-            var rgba_str = 'rgba('+rgba[0]+','+rgba[1]+','+rgba[2]+',1)';
+            var rgba_str = "rgba("+rgba[0]+","+rgba[1]+","+rgba[2]+",1)";
             this.items[label] = [label, yunits, xunits, rgba, rgba_str];
             this.t.ctx.fillStyle=rgba_str;
             this.t.ctx.fillText(label, this.edge + 10, this.t.grid.ystart+25);
             this.edge += label.toString().length * 7;
-            this.t.ctx.fillStyle='rgba(0, 0, 0, 1)';
+            this.t.ctx.fillStyle="rgba(0, 0, 0, 1)";
         }
 
         /*
-         * Draw from fx,fy to tx,ty, for plot item 'label'
+         * Draw from fx,fy to tx,ty, for plot item "label"
          */
         this.plot.draw = function(fx, fy, tx, ty, label){
             var color =  this.items[label][4];
@@ -1363,7 +1363,7 @@ Mechcalc.prototype._choice = function(t, item){
          * pixel. If each pixel accounts for 500 units, the step is 500.
          */
         this.xindexer = function(x){
-            if(this.grid.type == 'log'){
+            if(this.grid.type == "log"){
                 dif = (Math.floor(Math.log(this.grid.xmax)/Math.LN10)-Math.ceil(Math.log(x)/Math.LN10));
                 return 1/(this.xpixel*Math.pow(10, dif+1));
             }else{
@@ -1383,7 +1383,7 @@ Mechcalc.prototype._choice = function(t, item){
          * Convert x or y absolute position to relative to grid position
          */
         this._convertx = function(x){
-            if(this.grid.type == 'log' && x != 0){
+            if(this.grid.type == "log" && x != 0){
                 return this.plot.xcenter + Math.round(((Math.log(x)/Math.LN10-this.log.min) / this.log.range) * this.grid.width);
             }
             return this.plot.xcenter + (this.xpixel * x);
@@ -1417,23 +1417,23 @@ Mechcalc.prototype._choice = function(t, item){
             if(snum<1000){ return snum.toFixed(this.grid.label_rounding); }
 
             if(snum<1000000 && (snum/1000)>=1){
-                snum = (snum/1000).toFixed(this.grid.label_rounding) + 'K';
-                if(sign){snum = '-'+snum;}
+                snum = (snum/1000).toFixed(this.grid.label_rounding) + "K";
+                if(sign){snum = "-"+snum;}
                 return snum
             }
             if(snum<1000000000 && (snum/1000000)>=1){
-                snum = (snum/1000000).toFixed(this.grid.label_rounding) + 'M';
-                if(sign){snum = '-'+snum;}
+                snum = (snum/1000000).toFixed(this.grid.label_rounding) + "M";
+                if(sign){snum = "-"+snum;}
                 return snum
             }
             if(snum<1000000000000 && (snum/1000000000)>=1){
-                snum = (snum/1000000000).toFixed(this.grid.label_rounding) + 'G';
-                if(sign){snum = '-'+snum;}
+                snum = (snum/1000000000).toFixed(this.grid.label_rounding) + "G";
+                if(sign){snum = "-"+snum;}
                 return snum
             }
             if((snum/1000000000000)>=1){
-                snum = (snum/1000000000000).toFixed(this.grid.label_rounding) + 'T';
-                if(sign){snum = '-'+snum;}
+                snum = (snum/1000000000000).toFixed(this.grid.label_rounding) + "T";
+                if(sign){snum = "-"+snum;}
                 return snum
             }            
             return num;
@@ -1484,7 +1484,7 @@ Mechcalc.prototype._choice = function(t, item){
             this.ctx.save();
             this.ctx.translate((this.elem.width/2),(this.elem.height/2))
             this.ctx.rotate(270*Math.PI/180);
-            this.ctx.fillStyle='rgba(0, 0, 0, 255)';
+            this.ctx.fillStyle="rgba(0, 0, 0, 255)";
             this.ctx.fillText(text, x-(this.elem.width/2), y-(this.elem.height/2));
             this.ctx.restore()
         }
@@ -1508,7 +1508,7 @@ Mechcalc.prototype._choice = function(t, item){
             var grid_xline_space = this.width/this.xlines;
             var w = 0;
 
-            if(this.type == 'log'){
+            if(this.type == "log"){
                 var kfactor = this.width/this.t.log.range;
 
                 for(k=this.t.log.min; k<=this.t.log.max; k++){
@@ -1522,7 +1522,7 @@ Mechcalc.prototype._choice = function(t, item){
 
                     for(i=1; i<=10; i++){
                         ilog = kf+((Math.log(i)/Math.LN10)*kfactor)
-                        this.draw(ilog, 0, ilog, this.height, 'rgba(0, 0, 0, 0.2)');
+                        this.draw(ilog, 0, ilog, this.height, "rgba(0, 0, 0, 0.2)");
                     }
                 }
 
@@ -1555,7 +1555,7 @@ Mechcalc.prototype._choice = function(t, item){
                     }
 
                     w++;
-                    this.draw(i, 0, i, this.height, 'rgba(0, 0, 0, 0.2)');
+                    this.draw(i, 0, i, this.height, "rgba(0, 0, 0, 0.2)");
                 }
             }
 
@@ -1587,27 +1587,27 @@ Mechcalc.prototype._choice = function(t, item){
                 }
 
                 w++;
-                this.draw(0, i, this.width, i, 'rgba(0, 0, 0, 0.2)');
+                this.draw(0, i, this.width, i, "rgba(0, 0, 0, 0.2)");
             }
 
-            if(this.align == 'center'){
-                if(this.center_major_y0 == true){
+            if(this.align == "center"){
+                if(this.center_major_y0 == "1"){
                     var ystart = this.height-this.t.plot.ycenter+this.margin;
-                    this.draw(0, ystart, this.width, ystart, 'rgba(0,0,0,1)');
+                    this.draw(0, ystart, this.width, ystart, "rgba(0,0,0,1)");
                 }else{
-                    this.draw(0, this.height/2, this.width, this.height/2, 'rgba(0, 0, 0, 1)');
+                    this.draw(0, this.height/2, this.width, this.height/2, "rgba(0, 0, 0, 1)");
                 }
 
-                if(this.center_major_x0 == true){
+                if(this.center_major_x0 == "1"){
                     var xstart = this.t.plot.xcenter-this.xstart;
-                    this.draw(xstart, 0, xstart, this.height, 'rgba(0, 0, 0, 1)');
+                    this.draw(xstart, 0, xstart, this.height, "rgba(0, 0, 0, 1)");
                 }else{
-                    this.draw(this.width/2, 0, this.width/2, this.height, 'rgba(0, 0, 0, 1)');
+                    this.draw(this.width/2, 0, this.width/2, this.height, "rgba(0, 0, 0, 1)");
                 }
 
             }else{
-                this.draw(0, 0, this.width, 0, 'rgba(0, 0, 0, 1)');
-                this.draw(0, 0, 0, this.height, 'rgba(0, 0, 0, 1)');
+                this.draw(0, 0, this.width, 0, "rgba(0, 0, 0, 1)");
+                this.draw(0, 0, 0, this.height, "rgba(0, 0, 0, 1)");
             }
         }
 
@@ -1617,7 +1617,7 @@ Mechcalc.prototype._choice = function(t, item){
          */
 
         this._xyfloat_off = function(){
-            this._xyfloater.style.display = 'none';
+            this._xyfloater.style.display = "none";
         }
 
         this._xyfloat_color_check = function(rgba, against) {
@@ -1664,7 +1664,7 @@ Mechcalc.prototype._choice = function(t, item){
             if(this._xoff_grid(graph_x)){this._xyfloat_off(); return false;}
             if(this._yoff_grid(graph_y)){this._xyfloat_off(); return false;}
 
-            var plot_item = '';
+            var plot_item = "";
             var rgba_size = 4;
             var rgba = this.ctx.getImageData(graph_x-(rgba_size/2), graph_y-(rgba_size/2), rgba_size, rgba_size).data;
 
@@ -1677,9 +1677,9 @@ Mechcalc.prototype._choice = function(t, item){
                 }
             }
  
-            if(plot_item == ''){ return false; }
+            if(plot_item == ""){ return false; }
 
-            if(this.grid.type == 'log' && (graph_x) != 0){
+            if(this.grid.type == "log" && (graph_x) != 0){
                 adjx = this.t._format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.log.range+this.log.min));
             }else{
                 adjx = this.t._format_rounder(((graph_x-this.plot.xcenter)/this.xpixel));
@@ -1687,10 +1687,10 @@ Mechcalc.prototype._choice = function(t, item){
 
             adjy =  this.t._format_rounder((this.plot.ycenter-graph_y+2)/this.ypixel);
 
-            this._xyfloater.style.display = 'block';
-            this._xyfloater.style.top = posy+15+ 'px';
-            this._xyfloater.style.left = posx+15 + 'px';
-            this._xyfloater.innerHTML = plot_item[0]+'<br /><hr>'+adjy+plot_item[1]+'<br />'+adjx+plot_item[2];
+            this._xyfloater.style.display = "block";
+            this._xyfloater.style.top = posy+15+ "px";
+            this._xyfloater.style.left = posx+15 + "px";
+            this._xyfloater.innerHTML = plot_item[0]+"<br /><hr>"+adjy+plot_item[1]+"<br />"+adjx+plot_item[2];
         }
     }
 
@@ -1724,7 +1724,7 @@ Mechcalc.prototype._choice = function(t, item){
             if(inp.type != this.type_calc){ continue; }
             var select = inp.u.elem;
 
-            if(inp.u.display[sys] != ''){
+            if(inp.u.display[sys] != ""){
                 var units = inp.u.display[sys];
             }else{
                 var units = inp.u.convert_to;
@@ -1800,21 +1800,21 @@ Mechcalc.prototype._choice = function(t, item){
      * show - true, false or empty
      */
     Mechcalc.prototype.control_showhide = function(id, show){
-        if(typeof(show) == 'undefined'){ show = '';}
+        if(typeof(show) == "undefined"){ show = "";}
 
-        var cont = document.getElementById('mcalc_'+id+'_cont');
-        var sh = document.getElementById('mcalc_'+id+'_sh');
+        var cont = document.getElementById("mcalc_"+id+"_cont");
+        var sh = document.getElementById("mcalc_"+id+"_sh");
         if(show === true){
-            cont.style.display = 'block';
-            sh.innerHTML = '[-]';
+            cont.style.display = "block";
+            sh.innerHTML = "[-]";
         }else if(show === false){
-            cont.style.display = 'none';
-            sh.innerHTML = '[+]';
-        }else if(cont.style.display == 'none'){
-            cont.style.display = 'block';
-            sh.innerHTML = '[-]';
+            cont.style.display = "none";
+            sh.innerHTML = "[+]";
+        }else if(cont.style.display == "none"){
+            cont.style.display = "block";
+            sh.innerHTML = "[-]";
         }else{
-            cont.style.display = 'none';
-            sh.innerHTML = '[+]';
+            cont.style.display = "none";
+            sh.innerHTML = "[+]";
         }
     }

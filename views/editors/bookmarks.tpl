@@ -36,7 +36,6 @@
         }
 
         function rm_bookmark(bookmark){
-        console.log(bookmark);
             $("#"+bookmark).remove();
             $("#rm_"+bookmark).remove();
             $("#bookmarks").accordion( "refresh" );
@@ -71,8 +70,7 @@
   });
 
     function update_handle(idx) {
-    console.log($("#bookmark_title_" + idx).val());
-    $("#bookmark_handle_" + idx).text($("#bookmark_title_" + idx).val());
+        $("#bookmark_handle_" + idx).text($("#bookmark_title_" + idx).val());
     }
         </script>
     </head>

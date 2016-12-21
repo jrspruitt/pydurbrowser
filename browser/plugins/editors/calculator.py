@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 #    PyDurBrowser
 #
@@ -19,12 +20,12 @@
 ##############################################################################
 import os
 import bottle
+import json
 from browser.settings import data_path, updater_prefix
 from browser.editors import check_url
-from browser.plugins.page.calculator import calc_load
 
 calc_dir = '_calc'
-calc_config = 'calc.xml'
+calc_config = 'calc.json'
 calc_js = 'calc.js'
 
 def check(url):
@@ -43,10 +44,7 @@ def editor(url):
 
     if os.path.exists(path):
         if path.endswith(calc_config):
-            pass
-            #config = load_xml(path)
-            #return calc_load(path)
-            #return bottle.template('editors/calculator.tpl', url='/%s%s' % (updater_prefix, url), config=config)
+            return bottle.template('editors/calculator.tpl', url=url, update_url='/%s%s' % (updater_prefix, url))
         elif path.endswith(calc_js):
             with open(path, 'r') as f:
                 text = f.read()
@@ -57,12 +55,10 @@ def updater(url):
     check_url(url)
     path = os.path.join(data_path(), url)
 
-    if path.endswith(calc_js):
-        text = '%s' % bottle.request.POST.get('text', '')
-        with open(path, 'w') as f:
-            f.write(text)
+    text = bottle.request.POST.get('data', '')
+    with open(path, 'w') as f:
+        f.write(text.decode('string_escape').strip("\""))
  
-
     return bottle.redirect('/%s' % (os.path.dirname(os.path.dirname(url))))
 
     
