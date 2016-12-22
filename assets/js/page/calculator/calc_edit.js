@@ -1,4 +1,4 @@
-var Mechcalc = function(config_url){
+var Mechcalc = function(){
     this.type_calc = "calc";
     this.type_choice = "choice";
     this.type_graph = "graph";
@@ -8,20 +8,24 @@ var Mechcalc = function(config_url){
     this.type_seperator = "seperator";
     this.type_diagram = "diagram";
     this._none = "None";
-    this._data = new Object();
-    this._counter = 0;
-    var t = this;
-
-    $.getJSON( config_url, function(data) {
-        t.init(data);
-    });
 }
 
-Mechcalc.prototype.init = function(data){
+/***********************************************************
+ * Build the UI for editing calculator items.
+ *
+ * Called externally.
+ *
+ * config - json object from config file or empty for new calc.
+ *
+ */
+ 
+Mechcalc.prototype.init = function(config){
     var t = this;
-    this._data = data;
-    
     $("<h2 />", {text:"Calculator Config"}).appendTo("#mcalc");
+
+    if(! config){
+        config = {"rounding":0, "items":[]}
+    }
 
     var rounding_values = [0];
     var rounding_labels = ["None"];
@@ -32,7 +36,7 @@ Mechcalc.prototype.init = function(data){
     }
 
     var rounding_table = $("<div />", {class:"table"}).appendTo("#mcalc");
-    this._html_select("Rounding", "rounding", rounding_values, rounding_labels, data.rounding).prependTo(rounding_table);
+    this._html_select("Rounding", "rounding", rounding_values, rounding_labels, config.rounding).prependTo(rounding_table);
 
     var item_types = ["New Item", this.type_calc, this.type_choice, this.type_graph, this.type_label, this.type_button, this.type_textbox, this.type_seperator, this.type_diagram];
     this._html_select("Add Item", "add_item_type", item_types, item_types).appendTo("#mcalc");
@@ -43,8 +47,8 @@ Mechcalc.prototype.init = function(data){
     $("<div />", {id:"mcalc_accordion"})
                   .appendTo("#mcalc");
 
-    for(item in this._data.items){
-        var i = this._data.items[item];
+    for(item in config.items){
+        var i = config.items[item];
         if(i.type == this.type_calc){
             this._html_calc(i);
         }else if(i.type == this.type_choice){
@@ -75,6 +79,14 @@ $(function(){$("#mcalc_accordion").accordion({collapsible: true,
   } );
 }
 
+/***********************************************************
+ * Collect all item data from DOM elements to save to file.
+ *
+ * Called externally, so json object can be saved to file.
+ *
+ * returns - stringified json obect of all config data.
+ */
+ 
 Mechcalc.prototype.get_json = function(){
     var t = this;
     var items = [];
@@ -100,7 +112,7 @@ Mechcalc.prototype.get_json = function(){
 }
 
 /***********************************************************
- * Parse DOM to create item objects.
+ * Get item data from DOM.
  */
 
 Mechcalc.prototype._parse_calc = function(t, id, elem){
@@ -131,9 +143,23 @@ Mechcalc.prototype._parse_graph = function(t, id, elem){
     this.type = t.type_graph;
     this.label = $(elem).find("#label").val();
     this.config = {"align":$(elem).find("#graph_align").val(),
+                   "xlabel":$(elem).find("#graph_xlabel").val(),
                    "type":$(elem).find("#graph_type").val(),
-                   "centerX0":$(elem).find("#graph_centerX0").val(),
-                   "centerY0":$(elem).find("#graph_centerY0").val(),
+                   "label_rounding":parseInt($(elem).find("#graph_label_rounding").val()),
+
+                   "xlabel":$(elem).find("#graph_xlabel").val(),
+                   "centerX0":$(elem).find("#graph_centerX0").val() == "true",
+                   "xlines":parseInt($(elem).find("#graph_xlines").val()),
+                   "skip_xlabels":parseInt($(elem).find("#graph_skip_xlabels").val()),
+                   "labels_xmin":parseInt($(elem).find("#graph_labels_xmin").val()),
+                   "labels_xmax":parseInt($(elem).find("#graph_labels_xmax").val()),
+
+                   "ylabel":$(elem).find("#graph_ylabel").val(),
+                   "centerY0":$(elem).find("#graph_centerY0").val() == "true",
+                   "ylines":parseInt($(elem).find("#graph_ylines").val()),
+                   "skip_ylabels":parseInt($(elem).find("#graph_skip_ylabels").val()),
+                   "labels_ymin":parseInt($(elem).find("#graph_labels_ymin").val()),
+                   "labels_ymax":parseInt($(elem).find("#graph_labels_ymax").val()),
                    };
 }
 
@@ -157,7 +183,7 @@ Mechcalc.prototype._parse_diagram = function(t, id, elem){
     this.type = t.type_diagram;
     this.label = $(elem).find("#label").val();
     this.config = {"file":$(elem).find("#file").val(),
-                   "alt_text":$(elem).find("#file").val()};
+                   "alt_text":$(elem).find("#alt_text").val()};
 }
 
 Mechcalc.prototype._parse_generic = function(t, id, type, elem){
@@ -167,7 +193,7 @@ Mechcalc.prototype._parse_generic = function(t, id, type, elem){
 }
 
 /***********************************************************
- * Initial Item Objects
+ * Initialize Item Objects
  */
 
 Mechcalc.prototype._item_calc = function(t, id){
@@ -179,11 +205,33 @@ Mechcalc.prototype._item_calc = function(t, id){
     this.config = {"button": true, "category": t._none, "convert_to": t._none, "display":display};
 }
 
+Mechcalc.prototype._item_choice = function(t, id){
+    this.id = id;
+    this.type = t.type_choice;
+    this.label = "";
+    this.config = {"options":[]};
+}
+
 Mechcalc.prototype._item_graph = function(t, id){
     this.id = id;
     this.type = t.type_graph;
     this.label = "";
-    this.config = {"centerX0":"0", "centerY0":"0", "type":"normal", "align":"left"};
+    this.config = {"centerX0":false,
+                   "xlabel":"",
+                   "xlines":10,
+                   "skip_xlabels":0,
+                   "labels_xmin":0,
+                   "labels_xmax":10,
+                   "centerY0":false,
+                   "ylabel":"",
+                   "ylines":10,
+                   "skip_ylabels":0,
+                   "labels_ymin":0,
+                   "labels_ymax":10,
+                   "type":"normal",
+                   "align":"left",
+                   "labels_rounding":0,
+                   "items":[]};
 }
 
 Mechcalc.prototype._item_diagram = function(t, id){
@@ -199,12 +247,17 @@ Mechcalc.prototype._item_generic = function(t, id, type){
     this.label = "";
 }
 
+/*
+ * Add item functionality.
+ * Clears inputs, and calls the HTML create function.
+ */
+
 Mechcalc.prototype._new_item = function(type){
     var id = $("body").find("#add_item_name").val();
+
     $("body").find("#add_item_type").val("New Item");
     $("body").find("#add_item_name").val("");
-
-    if(id == ""){  return; }
+    if(id == ""){alert("No id given for item."); return; }
 
     if(type == this.type_calc){
         this._new_html_calc(id);
@@ -221,9 +274,9 @@ Mechcalc.prototype._new_item = function(type){
 }
 
 /***********************************************************
- * Create Item Editors
+ * Create Item's Editor HTML
+ * 
  */
-
 
 Mechcalc.prototype._new_html_calc = function(id){
     var item = new this._item_calc(this, id);
@@ -258,13 +311,28 @@ Mechcalc.prototype._html_graph = function(item){
     var heading = this._html_item_heading(item);
     var types = ["normal", "log"];
     var aligns = ["left", "center"];
-    var centers = ["1", "0"];
+    var centers = [true, false];
     var centers_labels = ["True","False"]
     this._html_input_box("Label: ", "label", item.label).appendTo(heading);
+
+    this._html_input_box("X Axis Label: ", "graph_xlabel", item.config.xlabel).appendTo(heading);
+    this._html_input_box("X Line Count: ", "graph_xlines", item.config.xlines).appendTo(heading);
+    this._html_input_box("Skip X Labels: ", "graph_skip_xlabels", item.config.xlines).appendTo(heading);
+    this._html_input_box("Label XMin: ", "graph_labels_xmin", item.config.labels_xmin).appendTo(heading);
+    this._html_input_box("Label XMax: ", "graph_labels_xmax", item.config.labels_xmax).appendTo(heading);
+    
+    this._html_input_box("Y Axis Label: ", "graph_ylabel", item.config.ylabel).appendTo(heading);
+    this._html_input_box("Y Line Count: ", "graph_ylines", item.config.ylines).appendTo(heading);
+    this._html_input_box("Skip Y Labels: ", "graph_skip_ylabels", item.config.xlines).appendTo(heading);
+    this._html_input_box("Label YMin: ", "graph_labels_ymin", item.config.labels_ymin).appendTo(heading);
+    this._html_input_box("Label YMax: ", "graph_labels_ymax", item.config.labels_ymax).appendTo(heading);
+
+
+    this._html_select("Label Rounding", "graph_label_rounding", [0,1,2,3,4,5], [0,1,2,3,4,5], item.config.label_rounding).appendTo(heading);
     this._html_select("Type", "graph_type", types, types, item.config.type).appendTo(heading);
     this._html_select("Alignment", "graph_align", aligns, aligns, item.config.align).appendTo(heading);
-    this._html_select("Center X on 0", "graph_centerX0", centers, centers_labels, item.config.centerX0).appendTo(heading);
-    this._html_select("Center Y on 0", "graph_centerY0", centers, centers_labels, item.config.centerY0).appendTo(heading);
+    this._html_select("Center X on 0", "graph_centerX0", centers, centers_labels, item.config.centerX0.toString()).appendTo(heading);
+    this._html_select("Center Y on 0", "graph_centerY0", centers, centers_labels, item.config.centerY0.toString()).appendTo(heading);
 }
 
 Mechcalc.prototype._new_html_choice = function(id){
@@ -333,8 +401,10 @@ Mechcalc.prototype._html_generic = function(item){
 
 Mechcalc.prototype._html_item_heading = function(item){
     var heading = $("<div />", {id:"item"}).appendTo("#mcalc_accordion");
-    $("<h3 />", {text:"Type: " + item.type + " ID: " + item.id})
+    var label = $("<h3 />", {text:"Type: " + item.type + " ID: " + item.id})
                  .appendTo(heading);
+
+    $("<a />",{text:"Remove",style:"float:right;"}).on("click", function(){heading.remove();}).appendTo(label);
 
     var item_container = $("<div />").appendTo(heading);
     var item_table = $("<div />", {class:"table"}).appendTo(item_container);

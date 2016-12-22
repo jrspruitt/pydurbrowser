@@ -19,12 +19,24 @@
 ##############################################################################
 
 import os
+import json
 from bottle import template
 from browser.items import get_items
 from browser.settings import get_css, get_js
 
 def handler(page):
-    page.config.rules.exclude_dirs = '_calc'
+    page.config.rules.ignore_files ='calc.json*'
+    page.config.rules.ignore_files = 'calc.js*' 
+    config_path = os.path.join(page.config.path, 'calc.json')
+    if os.path.exists(config_path):
+        data = {"items":[]}
+        with open(config_path, 'r') as f:
+            data = json.load(f)
+
+        for item in data['items']:
+            if (item['type'] == 'diagram'):
+                page.config.rules.ignore_files = item['config']['file']
+
     items = get_items(page.config)
 
     for plugin in page.config.list_plugins:
@@ -34,10 +46,10 @@ def handler(page):
     page.config.css.append(get_css('page/calculator.css', page))
     page.config.js.append(get_js('page/calculator/calc_app.js'))
     page.config.js.append(get_js('page/calculator/units.js'))
-    page.config.js.append(os.path.join('/%s' % page.config.url, '_calc/calc.js'))
+    page.config.js.append(os.path.join('/%s' % page.config.url, 'calc.js'))
         
     page.config.css.append(get_css('media.css', page))
     page.config.css.append(get_css('list.css', page))
-    page.config.script = ''
-
+    with open(os.path.join(page.config.path, 'calc.json')) as f:
+        page.config.script = 'mc.init(%s);' % f.read()
     page.display = template("pages/calculator.tpl", page=page)

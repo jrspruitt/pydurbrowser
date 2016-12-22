@@ -21,10 +21,9 @@
 import os
 import bottle
 import json
-from browser.settings import data_path, updater_prefix
+from browser.settings import data_path, updater_prefix, config_filename, editor_prefix
 from browser.editors import check_url
 
-calc_dir = '_calc'
 calc_config = 'calc.json'
 calc_js = 'calc.js'
 
@@ -35,30 +34,73 @@ def check(url):
 
 def creator(url):
     check_url(url)
-    return bottle.template('editors/calculator.tpl', url='/%s%s' % (updater_prefix, url))
+    update_url = '/%s%s' % (updater_prefix, url)
+    return bottle.template('editors/calculator.tpl', url=update_url, data="{}", creator=True)
 
 def editor(url):
     check_url(url)
     path = os.path.join(data_path(), url)
-    text = ""
+    update_url = '/%s%s' % (updater_prefix, url)
+    buf = ''
 
     if os.path.exists(path):
-        if path.endswith(calc_config):
-            return bottle.template('editors/calculator.tpl', url=url, update_url='/%s%s' % (updater_prefix, url))
-        elif path.endswith(calc_js):
-            with open(path, 'r') as f:
-                text = f.read()
-            return bottle.template('editors/calculator_js.tpl', url='/%s%s' % (updater_prefix, url), text=text)
+        with open(path, 'r') as f:
+            buf = f.read();
 
+    if path.endswith(calc_config):
+        return bottle.template('editors/calculator.tpl', url=update_url, data=buf, creator=False)
+
+    elif path.endswith(calc_js):
+        return bottle.template('editors/calculator_js.tpl', url=update_url, data=buf)
 
 def updater(url):
     check_url(url)
     path = os.path.join(data_path(), url)
+    retpath = '/%s' % (os.path.dirname(url))
+    data = bottle.request.POST.get('data', '')
 
-    text = bottle.request.POST.get('data', '')
-    with open(path, 'w') as f:
-        f.write(text.decode('string_escape').strip("\""))
+    if os.path.isdir(path):
+        name = bottle.request.POST.get('name', '')
+        if name:
+            mk_path = os.path.join(path, name)
+            if not os.path.exists(mk_path):
+                os.mkdir(mk_path)
+            else:
+                return bottle.template("Error - Path already exists.")
+
+            path = os.path.join(mk_path, calc_config)
+            retpath = '/%s%s/%s/%s' % (editor_prefix, url, name, config_filename)
+            create_js(os.path.join(mk_path, calc_js), data)
+
+    if path.endswith(calc_js):
+        with open(path, 'w') as f:
+            f.write(data)
+    else:
+        with open(path, 'w') as f:
+            f.write(data.decode('string_escape').strip("\""))
  
-    return bottle.redirect('/%s' % (os.path.dirname(os.path.dirname(url))))
+    return bottle.redirect(retpath)
 
-    
+def create_js(path, data):
+    buf = 'var mc = new Mechcalc();\n'
+    jdata = json.loads(data)
+
+    for item in jdata['items']:
+        if item['type'] in ['calc', 'button', 'graph']:
+            if item['type'] == 'graph':
+                buf += 'mc.graph_%s = function(){\n\tthis.clean();\n' % item['id']
+                buf += 'this.control_showhide("%s", true);' % item['id']
+            else:
+                buf += 'mc.calc_%s = function(){\n\tthis.clean();\n' % item['id']
+            if item['type'] in ['calc', 'button']:
+                buf += '\tif(!this.get_all(true)){ return false; }\n'
+                buf += '\tthis.%s.value = 1234;\n' % item['id']
+                buf +='\n\n\tthis.set();\n'
+            buf += '}\n'
+
+    with open(path, 'w') as f:
+        f.write(buf)
+
+
+
+
