@@ -90,7 +90,7 @@ $(function(){$("#mcalc_accordion").accordion({collapsible: true,
 Mechcalc.prototype.get_json = function(){
     var t = this;
     var items = [];
-    $("div[id*='item']").each(function(i, elem){
+    $("div[id='item']").each(function(i, elem){
         var id = $(elem).find("#item_id").val();
         var type = $(elem).find("#item_type").val();
 
@@ -124,7 +124,7 @@ Mechcalc.prototype._parse_calc = function(t, id, elem){
     var convert_to = $(elem).find("#convert_to").val() || t._none;
     var dstatic = $(elem).find("#static").val() || "";
     var types = []
-    $(elem).find("li[id*='units']").each(function(i, elem){types.push($(elem).text());});
+    $(elem).find("li[id='units']").each(function(i, elem){types.push($(elem).text());});
     var units = {"si":si,
                  "udefault":udefault,
                  "types":types};
@@ -142,6 +142,19 @@ Mechcalc.prototype._parse_graph = function(t, id, elem){
     this.id = id;
     this.type = t.type_graph;
     this.label = $(elem).find("#label").val();
+    var items = [];
+    var t = this;
+
+    $(elem).find("div[id='plot_item']")
+           .each(function(i, elem){var label = $(elem).find("#plot_item_label").val();
+                                   var xunit = $(elem).find("#plot_item_xunit").val();
+                                   var yunit = $(elem).find("#plot_item_yunit").val();
+                                   var color = $(elem).find("#plot_item_color").val();
+                                   if ( label ){
+                                       items.push({"label":label, "xunit":xunit, "yunit":yunit, "color":color});
+                                   }
+                                });
+
     this.config = {"align":$(elem).find("#graph_align").val(),
                    "xlabel":$(elem).find("#graph_xlabel").val(),
                    "type":$(elem).find("#graph_type").val(),
@@ -160,6 +173,7 @@ Mechcalc.prototype._parse_graph = function(t, id, elem){
                    "skip_ylabels":parseInt($(elem).find("#graph_skip_ylabels").val()),
                    "labels_ymin":parseInt($(elem).find("#graph_labels_ymin").val()),
                    "labels_ymax":parseInt($(elem).find("#graph_labels_ymax").val()),
+                   "items":items
                    };
 }
 
@@ -168,9 +182,9 @@ Mechcalc.prototype._parse_choice = function(t, id, elem){
     this.type = t.type_choice;
     this.label = $(elem).find("#label").val();
     var options = []
-    $(elem).find("li[id*='option']").each(function(i, elem){var label = $(elem).find("#label").val();
-                                                            var value = $(elem).find("#value").val();
-                                                            var selected = $(elem).find("#selected").prop("checked");
+    $(elem).find("li[id*='option']").each(function(i, elem){var label = $(elem).find("#option_label").val();
+                                                            var value = $(elem).find("#option_value").val();
+                                                            var selected = $(elem).find("#option_selected").prop("checked");
                                                             if(label || value){
                                                                 options.push({"label":label, "value":value, "selected":selected});
                                                             }
@@ -308,6 +322,7 @@ Mechcalc.prototype._new_html_graph = function(id){
 }
 
 Mechcalc.prototype._html_graph = function(item){
+    var t = this;
     var heading = this._html_item_heading(item);
     var types = ["normal", "log"];
     var aligns = ["left", "center"];
@@ -317,13 +332,13 @@ Mechcalc.prototype._html_graph = function(item){
 
     this._html_input_box("X Axis Label: ", "graph_xlabel", item.config.xlabel).appendTo(heading);
     this._html_input_box("X Line Count: ", "graph_xlines", item.config.xlines).appendTo(heading);
-    this._html_input_box("Skip X Labels: ", "graph_skip_xlabels", item.config.xlines).appendTo(heading);
+    this._html_input_box("Skip X Labels: ", "graph_skip_xlabels", item.config.skip_xlines).appendTo(heading);
     this._html_input_box("Label XMin: ", "graph_labels_xmin", item.config.labels_xmin).appendTo(heading);
     this._html_input_box("Label XMax: ", "graph_labels_xmax", item.config.labels_xmax).appendTo(heading);
     
     this._html_input_box("Y Axis Label: ", "graph_ylabel", item.config.ylabel).appendTo(heading);
     this._html_input_box("Y Line Count: ", "graph_ylines", item.config.ylines).appendTo(heading);
-    this._html_input_box("Skip Y Labels: ", "graph_skip_ylabels", item.config.xlines).appendTo(heading);
+    this._html_input_box("Skip Y Labels: ", "graph_skip_ylabels", item.config.skip_xlines).appendTo(heading);
     this._html_input_box("Label YMin: ", "graph_labels_ymin", item.config.labels_ymin).appendTo(heading);
     this._html_input_box("Label YMax: ", "graph_labels_ymax", item.config.labels_ymax).appendTo(heading);
 
@@ -333,6 +348,48 @@ Mechcalc.prototype._html_graph = function(item){
     this._html_select("Alignment", "graph_align", aligns, aligns, item.config.align).appendTo(heading);
     this._html_select("Center X on 0", "graph_centerX0", centers, centers_labels, item.config.centerX0.toString()).appendTo(heading);
     this._html_select("Center Y on 0", "graph_centerY0", centers, centers_labels, item.config.centerY0.toString()).appendTo(heading);
+
+    var plot_heading = $("<h4 />", {text:"Plot Items |"}).appendTo(heading.parent());
+    $("<a />",{text:" Add New Item"}).appendTo(plot_heading).on("click", function(){t._html_graph_item().appendTo(items_container);});
+
+    var units_picker = $("<div />").appendTo(heading.parent());
+    $("<span />", {text:"Units Picker"}).appendTo(units_picker);
+    var units_item_picker = $("<input />", {id:"units_picker_input"}).appendTo(units_picker);
+
+    var category_list = [];
+    for(u in this.units){
+        category_list.push(u);
+    }
+
+    var category_select = $("<select />", {class:"mcalc_select"}).appendTo(units_picker);
+    $("<option />", {value: "Category", text: "Category", disabled:true}).appendTo(category_select);
+
+    for (var i = 0;  i < category_list.length; i++){
+        $("<option />", {value: category_list[i], text: category_list[i]}).appendTo(category_select);
+    }
+    category_select.val("Category");
+    category_select.on("click", function(){t._html_units_picker(units_select, this.options[this.selectedIndex].value)});
+
+    var units_select = $("<select />", {class:"mcalc_select",
+                                        id:"units_picker_select"})
+                                        .appendTo(units_picker)
+                                        .on("click", function(){$("#units_picker_input").val(this.options[this.selectedIndex].value)});
+
+    $("<option />", {value: "Units", text: "Units", disabled:true}).appendTo(units_select);
+    units_select.val("Units");
+
+    var items_container = $("<div />",{id:"graph_plot_items", class:"table"}).appendTo(heading.parent());
+    var item_heading_row = $("<div />", {class:"tr"}).appendTo(items_container);
+    $("<span />",{text:"Label", class:"td"}).appendTo(item_heading_row);
+    $("<span />",{text:"X Units", class:"td"}).appendTo(item_heading_row);
+    $("<span />",{text:"Y Units", class:"td"}).appendTo(item_heading_row);
+    $("<span />",{text:"Color", class:"td"}).appendTo(item_heading_row);
+
+    if(typeof(item.config.items) == "object"){
+        for(i in item.config.items){
+            this._html_graph_item(item.config.items[i]).appendTo(items_container);
+        }
+    }
 }
 
 Mechcalc.prototype._new_html_choice = function(id){
@@ -343,11 +400,8 @@ Mechcalc.prototype._new_html_choice = function(id){
 
 Mechcalc.prototype._html_choice = function(item){
     var heading = this._html_item_heading(item);
-    var types = ["normal", "log"];
-    var aligns = ["left", "center"];
-    var centers = ["1", "0"];
-    var centers_labels = ["True","False"]
     $("<div />",{text:"Value - Label - Selected"}).appendTo(heading.parent());
+    this._html_input_box("Label: ","label", item.label).appendTo(heading);
     var option_list = $("<ul />",{id:"choice_options"}).appendTo(heading.parent());
     var t = this;
     $("<a />",{text:"Add Option"}).appendTo(heading.parent()).on("click", function(){t._html_choice_options("", "", false).appendTo(option_list);});
@@ -359,7 +413,7 @@ Mechcalc.prototype._html_choice = function(item){
         }else{
             o.selected = true;
         }
-        this._html_choice_options(o.value, o.label, o.selected).appendTo(option_list);
+        this._html_choice_options(o.value, o.label, o.selected, item.id).appendTo(option_list);
     }
 }
 
@@ -556,8 +610,7 @@ Mechcalc.prototype._populate_units = function(selected, units_elem, item){
   $(function(){
     $("#units_sort, #item_units_sort").sortable({
       connectWith: ".unit_sort_connect",
-      update: function(event, ui) {console.log(ui)
-                                    if(event.target.id == "units_sort") {
+      update: function(event, ui) {if(event.target.id == "units_sort") {
                                         ui.item[0].id = "";
                                     }else{
                                        ui.item[0].id = "units";
@@ -566,14 +619,13 @@ Mechcalc.prototype._populate_units = function(selected, units_elem, item){
   });
 }
 
-
 /*
  * Create choice item option inputs.
  *
  * returns element with choice inputs.
  */
  
- Mechcalc.prototype._html_choice_options = function(value, label, checked){
+ Mechcalc.prototype._html_choice_options = function(value, label, checked, id){
     if(typeof(value) == "undefined"){
         value = "";
     }
@@ -585,13 +637,52 @@ Mechcalc.prototype._populate_units = function(selected, units_elem, item){
     }
     var container = $("<li />", {id:"options", class:"ui-state-default"});
     var handle = $("<span />",{class:"ui-icon ui-icon-arrowthick-2-n-s"}).appendTo(container);
-    $("<input />", {id:"value",value:value, type:"text"}).appendTo(container);  
-    $("<input />", {id:"label",value:label, type:"text"}).appendTo(container); 
-    $("<input />", {id:"selected",name:"selected", value:value, type:"radio", checked:checked}).appendTo(container);
+    $("<input />", {id:"option_value",value:value, type:"text"}).appendTo(container);  
+    $("<input />", {id:"option_label",value:label, type:"text"}).appendTo(container); 
+    $("<input />", {id:"option_selected", name:"selected_" + id, value:value, type:"radio", checked:checked}).appendTo(container);
     return container;
  }
  
+/*
+ * Create graph item inputs.
+ *
+ */
+Mechcalc.prototype._html_graph_item = function(item){
+    if(typeof(item) == "undefined"){
+        item = {"label":"", "xunit":"", "yunit":"", "color":"red"}
+    }
+
+    var item_row = $("<div />", {class:"tr", id:"plot_item"});
+    var label_td = $("<div />", {class:"td"}).appendTo(item_row);
+    $("<a />", {text:"X"}).on("click", function(){item_row.remove();}).appendTo(label_td);
+    $("<input />", {id:"plot_item_label", type:"text", value:item.label}).appendTo(label_td);
+    var xunits_td = $("<div />", {class:"td"}).appendTo(item_row);
+    $("<input />", {id:"plot_item_xunit", type:"text", value:item.xunit}).appendTo(xunits_td);
+    var yunits_td = $("<div />", {class:"td"}).appendTo(item_row);
+    $("<input />", {id:"plot_item_yunit", type:"text", value:item.yunit}).appendTo(yunits_td);
+
+    var color_td = $("<div />", {class:"td"}).appendTo(item_row);
+    color_list = ["red", "green","blue","yellow","orange","purple","pink","aqua","gray"];
+    var color_select = $("<select />", {class:"mcalc_select", id:"plot_item_color"}).appendTo(color_td);
+
+    for (var i = 0;  i < color_list.length; i++){
+        $("<option />", {value: color_list[i], text: color_list[i]}).appendTo(color_select);
+    }
+    color_select.val(item.color);
+    return item_row;
+ }
+
+Mechcalc.prototype._html_units_picker = function(select_elem, category){
+    select_elem.empty()
+    if(typeof(selected) == "undefined"){
+        selected = "Units";
+    }
  
- 
- 
- 
+    $("<option />", {value: "Units", text: "Units", disabled:true}).appendTo(select_elem);
+
+    for (unit in this.units[category]){
+        if(unit == "convert_to") continue;
+        $("<option />", {value: unit, text: unit}).appendTo(select_elem);
+    }
+    select_elem.val("Units");
+ }

@@ -346,7 +346,9 @@ Mechcalc.prototype._html_calc_gui = function(t, item){
         var button = $("<button />", {class:"mcalc_calcbutton",
                                       id:"mcalc_" + item.id +"_btn",
                                       text:item.label})
-                                      .on("click",function(){t.cur_item=item.id;t["calc_" + item.id]();});
+                                      .on("click",function(){t.cur_item=item.id;
+                                                             t.clean();
+                                                             t["calc_" + item.id]();});
     }else{
         var button = $("<span />", {class:"mcalc_nobutton_label", "text":item.label});
     }
@@ -384,10 +386,13 @@ Mechcalc.prototype._html_calc_gui = function(t, item){
  *
  */
 Mechcalc.prototype._html_graph_gui = function(t, item){
+    var t = this;
     var button = $("<button />", {class:"mcalc_calcbutton",
                                   id:"mcalc_" + item.id +"_btn",
                                   text:"Graph"})
-                                  .on("click",function(){t["graph_" + item.id]();});
+                                  .on("click",function(){t.clean();
+                                                         t.control_showhide(item.id, true);
+                                                         t["graph_" + item.id]();});
 
     var label = $("<span />", {class:"mcalc_showhide_label",
                                text:item.label});
@@ -423,7 +428,7 @@ Mechcalc.prototype._html_graph_gui = function(t, item){
  */
 Mechcalc.prototype._html_choice_gui = function(t, item){
     var label = $("<span />", {class:"mcalc_nobutton_label",
-                               text:item.config.label});
+                               text:item.label});
 
     var select = $("<select />",{id:"mcalc_" + item.id,
                                  class:"mcalc_choice"});
@@ -482,7 +487,9 @@ Mechcalc.prototype._html_button_gui = function(t, item){
     var button = $("<button />",{class:"mcalc_calcbutton",
                                  id:"mcalc_" + item.id + "_btn",
                                  text:item.label})
-                                 .on("click",function(){t.cur_item=item.id;t["calc_" + item.id]();});;
+                                 .on("click",function(){t.cur_item=item.id;
+                                                        t.clean();
+                                                        t["calc_" + item.id]();});
 
     var input = $("<input />", {type:"hidden",
                                 class:"mcalc_button",
@@ -1191,6 +1198,17 @@ Mechcalc.prototype.graph = function(t, item, elem){
     this.plot = {};
     this.plot.t = this;
     this.plot.items = {};
+
+    this.plot.colors = {"red":[255,0,0,1],
+                        "green":[0,255,0,1],
+                        "blue":[0,0,255,1],
+                        "yellow":[255,255,0,1],
+                        "orange":[255,127,0,1],
+                        "purple":[127,0,127,1],
+                        "pink":[255,0,255,1],
+                        "aqua":[0,255,255,1],
+                        "gray":[127,127,127,1],
+                            }
     
     /*
      * type - "log" (x-axis) or "normal"
@@ -1219,7 +1237,9 @@ Mechcalc.prototype.graph = function(t, item, elem){
 
     for(plot_item in item.config.items){
         var i = item.config.items[plot_item];
-        this.plot.add_item(i.label, i.xunits, i.yunits, i.color);
+        var rgba = this.plot.colors[i.color];
+        var rgba_str = "rgba("+rgba[0]+","+rgba[1]+","+rgba[2]+",1)";
+        this.plot.items[i.label] = [i.label, i.yunit, i.xunit, rgba, rgba_str];
     }
 
     /*
@@ -1278,21 +1298,6 @@ Mechcalc.prototype.graph = function(t, item, elem){
     this.plot.ycenter = this.grid.ycenter;
     this.plot.edge = this.grid.xstart;
 
-    this.plot.colors = {"red":[255,0,0,1],
-                        "green":[0,255,0,1],
-                        "blue":[0,0,255,1],
-                        "yellow":[255,255,0,1],
-                        "orange":[255,127,0,1],
-                        "purple":[127,0,127,1],
-                        "pink":[255,0,255,1],
-                        "aqua":[0,255,255,1],
-                        "gray":[127,127,127,1],
-                            }
-
-
-
-
-
     /************************
      * User runtime options and functions
      */
@@ -1300,15 +1305,15 @@ Mechcalc.prototype.graph = function(t, item, elem){
     /*
      * Creates an item to plot on the graph
      * label - Name displayed color keyed on graph and a reference for drawing.
-     * yunits - Y Axis units. (for hover over box)
-     * xunits - X Axis units. (for hover over box)
+     * yunit - Y Axis units. (for hover over box)
+     * xunit - X Axis units. (for hover over box)
      * color - red, green, blue, yellow, orange, purple, pink, aqua, gray
      */
    
-    this.plot.add_item = function(label, xunits, yunits, color){
+    this.plot.add_item = function(label, xunit, yunit, color){
         var rgba = this.colors[color];
         var rgba_str = "rgba("+rgba[0]+","+rgba[1]+","+rgba[2]+",1)";
-        this.items[label] = [label, yunits, xunits, rgba, rgba_str];
+        this.items[label] = [label, yunit, xunit, rgba, rgba_str];
     }
 
     this.plot.item_label = function(item){
@@ -1685,13 +1690,11 @@ Mechcalc.prototype.graph = function(t, item, elem){
         for(pitem in this.plot.items){
             if (this._xyfloat_color_check(rgba, this.plot.items[pitem][3])) {
                 plot_item = this.plot.items[pitem];
-            }else{
-                this._xyfloat_off();
-                return false;
+                break;
             }
         }
- 
-        if(plot_item == ""){ return false; }
+
+        if(plot_item == ""){ this._xyfloat_off(); return false; }
 
         if(this.grid.type == "log" && (graph_x) != 0){
             adjx = this.t._format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.grid.log.range+this.grid.log.min));

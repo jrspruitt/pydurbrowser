@@ -82,21 +82,29 @@ def updater(url):
     return bottle.redirect(retpath)
 
 def create_js(path, data):
-    buf = 'var mc = new Mechcalc();\n'
+    buf = 'var mc = new Mechcalc();\n\n'
     jdata = json.loads(data)
 
     for item in jdata['items']:
         if item['type'] in ['calc', 'button', 'graph']:
+
             if item['type'] == 'graph':
-                buf += 'mc.graph_%s = function(){\n\tthis.clean();\n' % item['id']
-                buf += 'this.control_showhide("%s", true);' % item['id']
-            else:
-                buf += 'mc.calc_%s = function(){\n\tthis.clean();\n' % item['id']
-            if item['type'] in ['calc', 'button']:
+                buf += 'mc.graph_%s = function(){\n' % item['id']
                 buf += '\tif(!this.get_all(true)){ return false; }\n'
+                buf += '\tthis.%s.grid.build();\n' % item['id']
+
+                for pitem in item['config']['items']:
+                    buf += '\tthis.%s.plot.draw(fromX, fromY, toX, toY, "%s");\n' % (item['id'], pitem['label'])
+
+            else:
+                buf += 'mc.calc_%s = function(){\n' % item['id']
+                buf += '\tif(!this.get_all(true)){ return false; }\n'
+
+            if item['type'] in ['calc', 'button']:
                 buf += '\tthis.%s.value = 1234;\n' % item['id']
-                buf +='\n\n\tthis.set();\n'
-            buf += '}\n'
+                buf +='\tthis.set();\n'
+
+            buf += '}\n\n'
 
     with open(path, 'w') as f:
         f.write(buf)
