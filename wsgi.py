@@ -108,6 +108,7 @@ def dataport_entry(url=''):
 def show_display(url=''):
     path = os.path.join(data_path(), url)
     cfg = get_config(url)
+    cfg.is_displayed = True
 
     try:
         aaa.current_user

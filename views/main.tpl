@@ -1,6 +1,6 @@
 % import os
 % from browser.page import page
-% from browser.settings import tracking_code
+% from browser.settings import tracking_code, display_prefix
 <!DOCTYPE html>
 <html>
     <head>
@@ -35,11 +35,17 @@
     </script>
     </head>
 <body>
-% if item.config.logged_in and isinstance(item, page):
+% if item.config.logged_in:
 % include('admin_editor_header.tpl')
 % elif item.config.rules.allow_ip:
+
+% prefix = ''
+% if item.config.is_displayed:
+%   prefix = display_prefix
+% end
+
     <form style="display:inline" id="login_form" action="/login" method="GET">
-    <input type="hidden" name="last_page" value="{{ item.config.url }}" />
+    <input type="hidden" name="last_page" value="{{ prefix }}{{ item.config.url }}" />
     <a href="#" onclick="document.getElementById('login_form').submit();">Login</a>
     </form>
 % end

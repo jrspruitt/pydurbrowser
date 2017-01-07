@@ -40,6 +40,7 @@ def get_config(url):
     path               Abs path of requested item, parent dir if file.
     files              List of all config files in path.
     is_parent          If this dir has the parent config.
+    is_displayed       If current item is in display mode.
     parent_url         Title link URL.
     show_nav           If to show Up link URL.
     head_img_link      Directory of head_img having config file.
@@ -64,6 +65,7 @@ def get_config(url):
     config.url = url.rstrip('/')
 
     config.path = os.path.join(data_path(), config.url)
+    config.is_displayed = False
 
     if not os.path.isdir(config.path):
         config.path = os.path.dirname(config.path)
