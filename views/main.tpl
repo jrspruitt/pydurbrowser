@@ -66,7 +66,13 @@
     </div>
     <div class="nav_menu">
         % if item.config.nav_link:
-        <a href="{{ item.config.nav_link }}">Up/</a>
+            % links = ['<a href="/">Home</a>']
+            % last_link = ''
+            % for link in item.config.nav_link[0:-1]:
+                % links.append('<a href="%s/%s">%s</a>' % (last_link, link, link))
+                % last_link = '%s/%s' % (last_link, link)
+            % end
+            {{! '/'.join(links) }}
         % end          
     </div>
 

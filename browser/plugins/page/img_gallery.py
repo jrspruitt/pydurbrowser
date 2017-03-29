@@ -43,6 +43,7 @@ def handler(page):
     page.config.css.append(get_css('page/img_gallery.css', page))
     page.config.css.append(get_css('media.css', page))
     page.config.js.append(get_js('page/img_gallery.js'))
+    page.config.js.append(get_js('list.js'))
     page.config.script += """
     resize_event();
     generate_height();

@@ -49,7 +49,7 @@ class xfile(object):
         self.path = os.path.join(data_path(), self.url)
         self.name = os.path.basename(self.path)
         self.display = None
-        self.desc = get_desc(self, config)
+        self.desc = get_desc(self, config, True)
 
         for module in config.display_plugins:
             plugin = module['plugin']

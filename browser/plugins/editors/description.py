@@ -30,31 +30,38 @@ def check(url):
 def creator(url):
     check_url(os.path.dirname(url))
     text = ''
+    display = bottle.request.POST.get('display', '')
     tpl_path = os.path.join(os.path.dirname(__file__), 'template.tpl')
-    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text)
+    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text, display=display)
 
 def editor(url):
     check_url(url)
     path = os.path.join(data_path(), url)
     text = ''
+    display = bottle.request.POST.get('display', '')
 
     if os.path.exists(path):
         with open(path, 'r') as f:
             text = f.read()
 
-    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text)
+    return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text, display=display)
 
 def updater(url):
     check_url(url)
     path = os.path.join(data_path(), url)
     text = '%s' % bottle.request.POST.get('text', '')
-    redirect_url = '/%s%s' % (display_prefix, url[0:len(url) - len(desc_ext)])
+    display = '%s' % bottle.request.POST.get('display', '')
+
+    if display:
+        redirect_url = '/%s%s' % (display_prefix, url[0:len(url) - len(desc_ext)])
+    else:
+        redirect_url = '/%s' % (os.path.dirname(url))
+
 
     try:
         if text == '':
             if os.path.exists(path) and os.path.isfile(path):
                 os.remove(path)
-                redirect_url = '/%s' % (os.path.dirname(url))
         else:
             with open(path, 'w') as f:
                 f.write(text)

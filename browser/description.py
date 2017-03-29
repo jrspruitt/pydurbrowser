@@ -2,21 +2,26 @@ import os
 import markdown as md
 from browser.settings import desc_ext, editor_prefix, creator_prefix
 
-def get_desc(item, config):
+def get_desc(item, config, is_displayed=False):
         desc_path = '%s%s' % (item.path, desc_ext)
-        dtext = ""
+        dtext = '' 
+        display = '' if not is_displayed else 'display'
 
         if config.logged_in:
             if os.path.exists(desc_path):
-                dtext = '<a href="/%s%s%s">Edit Description</a>' % (editor_prefix, item.url, desc_ext)
-
+                dtype = 'Edit'
+                prefix = editor_prefix
             else:
-                name = os.path.basename(desc_path).replace('.', '-')
-                dtext = """
-                        <form id="dedit-%s" action="/%s%s%s" method="POST">
-                        <input type="hidden" value="description" name="etype" />
-                        <a style="cursor:pointer;" onclick="$('#dedit-%s').submit();">Create Description</a>
-                        </form><br />""" % (name, creator_prefix, item.url, desc_ext, name)
+                dtype = 'Create'
+                prefix = creator_prefix
+
+            name = os.path.basename(desc_path).replace('.', '-')
+            dtext = """
+                <form id="dedit-%s" action="/%s%s%s" method="POST">
+                <input type="hidden" value="description" name="etype" />
+                <input type="hidden" value="%s" name="display">
+                <a style="cursor:pointer;" onclick="$('#dedit-%s').submit();">%s Description</a>
+                </form><br />""" % (name, prefix, item.url, desc_ext, display, name, dtype)
 
         if os.path.exists(desc_path):
             with open(desc_path, 'r') as f:

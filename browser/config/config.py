@@ -42,7 +42,6 @@ def get_config(url):
     is_parent          If this dir has the parent config.
     is_displayed       If current item is in display mode.
     parent_url         Title link URL.
-    show_nav           If to show Up link URL.
     head_img_link      Directory of head_img having config file.
     logged_in          If user is logged in or not.
     inherit            If child dirs should inherit page type and list/display
@@ -73,7 +72,6 @@ def get_config(url):
     config.files = gather_configs(config.path, [])
     config.rules = rules(config.files)
     config.parent_url = os.path.dirname(config.files[0]).replace(data_path(), '') or '/'
-    config.show_nav = config.path != data_path()
     config.is_parent = config.files[0] == os.path.join(config.path, config_filename)
     cxml = parse_xml(config.files[0], config.is_parent)
 
@@ -109,9 +107,9 @@ def get_config(url):
         config.page['src'] = os.path.join(config.path, config.page['src'])
 
     if config.url:
-        config.nav_link = '/%s' % os.path.dirname(config.url)
+        config.nav_link = [elem for elem in config.url.split('/') if elem] #'/%s' % os.path.dirname(config.url)
     else:
-        config.nav_link = ''
+        config.nav_link = []
 
     return config
 

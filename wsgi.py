@@ -46,6 +46,7 @@ def post_get(name, default=''):
     return bottle.request.POST.get(name, default).strip()
 
 @bottle.route('/%s<url:path>' % editor_prefix)
+@bottle.post('/%s<url:path>' % editor_prefix)
 @authorize()
 def adm_editor(url=''):
     return editors.editor(url)
