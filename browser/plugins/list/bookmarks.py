@@ -29,7 +29,7 @@ match = 100
 order = 1000
 
 def check(item):
-    return item.name.startswith('pdb_bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)
+    return item.name.startswith('bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)
 
 def handler(item, config):
     try:
@@ -37,10 +37,7 @@ def handler(item, config):
         title = '' 
     
         if root.find('channel/title') is not None:
-            title = root.find('channel/title').text or item.name.replace('pdb_bookmarks', '').replace('.xml', '')
-        
-        if 'bookmarks' not in title.lower():
-            title = '%s Bookmarks' % (title)
+            title = root.find('channel/title').text or item.name.replace('bookmarks', '').replace('.xml', '')
 
     except:
         title = 'Bookmarks'

@@ -92,6 +92,10 @@ def _process_image(item, rwidth, rheight, img_dir):
 def _list_dir(path):
 
     items = []
+
+    if not os.path.exists(path):
+        return items
+
     for item in os.listdir(path):
         item_path = os.path.join(path, item)
 
@@ -112,17 +116,15 @@ def _cleanup_images(path):
         if image in display:
             del display[display.index(image)]
 
-    if len(thumbs):
-        for t in thumbs:
-            tpath = os.path.join(path, img_thumbs, t)
+    for t in thumbs:
+        tpath = os.path.join(path, img_thumbs, t)
 
-            if os.path.exists(tpath):
-                os.remove(tpath)
+        if os.path.exists(tpath):
+            os.remove(tpath)
 
-    if len(display):
-        for d in display:
-            dpath = os.path.join(path, img_display, d)
+    for d in display:
+        dpath = os.path.join(path, img_display, d)
 
-            if os.path.exists(dpath):
-                os.remove(dpath)
+        if os.path.exists(dpath):
+            os.remove(dpath)
 

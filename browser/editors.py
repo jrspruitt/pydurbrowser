@@ -30,7 +30,7 @@ def name_process(url, name_formatter):
     origname = '%s' % bottle.request.POST.get('origname', '')
 
     if not name:
-        return 'No filename provided.'
+        name = 'default'
 
     name = name_formatter(name)
 

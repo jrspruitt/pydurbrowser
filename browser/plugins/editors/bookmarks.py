@@ -26,14 +26,14 @@ from browser.settings import data_path, updater_prefix, display_prefix
 from browser.editors import check_url, name_process
 
 def check(url):
-    return os.path.basename(url).startswith('pdb_bookmarks') and url.endswith('.xml')
+    return os.path.basename(url).startswith('bookmarks') and url.endswith('.xml')
 
 def name_formatter(name):
     if check(name):
         return name
 
-    if not name.startswith('pdb_bookmarks_'):
-        name = 'pdb_bookmarks_%s' % name
+    if not name.startswith('bookmarks_'):
+        name = 'bookmarks_%s' % name
 
     if not name.endswith('.xml'):
         name = '%s.xml' % name

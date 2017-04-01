@@ -6,11 +6,13 @@ def get_desc(item, config, is_displayed=False):
         desc_path = '%s%s' % (item.path, desc_ext)
         dtext = '' 
         display = '' if not is_displayed else 'display'
+        has_desc = False
 
         if config.logged_in:
             if os.path.exists(desc_path):
                 dtype = 'Edit'
                 prefix = editor_prefix
+                has_desc = True
             else:
                 dtype = 'Create'
                 prefix = creator_prefix
@@ -24,6 +26,7 @@ def get_desc(item, config, is_displayed=False):
                 </form><br />""" % (name, prefix, item.url, desc_ext, display, name, dtype)
 
         if os.path.exists(desc_path):
+            has_desc = True
             with open(desc_path, 'r') as f:
                 try:
                     dtext += md.markdown(f.read().decode('utf-8'), ['tables'])
@@ -31,4 +34,4 @@ def get_desc(item, config, is_displayed=False):
                     f.seek(0)
                     dtext += f.read()
 
-        return dtext
+        return dtext, has_desc

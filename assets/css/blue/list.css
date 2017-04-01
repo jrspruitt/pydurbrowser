@@ -24,7 +24,6 @@
 }
 .item_file{
 }
-
 .desc{
 	padding:.5em;
 	margin:.5em;
@@ -32,4 +31,22 @@
     border:solid .1em #EEEEEE;
     box-shadow:1px 1px 1px 1px #888888;
 	display:none;
+}
+@media only screen and (max-width: 600px) {
+    .item_date {
+        display:none;
+    }
+    .item_size{
+        display:none;
+    }
+}
+.show_hide_e:before {
+    color:#000;
+    font-size:1em;
+    content:"↓";
+}
+.show_hide_c:before {
+    color:#000;
+    font-size:1em;
+    content:"↑";
 }

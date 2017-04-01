@@ -35,6 +35,7 @@ class item_desc(object):
     path        Abs path to item.
     url         URL/Path relative to doc root.
     desc        Description text.
+    has_desc    If item has actual description file attached.
     display     Holder for list HTML
     size        Size of item B, KB, MB
     mtime       Modified date.
@@ -102,7 +103,7 @@ def _create_item(name, url, path, config):
     item.path = path
     item.name = name
     item.url = url
-    item.desc = get_desc(item, config)
+    item.desc, item.has_desc = get_desc(item, config)
 
     try:
         item.mtime = time.ctime(os.path.getmtime(path))

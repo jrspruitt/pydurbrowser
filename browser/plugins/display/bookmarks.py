@@ -27,7 +27,7 @@ from browser.settings import get_css, data_path, get_js, editor_prefix
 match = 100
 
 def check(xfile):
-    return xfile.name.startswith('pdb_bookmarks') and xfile.name.endswith('.xml') and os.path.isfile(xfile.path)
+    return xfile.name.startswith('bookmarks') and xfile.name.endswith('.xml') and os.path.isfile(xfile.path)
 
 
 def handler(xfile):
@@ -49,7 +49,8 @@ def handler(xfile):
 
 def load_bookmark(xfile):
     path = xfile.path
-    ret = {'title':'Bookmarks',
+    ret = {'id':'',
+           'title':'Bookmarks',
            'description':'',
            'link':xfile.url,
            'items':[]}
@@ -63,12 +64,15 @@ def load_bookmark(xfile):
     
         if root.find('channel/link') is not None:
             ret['link'] = root.find('channel/link').text or xfile.url 
-    
+
+        i = 0
         for rssxfile in root.iterfind('channel/item'):
+            i += 1
+            html_id = 'bookmark_%s' % i
             title = rssxfile.find('title').text
             link = rssxfile.find('link').text
             desc = rssxfile.find('description').text
-            ret['items'].append({'title':title, 'link':link, 'description':desc})
+            ret['items'].append({'id':html_id, 'title':title, 'link':link, 'description':desc})
     except:
         pass
 

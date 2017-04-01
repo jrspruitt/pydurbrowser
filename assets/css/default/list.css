@@ -24,7 +24,6 @@
 }
 .item_file{
 }
-
 .desc{
 	padding:.5em;
 	margin:.5em;
@@ -40,4 +39,14 @@
     .item_size{
         display:none;
     }
+}
+.show_hide_e:before {
+    color:#000;
+    font-size:1em;
+    content:"↓";
+}
+.show_hide_c:before {
+    color:#000;
+    font-size:1em;
+    content:"↑";
 }

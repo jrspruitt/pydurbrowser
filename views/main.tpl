@@ -72,6 +72,7 @@
                 % links.append('<a href="%s/%s">%s</a>' % (last_link, link, link))
                 % last_link = '%s/%s' % (last_link, link)
             % end
+            % links.append(item.config.nav_link[-1])
             {{! '/'.join(links) }}
         % end          
     </div>

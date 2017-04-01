@@ -40,6 +40,7 @@ class xfile(object):
     path      Abs path of file
     name      File name.
     desc      Description text.
+    has_desc  If file has actual description attached.
     display   Holder for display HTML.
     """
 
@@ -49,7 +50,7 @@ class xfile(object):
         self.path = os.path.join(data_path(), self.url)
         self.name = os.path.basename(self.path)
         self.display = None
-        self.desc = get_desc(self, config, True)
+        self.desc, self.has_desc = get_desc(self, config, True)
 
         for module in config.display_plugins:
             plugin = module['plugin']

@@ -7,9 +7,8 @@
             % for item in bookmark['items']:
                 <li><a href="{{ item['link'] }}" target="_blank">{{ item['title'] }}</a>
                 % if item['description']:
-                % id = item['title'].replace(' ', '')
-                <a id="{{ id }}_sh"  href="#" onclick="show_hide('{{! id }}')">[+]</a><br />
-                <div id="{{ id }}" class="desc">{{! item['description'] }}</div>
+                <a id="{{ item['id'] }}_sh"  href="#" onclick="show_hide('{{! item['id'] }}')">[+]</a><br />
+                <div id="{{ item['id'] }}" class="desc">{{! item['description'] }}</div>
                 % else:
                     <br />
                 % end

@@ -3,7 +3,8 @@
             <div class="items item_name td item_file">
                 <a href="/git/{{ item.url }}/">{{ item.name }}</a>
                 % if hasattr(item, 'repo') or item.desc:
-	                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')">[+]</a>
+                % style = 'style="background-color:#CCC;"' if item.has_desc else ''
+                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" {{! style }} class="show_hide_e"></a>
 	                <div id="{{ item.name }}" class="desc">
 	                   % if config.logged_in:
 	                   <a href="/{{ editor_prefix }}{{ item.url }}">Edit CGit</a><br />
