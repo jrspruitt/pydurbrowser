@@ -23,7 +23,7 @@ import re
 from subprocess import check_output
 from bottle import template
 from browser.config.rules import rules
-from browser.settings import config_filename
+from browser.settings import config_filename, desc_ext
 
 name = 'cgit'
 match = 100
@@ -70,19 +70,11 @@ def handler(item, config):
         pass
 
     name, desc = cgitrc_parser(item.path)
+    print name, desc
     if name is not None:
         item.name = name
-
-    if desc is None:
-        dpath = os.path.join(item.path, 'description')
-        if os.path.exists(dpath):
-            try:
-                with open(dpath, 'r') as f:
-                    item.desc = f.read()
-            except:
-                pass
-    else:
-        item.desc = desc
+    if desc is not None:
+        item.cgit_desc = desc
 
     item.repo = {}
     try:

@@ -1,17 +1,13 @@
 % from browser.settings import editor_prefix
        <div class="tr">
             <div class="items item_name td item_file">
+                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" style="background-color:#CCC;" class="show_hide_e"></a>
                 <a href="/git/{{ item.url }}/">{{ item.name }}</a>
-                % if hasattr(item, 'repo') or item.desc:
-                % style = 'style="background-color:#CCC;"' if item.has_desc else ''
-                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" {{! style }} class="show_hide_e"></a>
 	                <div id="{{ item.name }}" class="desc">
 	                   % if config.logged_in:
 	                   <a href="/{{ editor_prefix }}{{ item.url }}">Edit CGit</a><br />
 	                   % end
-					    % if item.desc:
-					    	{{! item.desc }}<br /><br />
-					    % end
+					    {{! item.cgit_desc }}<br /><br />
 
 						% if hasattr(item, 'repo'):
 							% if 'commit' in item.repo:
@@ -35,8 +31,8 @@
 									</span><br />
 								% end
 					    % end
+					    {{! item.desc }}<br /><br />
 					</div>
-                % end
             </div>
             <div class="items item_size td">Git Repo</div>
             <div class="items item_date td">{{ item.mtime }}</div>
