@@ -147,6 +147,8 @@
         <div class="cell">
             <h4>{{ plugin.capitalize() }}:</h4>
             <select name="{{ plugin }}" multiple="multiple" style="height:150px;">
+                % selected = 'selected="selected"' if 'none' in config[plugin]['plugins'] or not config[plugin]['plugins'] else ''
+                <option value="none" {{! selected }}>none</option>
                 % selected = 'selected="selected"' if 'all' in config[plugin]['plugins'] else ''
                 <option value="all" {{! selected }}>all</option>
                 % for type in plugins[plugin]:

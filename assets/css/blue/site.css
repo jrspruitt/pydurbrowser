@@ -29,6 +29,7 @@ BODY {
     border:solid .1em #000000;
 }
 .nav_menu{
+    margin-top:.1em;
     height:1.5em;
 }
 .content_container{

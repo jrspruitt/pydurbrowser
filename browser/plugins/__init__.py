@@ -79,6 +79,9 @@ def get_dot_paths(plugins, ptype):
                 mod_name = '%s.%s' % (mod_dot, item)
                 if mod_name not in plugin_list:
                     plugin_list.append(mod_name)
+
+    elif 'none' in plugins:
+        pass  
     else:
         for plugin in plugins:
             if not plugin.startswith('-'):

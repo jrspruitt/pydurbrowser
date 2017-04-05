@@ -1,3 +1,4 @@
+@charset "utf-8";
 .mcalc_containers {
 	display:block;
 	/*position:relative;*/
@@ -28,7 +29,7 @@
 }
 .mcalc_calcbutton {
 	font-size:.9em;
-	width:18.8em;
+	width:18.0em;
 }
 .mcalc_nobutton_label {
 	padding-top:.1em;
@@ -66,15 +67,16 @@
 .mcalc_units_container {
 	display:inline-block;
 	position:relative;
+	padding-left:1em;
 	top:0em;
 	right:0em;
-	width:3.7em;
+	width:4em;
 	height:inherit;
 	text-align:right;
 	vertical-align:middle;
 }
 .mcalc_select {
-	font-size:.9em;
+	font-size:1em;
 	width:4.2em;
 }
 .mcalc_noselect_label {
@@ -149,7 +151,8 @@
 }
 .mcalc_control_menu select{
 	font-size:.7em;
-	width:5.9em;
+	width:6.1em;
+	height:1.55em;
 }
 .mcalc_control_menu_button {
 	font-size:.7em;
