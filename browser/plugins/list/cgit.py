@@ -31,8 +31,8 @@ order = 100
 
 def cgitrc_parser(path):
     lines = []
-    name = None
-    desc = None
+    name = os.path.basename(path)
+    desc = 'cgit description'
     path = os.path.join(path, 'cgitrc')
     rgx_name = re.compile('^name[ ]*=[ ]*')
     rgx_desc = re.compile('^desc[ ]*=[ ]*')
@@ -69,14 +69,9 @@ def handler(item, config):
     except:
         pass
 
-    name, desc = cgitrc_parser(item.path)
-    print name, desc
-    if name is not None:
-        item.name = name
-    if desc is not None:
-        item.cgit_desc = desc
-
+    item.name, item.cgit_desc = cgitrc_parser(item.path)
     item.repo = {}
+
     try:
         commit = check_output('git log --pretty=short -n 1', cwd=item.path, shell=True)
         if commit:

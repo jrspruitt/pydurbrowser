@@ -74,7 +74,8 @@
             % end
             % links.append(item.config.nav_link[-1])
             {{! '/'.join(links) }}
-        % end          
+        % end
+        <br />    
     </div>
 
     <div class="content_container">
