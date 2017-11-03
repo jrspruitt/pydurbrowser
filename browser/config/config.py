@@ -151,6 +151,9 @@ def _get_theme(files):
     """
     try:
         for cfg in files:
+            if os.path.islink(os.path.dirname(cfg)):
+                continue
+
             root = etree.parse(cfg).getroot()
             theme = root.find('theme')
 
@@ -317,3 +320,4 @@ def gather_configs(path, files):
             gather_configs(parent_path, files)
 
     return files
+
