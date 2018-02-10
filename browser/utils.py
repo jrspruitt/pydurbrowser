@@ -73,6 +73,12 @@ def _process_image(item, rwidth, rheight, img_dir):
     if os.path.exists(rimg_path):
         return
 
+    ext = os.path.splitext(item.name)[1]
+    if ext not in ['jpg', 'jpeg',  'gif', 'png']:
+        item.resized_img_url = item.url
+        item.resized_img_path = item.path
+        return
+
     if not os.path.exists(rimg_dir):
         try:
             os.mkdir(rimg_dir)

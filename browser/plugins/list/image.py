@@ -28,7 +28,7 @@ order = 1000
 
 def check(item):
     ext = os.path.splitext(item.name)[1]
-    exts = ['jpg', 'jpeg',  'gif', 'png']
+    exts = ['jpg', 'jpeg',  'gif', 'png', 'svg']
     if ext.lower()[1:] in exts and os.path.isfile(item.path):
         return True
     return False

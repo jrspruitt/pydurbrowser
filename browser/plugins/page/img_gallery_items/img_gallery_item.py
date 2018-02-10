@@ -30,7 +30,7 @@ order = 1000
 
 def check(item):
     ext = os.path.splitext(item.name)[1]
-    exts = ['jpg', 'jpeg',  'gif', 'png']
+    exts = ['jpg', 'jpeg',  'gif', 'png', 'svg']
     if ext.lower()[1:] in exts:
         return True
     return False
@@ -39,9 +39,16 @@ def check(item):
 def handler(item, config):
     process_thumbnail(item)
 
-    with Image.open(item.resized_img_path) as im:
-        item.width = im.size[0] if im.size[0] <= img_thumbs_size[0] else img_thumbs_size[0]
-        item.height = im.size[1] if im.size[1] <= img_thumbs_size[1] else img_thumbs_size[1]
+    try:
+        with Image.open(item.resized_img_path) as im:
+            item.width = im.size[0] if im.size[0] <= img_thumbs_size[0] else img_thumbs_size[0]
+            item.height = im.size[1] if im.size[1] <= img_thumbs_size[1] else img_thumbs_size[1]
+            item.display_width = 'width="%s"' % item.width
+            item.display_height = 'height="%s"' % item.height
+
+    except:
+        item.display_width = 'width="%s"' % img_thumbs_size[0]
+        item.display_height = 'height="%s"' % img_thumbs_size[1]
 
     if not config.rules.ignore_filehandler(item.path):
         item.url = display_url(item.url)

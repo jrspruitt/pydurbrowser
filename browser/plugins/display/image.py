@@ -25,7 +25,7 @@ from PIL import ExifTags
 
 from bottle import template
 from browser.utils import get_filesize, process_displayimg
-from browser.settings import get_css, display_prefix
+from browser.settings import get_css, display_prefix, img_display_size
 from browser.items import get_items
 from browser.config.config import get_config
 from browser.plugins.list import image as pimage
@@ -46,7 +46,7 @@ def check(xfile):
     pdb_config.xml config/display/plugin.    
     """
     ext = os.path.splitext(xfile.name)[1]
-    exts = ['jpg', 'jpeg',  'gif', 'png']
+    exts = ['jpg', 'jpeg',  'gif', 'png', 'svg']
 
     if ext.lower()[1:] in exts:
         return True
@@ -106,10 +106,14 @@ def handler(xfile):
                 pass
 
         with Image.open(xfile.resized_img_path) as rim:
-            xfile.display_width = rim.width
-            xfile.display_height = rim.height
-    except Exception, e:
-        print e
+            xfile.display_width = 'width="%s"' % rim.width
+            xfile.display_height = 'height="%s"' % rim.height
+
+    except:
+        xfile.width = "None"
+        xfile.height = "None"
+        xfile.display_width = 'width="%s"' % img_display_size[0]
+        xfile.display_height = ""
 
     try:
         xfile.mtime = time.ctime(os.path.getmtime(xfile.path))
