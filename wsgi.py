@@ -171,7 +171,7 @@ def index(url=''):
 application = bottle.default_app()
 session_opts = {
     'session.cookie_expires': True,
-    'session.encrypt_key': "1", #session_key,
+    'session.encrypt_key': session_key, #session_key,
     'session.httponly': True,
     'session.timeout': 3600 * 24,   #1 day
     'session.type': 'cookie',
