@@ -22,7 +22,7 @@ def get_desc(item, config, is_displayed=False):
                 <form id="dedit-%s" action="/%s%s%s" method="POST">
                 <input type="hidden" value="description" name="etype" />
                 <input type="hidden" value="%s" name="display">
-                <a style="cursor:pointer;" onclick="$('#dedit-%s').submit();">%s Description</a>
+                <a style="cursor:pointer;font-size:.8em;" onclick="$('#dedit-%s').submit();">%s Description</a>
                 </form><br />""" % (name, prefix, item.url, desc_ext, display, name, dtype)
 
         if os.path.exists(desc_path):

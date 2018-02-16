@@ -42,6 +42,38 @@ def handler(item, config):
     except:
         title = 'Bookmarks'
 
+    if not 'bookmarks' in title.lower():
+        title = 'Bookmarks/%s' % title
+
+    bookmark = load_bookmark(item)
+
+
     item.name = title
     item.url = display_url(item.url)
-    item.display = template('lists/bookmarks.tpl', item=item, config=config)
+    item.display = template('lists/bookmarks.tpl', item=item, config=config, bookmark=bookmark)
+
+
+
+def load_bookmark(xfile):
+    path = xfile.path
+    ret = {'id':'',
+           'title':'Bookmarks',
+           'description':'',
+           'items':[]}
+    try:
+        root = etree.parse(path).getroot()
+        if root.find('channel/title') is not None:
+            ret['title'] = root.find('channel/title').text
+    
+        if root.find('channel/description') is not None:
+            ret['description'] = root.find('channel/description').text or ''
+
+        for rssxfile in root.iterfind('channel/item'):
+            title = rssxfile.find('title').text
+            link = rssxfile.find('link').text
+            ret['items'].append({'title':title, 'link':link})
+    except:
+        pass
+
+    return ret
+
