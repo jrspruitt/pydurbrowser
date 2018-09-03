@@ -74,7 +74,8 @@ def _process_image(item, rwidth, rheight, img_dir):
         return
 
     ext = os.path.splitext(item.name)[1]
-    if ext not in ['jpg', 'jpeg',  'gif', 'png']:
+
+    if ext.lower()[1:] not in ['jpg', 'jpeg',  'gif', 'png']:
         item.resized_img_url = item.url
         item.resized_img_path = item.path
         return

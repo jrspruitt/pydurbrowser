@@ -1,5 +1,5 @@
 % from browser.settings import editor_prefix
-% if page.config.logged_in:
+% if page.config.user_admin:
 <div>
     <a href="/{{ editor_prefix }}{{page.config.url}}/calc.js">Edit Javascript</a><br />
     <a href="/{{ editor_prefix }}{{page.config.url}}/calc.json">Edit Config</a>

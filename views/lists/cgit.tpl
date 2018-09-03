@@ -4,7 +4,7 @@
                 <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" style="background-color:#CCC;" class="show_hide_e"></a>
                 <a href="/git/{{ item.url }}/">{{ item.name }}</a>
 	                <div id="{{ item.name }}" class="desc">
-	                   % if config.logged_in:
+	                   % if config.user_admin:
 	                   <a href="/{{ editor_prefix }}{{ item.url }}">Edit CGit</a><br />
 	                   % end
 					    {{! item.cgit_desc }}<br /><br />

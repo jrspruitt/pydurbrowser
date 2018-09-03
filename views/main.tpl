@@ -35,19 +35,8 @@
     </script>
     </head>
 <body>
-% if item.config.logged_in:
+% if item.config.user_admin:
 % include('admin_editor_header.tpl')
-% elif item.config.rules.allow_ip:
-
-% prefix = ''
-% if item.config.is_displayed:
-%   prefix = display_prefix
-% end
-
-    <form style="display:inline" id="login_form" action="/login" method="GET">
-    <input type="hidden" name="last_page" value="{{ prefix }}{{ item.config.url }}" />
-    <a href="#" onclick="document.getElementById('login_form').submit();">Login</a>
-    </form>
 % end
 
     <div class="heading_container">
@@ -84,6 +73,19 @@
 
     <div class="footer_content">
         <span class="legal">Built on: <a href="https://github.com/jrspruitt/pydurbrowser">pydurbrowser</a> &copy;2014 Jason Pruitt</span>
+        % prefix = ''
+        % if item.config.is_displayed:
+        %   prefix = display_prefix
+        % end
+        % name = 'Login'
+        % if item.config.logged_in:
+            % name = 'Logout'
+        % end
+        <br />
+        <form style="display:inline" id="login_form" action="/{{ name.lower() }}" method="GET">
+        <input type="hidden" name="last_page" value="{{ prefix }}{{ item.config.url }}" />
+        <a href="#" onclick="document.getElementById('login_form').submit();">{{ name }}</a>
+        </form>
     </div>
     %if tracking_code:
     	{{! tracking_code }}

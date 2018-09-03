@@ -49,18 +49,27 @@ def post_get(name, default=''):
 @bottle.post('/%s<url:path>' % editor_prefix)
 @authorize()
 def adm_editor(url=''):
+    cfg = get_config(url, aaa)
+    if not cfg.user_admin:
+        bottle.redirect('/')
     return editors.editor(url)
 
 @bottle.post('/%s' % updater_prefix)
 @bottle.post('/%s<url:path>' % updater_prefix)
 @authorize()
 def adm_updater(url=''):
+    cfg = get_config(url, aaa)
+    if not cfg.user_admin:
+        bottle.redirect('/')
     return editors.updater(url)
 
 @bottle.post('/%s' % creator_prefix)
 @bottle.post('/%s<url:path>' % creator_prefix)
 @authorize()
 def adm_creator(url=''):
+    cfg = get_config(url, aaa)
+    if not cfg.user_admin:
+        bottle.redirect('/')
     return editors.creator(url)
 
 @bottle.post('/login')
@@ -108,14 +117,8 @@ def dataport_entry(url=''):
 @bottle.route('/%s<url:path>' % display_prefix)
 def show_display(url=''):
     path = os.path.join(data_path(), url)
-    cfg = get_config(url)
+    cfg = get_config(url, aaa)
     cfg.is_displayed = True
-
-    try:
-        aaa.current_user
-        cfg.logged_in = True
-    except:
-        cfg.logged_in = False
 
     if not os.path.isdir(path) and os.path.exists(path):
         if cfg.rules.exclude_file(path):
@@ -144,13 +147,7 @@ def index(url=''):
 
     url = url.rstrip('/')
     path = path.rstrip('/')
-    cfg = get_config(url)
-
-    try:
-        aaa.current_user
-        cfg.logged_in = True
-    except:
-        cfg.logged_in = False
+    cfg = get_config(url, aaa)
 
     if not os.path.exists(path):
         bottle.abort(404, 'Bad path.')

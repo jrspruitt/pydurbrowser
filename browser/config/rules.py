@@ -20,7 +20,6 @@
 
 import os
 import re
-from netaddr import IPNetwork, IPAddress
 from lxml import etree
 from bottle import abort, request
 from browser.settings import config_filename, desc_ext
@@ -43,8 +42,9 @@ class rules(object):
     Ignore Filehandle, display item will be disabled, only showing as raw file.
     """
 
-    def __init__(self, config_files):
-        self._allowed_ips = []
+    def __init__(self, config_files, logged_in=False):
+        self._logged_in = logged_in
+        self._admin_users = []
         self._ignore_filehandlers = []
         self._ignore_files = []
         self._ignore_dirs = []
@@ -59,13 +59,12 @@ class rules(object):
         for config_file in config_files:
             self.add_rules(config_file)
 
-        self._ip_allowed = self._ip_check(request.environ.get('REMOTE_ADDR'))
 
-    def _set_allow_ip(self, rule):
-        self._add_ip(rule, self._allowed_ips)
-    def _get_allow_ip(self):
-        return self._ip_allowed
-    allow_ip = property(_get_allow_ip, _set_allow_ip)
+    def _set_admin_user(self, rule):
+        self._add_user(rule, self._admin_users)
+    def _get_admin_user(self):
+        return self._admin_users
+    admin_user = property(_get_admin_user, _set_admin_user)
 
 
     def _set_ignore_dir(self, rule):
@@ -113,24 +112,19 @@ class rules(object):
             pass
 
 
-    def _add_ip(self, ip, ip_list):
+    def _add_user(self, username, user_list):
         try:
-            ip_list.append(IPNetwork(ip))
+            user_list.append(username)
         except:
             pass
+ 
+    def is_admin(self, username):
+        """If give user is an admin for this path."""
+        return username in self._admin_users
 
-    def _ip_check(self, ip):
-        """Check if user's IP is allowed to see excluded content."""
-        for allowed_ip in self._allowed_ips:
-            if IPAddress(ip) in allowed_ip:
-                return True
-        else:
-            return False
-                
-        
     def exclude_dir(self, path):
         """If directory should be excluded."""
-        if  self._ip_allowed:
+        if self._logged_in:
             return False
 
         for rule in self.exclude_dirs:
@@ -149,12 +143,15 @@ class rules(object):
 
     def exclude_file(self, path):
         """If file should be excluded."""
+        if self._logged_in:
+            return False
+
         parent_dir = os.path.dirname(path)
-        if self.exclude_dir(parent_dir) and not self._ip_allowed:
+        if self.exclude_dir(parent_dir):
             return True
 
         for rule in self.exclude_files:
-            if rule.search(path) and not self._ip_allowed:
+            if rule.search(path):
                 return True
         return False
 
@@ -206,9 +203,8 @@ class rules(object):
             for ignore in rules['files']['show_raw']['regex']:
                 self.ignore_filehandlers = ignore
 
-            for ip in rules['ip']['allow']:
-                self.allow_ip = ip
-
+            for user in rules['users']['admin']:
+                self.admin_user = user
 
    
 def parse_xml(path):
@@ -225,7 +221,7 @@ def parse_xml(path):
            'files':{'exclude':{'regex':[]},
                     'ignore':{'regex':[]},
                     'show_raw':{'regex':[]}},
-           'ip':{'allow':[]},
+           'users':{'admin':[]},
            }
 
     try:
@@ -234,7 +230,7 @@ def parse_xml(path):
         except:
             ret['dirs']['exclude']['regex'].append('*')
             ret['files']['exclude']['regex'].append('*')
-            ret['ip']['allow'] = []
+            ret['users']['admin'] = []
             return ret
 
         excluded = root.find('dirs/exclude')
@@ -272,12 +268,12 @@ def parse_xml(path):
                     continue
                 ret['files']['show_raw']['regex'].append(show_raw.text)
 
-        allow_ip = root.find('ip')
-        if allow_ip is not None:
-            for allow_ip in allow_ip.iterfind('allow'):
-                if not allow_ip.text:
+        admin_user = root.find('users')
+        if admin_user is not None:
+            for admin_user in admin_user.iterfind('admin'):
+                if not admin_user.text:
                     continue
-                ret['ip']['allow'].append(allow_ip.text)
+                ret['users']['admin'].append(admin_user.text)
 
         return ret
 

@@ -34,7 +34,7 @@ def handler(xfile):
     bookmark = load_bookmark(xfile)
     admin = None
 
-    if xfile.config.logged_in:
+    if xfile.config.user_admin:
         try:
             import browser.plugins.editors.bookmarks
             admin = {'url':'/%s%s' % (editor_prefix, xfile.url),'name':'Edit Bookmarks'}

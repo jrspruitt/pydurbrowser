@@ -8,7 +8,7 @@ def get_desc(item, config, is_displayed=False):
         display = '' if not is_displayed else 'display'
         has_desc = False
 
-        if config.logged_in:
+        if config.user_admin:
             if os.path.exists(desc_path):
                 dtype = 'Edit'
                 prefix = editor_prefix

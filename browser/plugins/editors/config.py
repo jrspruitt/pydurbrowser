@@ -159,7 +159,7 @@ def _cfg_save(path):
         files.append(_list_to_xml('show_raw', 'regex', _to_list(_get_var('files_show_raw'))))
         rules.append(files)
 
-        rules.append(_list_to_xml('ip', 'allow', _to_list(_get_var('ip_allow'))))
+        rules.append(_list_to_xml('users', 'admin', _to_list(_get_var('users_admin'))))
         root.append(rules)
 
         xml_buf = etree.tostring(root, encoding=unicode, pretty_print=True)

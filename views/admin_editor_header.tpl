@@ -29,12 +29,3 @@
     </script>
 % end
 % end
-
-% prefix = ''
-% if item.config.is_displayed:
-%   prefix = display_prefix
-% end
-    <form style="display:inline" id="login_form" action="/logout" method="GET">
-    <input type="hidden" name="last_page" value="{{ prefix }}{{ item.config.url }}" />
-    <a href="#" onclick="document.getElementById('login_form').submit();">Logout</a>
-    </form>

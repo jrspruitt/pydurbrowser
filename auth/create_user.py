@@ -4,7 +4,7 @@ from datetime import datetime
 from cork import Cork
 
 def create(username, password):
-    cork = Cork('./', initialize=True)
+    cork = Cork('./', initialize=False)
 
     cork._store.roles['admin'] = 100
     cork._store.save_roles()

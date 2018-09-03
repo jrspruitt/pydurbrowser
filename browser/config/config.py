@@ -24,11 +24,12 @@ from browser.settings import config_filename, data_path, readme_default
 from browser.config.rules import rules
 from browser.plugins import load_plugins
 
-def get_config(url):
+def get_config(url, cork):
     """Get config object
 
     Args:
         Str:url    requested URL.
+        Cork:cork  Cork object.
 
     Returns:
         Obj:config    Config object.
@@ -43,7 +44,10 @@ def get_config(url):
     is_displayed       If current item is in display mode.
     parent_url         Title link URL.
     head_img_link      Directory of head_img having config file.
+    cork               Initialized cork object
+    username           Name of logged in user, or 'anonymous'
     logged_in          If user is logged in or not.
+    user_admin         If the user is an admin for this path.
     inherit            If child dirs should inherit page type and list/display
     rules              Rules object.
     page               {'type':'default, img_gallery, 'src':'filename'}
@@ -61,6 +65,7 @@ def get_config(url):
     """
 
     config = _config()
+    config.cork = cork
     config.url = url.rstrip('/')
 
     config.path = os.path.join(data_path(), config.url)
@@ -69,8 +74,19 @@ def get_config(url):
     if not os.path.isdir(config.path):
         config.path = os.path.dirname(config.path)
 
+
+    try:
+        config.username = cork.current_user.username
+        config.logged_in = True
+    except:
+        config.logged_in = False
+        config.username = None
+
     config.files = gather_configs(config.path, [])
-    config.rules = rules(config.files)
+    config.rules = rules(config.files, config.logged_in)
+
+    config.user_admin = config.rules.is_admin(config.username)
+
     config.parent_url = os.path.dirname(config.files[0]).replace(data_path(), '') or '/'
     config.is_parent = config.files[0] == os.path.join(config.path, config_filename)
     cxml = parse_xml(config.files[0], config.is_parent)
@@ -287,6 +303,8 @@ class _config(object):
                  'style',
                  'meta',
                  'logged_in',
+                 'username',
+                 'cork',
                  ]
 
         for name in attrs:

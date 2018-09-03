@@ -50,7 +50,7 @@ def handler(xfile):
 
     try:
         admin = None
-        if xfile.config.logged_in:
+        if xfile.config.user_admin:
             import browser.plugins.editors.markdown
             admin = {'url':'/%s%s' % (editor_prefix, xfile.url)}
     except ImportError, e:

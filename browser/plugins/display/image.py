@@ -67,7 +67,7 @@ def handler(xfile):
     process_displayimg(xfile)
     img_plugin = 'browser.plugins.list.image'
     xfile.config.css.append(get_css('media.css', xfile))
-    config = get_config(os.path.dirname(xfile.url))
+    config = get_config(os.path.dirname(xfile.url), xfile.config.cork)
     config.list_plugins = [{'name':img_plugin, 'plugin':pimage}]
     items = get_items(config)
     peer_files = []
