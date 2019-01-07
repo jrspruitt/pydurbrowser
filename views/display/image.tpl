@@ -15,9 +15,9 @@
 			next
 		% end
 		</div>
-		<div>
+		<div style="width:{{! xfile.display_width }}px;">
 		    <a href="/{{ xfile.url }}">
-		        <img class="single" src="/{{ xfile.resized_img_url }}" {{! xfile.display_width }} {{! xfile.display_height }} />
+		        <img class="single" src="/{{ xfile.resized_img_url }}" width="{{! xfile.display_width }}" height="{{! xfile.display_height }}" />
 		    </a>
 	    </div>
     </div>

@@ -106,14 +106,14 @@ def handler(xfile):
                 pass
 
         with Image.open(xfile.resized_img_path) as rim:
-            xfile.display_width = 'width="%s"' % rim.width
-            xfile.display_height = 'height="%s"' % rim.height
+            xfile.display_width = rim.width
+            xfile.display_height = rim.height
 
     except:
-        xfile.width = "None"
-        xfile.height = "None"
-        xfile.display_width = 'width="%s"' % img_display_size[0]
-        xfile.display_height = ""
+        xfile.width = 'None'
+        xfile.height = 'None'
+        xfile.display_width = img_display_size[0]
+        xfile.display_height = img_display_size[1]
 
     try:
         xfile.mtime = time.ctime(os.path.getmtime(xfile.path))
