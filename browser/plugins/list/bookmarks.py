@@ -22,7 +22,7 @@ import os
 from lxml import etree
 from bottle import template
 from browser.utils import display_url
-from browser.settings import display_prefix
+from browser.settings import display_prefix, editor_prefix
 
 name = 'bookmarks'
 match = 100
@@ -32,6 +32,15 @@ def check(item):
     return item.name.startswith('bookmarks') and item.name.endswith('.xml') and os.path.isfile(item.path)
 
 def handler(item, config):
+    admin = None
+
+    if config.user_admin:
+        try:
+            import browser.plugins.editors.bookmarks
+            admin = {'url':'/%s%s' % (editor_prefix, item.url),'name':'Edit Bookmarks'}
+        except ImportError, e:
+            pass
+
     try:
         root = etree.parse(item.path).getroot()
         title = '' 
@@ -42,7 +51,7 @@ def handler(item, config):
     except:
         title = 'Bookmarks'
 
-    if not 'bookmarks' in title.lower():
+    if not 'bookmarks' in title.lower() and os.path.basename(os.path.dirname(item.url)).lower() != 'bookmarks':
         title = 'Bookmarks/%s' % title
 
     bookmark = load_bookmark(item)
@@ -50,7 +59,7 @@ def handler(item, config):
 
     item.name = title
     item.url = display_url(item.url)
-    item.display = template('lists/bookmarks.tpl', item=item, config=config, bookmark=bookmark)
+    item.display = template('lists/bookmarks.tpl', item=item, config=config, bookmark=bookmark, admin=admin)
 
 
 
@@ -62,16 +71,24 @@ def load_bookmark(xfile):
            'items':[]}
     try:
         root = etree.parse(path).getroot()
+
         if root.find('channel/title') is not None:
             ret['title'] = root.find('channel/title').text
     
         if root.find('channel/description') is not None:
             ret['description'] = root.find('channel/description').text or ''
+        else:
+            ret['description'] = ret['title']
 
         for rssxfile in root.iterfind('channel/item'):
             title = rssxfile.find('title').text
             link = rssxfile.find('link').text
-            ret['items'].append({'title':title, 'link':link})
+            desc = rssxfile.find('description').text
+
+            if desc is None:
+                desc = link
+
+            ret['items'].append({'title':title, 'link':link, 'description':desc})
     except:
         pass
 

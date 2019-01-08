@@ -1,7 +1,7 @@
 % from browser.settings import editor_prefix
        <div class="tr">
             <div class="items item_name td item_file">
-                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" style="background-color:#CCC;" class="show_hide_e"></a>
+                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" class="show_hide_e show_hide_has_desc"></a>
                 <a href="/git/{{ item.url }}/">{{ item.name }}</a>
 	                <div id="{{ item.name }}" class="desc">
 	                   % if config.user_admin:

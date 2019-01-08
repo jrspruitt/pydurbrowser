@@ -57,7 +57,7 @@ def updater(url):
         return bottle.redirect('/%s' % (os.path.dirname(url)))
 
     if _cfg_save(path):
-        return bottle.redirect('/%s%s' % (display_prefix, url))
+        return bottle.redirect('/%s' % (os.path.dirname(url)))
     else:
         return "Failed to save config."
 

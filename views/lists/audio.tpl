@@ -1,7 +1,7 @@
         <div class="tr">
             <div class="items item_name td item_file">
-                % style = 'style="background-color:#CCC;"' if item.has_desc else ''
-                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" {{! style }} class="show_hide_e"></a>
+                % has_desc = 'show_hide_has_desc' if item.has_desc else ''
+                <a id="{{ item.name }}_sh"  href="#" onclick="show_hide('{{! item.name }}')" class="show_hide_e {{! has_desc }}"></a>
                 <audio class="single" controls="controls" preload="none">
                     <source src="/{{ item.url }}" />
                 </audio>

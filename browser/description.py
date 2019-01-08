@@ -18,12 +18,12 @@ def get_desc(item, config, is_displayed=False):
                 prefix = creator_prefix
 
             name = os.path.basename(desc_path).replace('.', '-')
-            dtext = """
+            dtext = """<div>
                 <form id="dedit-%s" action="/%s%s%s" method="POST">
                 <input type="hidden" value="description" name="etype" />
                 <input type="hidden" value="%s" name="display">
-                <a style="cursor:pointer;font-size:.8em;" onclick="$('#dedit-%s').submit();">%s Description</a>
-                </form><br />""" % (name, prefix, item.url, desc_ext, display, name, dtype)
+                <a class="edit_desc_link" onclick="$('#dedit-%s').submit();">%s Description</a>
+                </form></div>""" % (name, prefix, item.url, desc_ext, display, name, dtype)
 
         if os.path.exists(desc_path):
             has_desc = True
