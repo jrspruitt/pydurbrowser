@@ -31,7 +31,8 @@ order = 100
 
 def cgitrc_parser(path):
     lines = []
-    name = os.path.basename(path)
+    filename = os.path.basename(path);
+    name = filename[0:-4] if filename.endswith('.git') else filename
     desc = 'cgit description'
     path = os.path.join(path, 'cgitrc')
     rgx_name = re.compile('^name[ ]*=[ ]*')
