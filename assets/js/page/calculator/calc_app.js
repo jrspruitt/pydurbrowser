@@ -586,6 +586,12 @@ Mechcalc.prototype.get_list = function(list, gui){
 
     for(id in list){
         if(list[id].type == this.type_calc){
+            if(this.cur_item == list[id].id){
+                list[id].valid.clear();
+                this._gui_clear_decoration(list[id]);
+                continue;
+            }
+
             if(!this.get(list[id], gui)){
                 error = true;
             }
@@ -664,7 +670,7 @@ Mechcalc.prototype.get = function(inp, gui){
 
     this._format_input_value(inp);
 
-    if(!this.is_number(inp.value)){                
+    if(!this.is_number(inp.value)){
         this._set_error(inp, this.err_num);
         if(gui){ this._gui_set_error(inp); };
         return false;
@@ -836,8 +842,7 @@ Mechcalc.prototype._set_error = function(inp, msg){
  */
 Mechcalc.prototype._gui_set_errors = function(){
     for(id in this.i){
-        if(this.i[id].type != this.type_calc){continue; };
-
+        if(this.i[id].type != this.type_calc){ continue; };
         if(this.i[id].value == this.err_val){
             this._gui_set_error(this.i[id]);
         }
@@ -891,7 +896,9 @@ Mechcalc.prototype._gui_clear_decoration = function(inp){
  */
 Mechcalc.prototype._gui_clear_decorations = function(){
     for(id in this.i){
-        this._gui_clear_decoration(this.i[id])
+        if(this.i[id].type == this.type_calc){
+            this._gui_clear_decoration(this.i[id])
+        }
     }
 }
 
@@ -1738,10 +1745,15 @@ Mechcalc.prototype.graph = function(t, item, elem){
  */
 Mechcalc.prototype.control_units_conv = function(id){
     var select = this.i[id].u.elem;
-
+    this._gui_clear_decoration(this.i[id]);
     if(this.get(this.i[id], true)){
-        this.i[id].u.unit = this.i[id].u.elem.options[this.i[id].u.elem.selectedIndex].value;
+        this.i[id].u.unit = select.options[select.selectedIndex].value;
         this.set(this.i[id]);
+    } else {
+        for(var i = 0; i < select.options.length; i++){
+            if(select.options[i].value != this.i[id].u.unit){ continue; }
+            select.selectedIndex = i;
+        }
     }
 }
 
@@ -1765,7 +1777,7 @@ Mechcalc.prototype.control_units_system = function(sys){
 
         this.get(inp, true);
         for(var i = 0; i < select.options.length; i++){
-            if(select.options[i].value != units){ continue;    }
+            if(select.options[i].value != units){ continue; }
             select.selectedIndex = i;
             inp.u.unit = select.options[i].value;
         }
