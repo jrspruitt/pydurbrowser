@@ -157,6 +157,7 @@ def _get_head_img(files):
     except:
         return ['','']
 
+
 def _get_theme(files):
     """Look through config files for parent theme.
     

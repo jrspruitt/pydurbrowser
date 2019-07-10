@@ -46,9 +46,13 @@
             <table>
                 % for k in exif:
                 % if k != 'MakerNote':
+                % try:
                     <tr>
                         <td>{{ k }}</td><td><span class="second_color">{{ exif[k] }}</span></td>
                     </tr>
+                % except:
+                % pass
+                % end
                 % end
                 %end
             </table>
