@@ -35,7 +35,7 @@ def handler(item, config):
     subitems = 0
 
     if os.path.exists(cpath):
-        dir_rules = rules([cpath] + config.files)
+        dir_rules = rules([cpath] + config.files, config.logged_in)
     else:
         dir_rules = config.rules
 
