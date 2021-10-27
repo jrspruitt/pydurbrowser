@@ -1373,16 +1373,17 @@ Mechcalc.prototype.graph = function(t, item, elem){
         this.t.ctx.stroke();
         return true;
     }
-        /*
-         * Min/Max values to use for grid labels.
-         * In betweens will be calculated by xmax/xlines
-         */
-        this.grid.labels = function(xmin, xmax, ymin, ymax){
-            this.xmin = xmin;
-            this.xmax = xmax;
-            this.ymin = ymin;
-            this.ymax = ymax;
-        }
+
+    /*
+     * Min/Max values to use for grid labels.
+     * In betweens will be calculated by xmax/xlines
+     */
+    this.grid.labels = function(xmin, xmax, ymin, ymax){
+        this.xmin = xmin;
+        this.xmax = xmax;
+        this.ymin = ymin;
+        this.ymax = ymax;
+    }
 
     /*
      * Loop index helpers.

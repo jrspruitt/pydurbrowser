@@ -37,7 +37,7 @@ def handler(page):
         html_path = os.path.join(page.config.path, html_src)
 
         if os.path.exists(html_path):
-            with open(html_path, 'r') as f:
+            with open(html_path, 'r', encoding='utf8') as f:
                 html = f.read()
 
     page.config.js.append(get_js('list.js'))

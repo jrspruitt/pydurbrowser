@@ -277,6 +277,6 @@ def parse_xml(path):
 
         return ret
 
-    except Exception, e:
-        print 'Bad page config: %s %s' % (path, e)
+    except Exception as e:
+        print('Bad page config: %s %s' % (path, e))
         abort(500, 'Bad page config.')

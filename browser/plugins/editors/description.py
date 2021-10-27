@@ -41,7 +41,7 @@ def editor(url):
     display = bottle.request.POST.get('display', '')
 
     if os.path.exists(path):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf8') as f:
             text = f.read()
 
     return bottle.template('editors/description.tpl', url='/%s%s' % (updater_prefix, url), text=text, display=display)
@@ -63,7 +63,7 @@ def updater(url):
             if os.path.exists(path) and os.path.isfile(path):
                 os.remove(path)
         else:
-            with open(path, 'w') as f:
+            with open(path, 'w', encoding='utf8') as f:
                 f.write(text)
 
     except:

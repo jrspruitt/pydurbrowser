@@ -162,16 +162,16 @@ def _cfg_save(path):
         rules.append(_list_to_xml('users', 'admin', _to_list(_get_var('users_admin'))))
         root.append(rules)
 
-        xml_buf = etree.tostring(root, encoding=unicode, pretty_print=True)
+        xml_buf = etree.tostring(root, encoding=str, pretty_print=True)
 
-        f = codecs.open('%s' % path, 'w', encoding="utf-8")
+        f = codecs.open('%s' % path, 'w', encoding='utf-8')
         f.write(xml_buf)
         f.close()
         return True
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         import traceback
-        print traceback.print_exc()
+        print(traceback.print_exc())
         return False
 
 def _get_var(name, default=''):

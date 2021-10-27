@@ -54,8 +54,8 @@ def dataport(url, request):
         plugin = load_plugin_list(plugins)[0]
         return plugin['plugin'].get_data(url_data, request)
 
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         pass
 
     return '{"result":"false1"}'

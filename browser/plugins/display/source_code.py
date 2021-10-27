@@ -63,8 +63,8 @@ def check(xfile):
 
 def handler(xfile):
     xfile.code = 'Load Error.'
-    with open(xfile.path, 'rb') as f:
-        xfile.code = f.read().decode('ISO-8859-1')
+    with open(xfile.path, 'r', encoding='utf8') as f:
+        xfile.code = f.read()
 
     xfile.config.js.append('https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js?skin=sunburst')
     xfile.display = template('display/source_code.tpl', xfile=xfile)

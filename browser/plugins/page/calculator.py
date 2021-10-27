@@ -30,7 +30,7 @@ def handler(page):
     config_path = os.path.join(page.config.path, 'calc.json')
     if os.path.exists(config_path):
         data = {"items":[]}
-        with open(config_path, 'r') as f:
+        with open(config_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
         for item in data['items']:
@@ -50,6 +50,6 @@ def handler(page):
         
     page.config.css.append(get_css('media.css', page))
     page.config.css.append(get_css('list.css', page))
-    with open(os.path.join(page.config.path, 'calc.json')) as f:
+    with open(os.path.join(page.config.path, 'calc.json'), 'r', encoding='utf-8') as f:
         page.config.script = 'mc.init(%s);' % f.read()
     page.display = template("pages/calculator.tpl", page=page)

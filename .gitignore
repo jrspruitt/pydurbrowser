@@ -1,3 +1,5 @@
+
+
 ##########################
 #Linux Specific GitIgnore#
 ##########################
@@ -35,3 +37,4 @@ local.properties
 browser/settings.py
 auth/*.json
 tools/
+venv/

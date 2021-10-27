@@ -39,7 +39,7 @@ def cgitrc_parser(path):
     rgx_desc = re.compile('^desc[ ]*=[ ]*')
 
     if os.path.exists(path):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf8') as f:
             lines = f.readlines()
 
         for line in lines:
@@ -79,40 +79,41 @@ def handler(item, config):
             item.repo['commit'] = {}
             item.repo['commit']['msgs'] = []
 
-            for line in commit.split('\n'):
+            for line in commit.split(b'\n'):
                 line = line.strip()
 
-                if line.startswith('commit'):
+                if line.startswith(b'commit'):
                     ghash = line.split()[1]
-                    item.repo['commit']['hash'] = ghash
+                    item.repo['commit']['hash'] = ghash.decode('utf-8')
 
-                elif line.startswith('Author'):
+                elif line.startswith(b'Author'):
                     try:
                         parts = line.split()
                         email = parts[-1]
-                        name = ' '.join(parts[1:-1])
-                    except:
+                        name = b' '.join(parts[1:-1])
+
+                    except Exception as e:
                         name = 'Nobody'
                         email = ''
 
-                    email = email.lstrip('<').rstrip('>')
-                    item.repo['commit']['name'] = name
-                    item.repo['commit']['email'] = email
+                    email = email.lstrip(b'<').rstrip(b'>')
+                    item.repo['commit']['name'] = name.decode('utf-8')
+                    item.repo['commit']['email'] = email.decode('utf-8')
 
-                elif line != '':
-                    item.repo['commit']['msgs'].append(line)
+                elif line != b'':
+                    item.repo['commit']['msgs'].append(line.decode('utf-8'))
 
 
         branches = check_output('git branch -a', cwd=item.path, shell=True)
         if branches:
             item.repo['branches'] = {}
             item.repo['branches']['names'] = []
-            for branch in branches.split('\n'):
+            for branch in branches.split(b'\n'):
                 branch = branch.lstrip()
 
-                if branch.startswith('*'):
+                if branch.startswith(b'*'):
                     branch = branch[1:].lstrip()
-                    item.repo['branches']['selected_branch'] = branch
+                    item.repo['branches']['selected_branch'] = branch.decode('utf-8')
 
                 item.repo['branches']['names'].append(branch)
 

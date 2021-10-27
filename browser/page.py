@@ -50,7 +50,7 @@ class page(object):
 
 def _open_readme(path, page):
     try:
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf8') as f:
             page.readme = md.markdown(f.read().decode('utf-8'), ['tables'])
     except:
         page.readme = ''
@@ -68,14 +68,14 @@ def _load_readme(page):
 def _load_page_config(page):
     module = 'browser.plugins.page'
     try:
-        mod = __import__(module, globals(), locals(), [page.config.page['type']], -1)
+        mod = __import__(module, globals(), locals(), [page.config.page['type']], 0)
         handler = getattr(mod, page.config.page['type'])
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         try:
-            mod = __import__(module, globals(), locals(), ['default'], -1)
+            mod = __import__(module, globals(), locals(), ['default'], 0)
             handler = getattr(mod, 'default')
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
     finally:
         handler.handler(page)

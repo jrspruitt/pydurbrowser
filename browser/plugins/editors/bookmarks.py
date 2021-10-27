@@ -85,8 +85,8 @@ def _load_editor(url, name=''):
                                            'link':item.find('link').text or '',
                                            'description':item.find('description').text or ''})
 
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
 
     return bottle.template('editors/bookmarks.tpl', url='/%s%s' % (updater_prefix, url), bookmarks=bookmarks, name=name)
 
@@ -156,15 +156,15 @@ def _cfg_save(path):
         rss_xml.attrib['version'] = '2.0'
         rss_xml.append(root)
 
-        xml_buf = etree.tostring(rss_xml, encoding=unicode, pretty_print=True)
+        xml_buf = etree.tostring(rss_xml, encoding=str, pretty_print=True)
         f = codecs.open('%s' % path, 'w', encoding="utf-8")
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n%s' % xml_buf)
         f.close()
         return True
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         import traceback
-        print traceback.print_exc()
+        print(traceback.print_exc())
         return False
 
 def _get_var(name, default=''):

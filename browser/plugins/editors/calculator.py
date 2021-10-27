@@ -44,7 +44,7 @@ def editor(url):
     buf = ''
 
     if os.path.exists(path):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf8') as f:
             buf = f.read();
 
     if path.endswith(calc_config):
@@ -73,10 +73,10 @@ def updater(url):
             create_js(os.path.join(mk_path, calc_js), data)
 
     if path.endswith(calc_js):
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf8') as f:
             f.write(data)
     else:
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf8') as f:
             f.write(data.decode('string_escape').strip("\""))
  
     return bottle.redirect(retpath)
@@ -106,7 +106,7 @@ def create_js(path, data):
 
             buf += '}\n\n'
 
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf8') as f:
         f.write(buf)
 
 

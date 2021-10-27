@@ -44,7 +44,7 @@ def editor(url):
     text = ''
 
     if os.path.exists(path):
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf8') as f:
             text = f.read()
 
     return bottle.template('editors/markdown.tpl', url='/%s%s' % (updater_prefix, url), text=text, name=os.path.basename(path))
@@ -61,11 +61,11 @@ def updater(url):
                 os.remove(path)
                 redirect_url = '/%s' % (os.path.dirname(url))
         else:
-            with open(path, 'w') as f:
+            with open(path, 'w', encoding='utf8') as f:
                 f.write(text)
 
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         return "Failed to save file."
 
     return bottle.redirect(redirect_url)

@@ -34,10 +34,10 @@ def load_plugins(plugins, ptype='list'):
 
     for plugin in plugins:
         try:
-            mod = __import__(plugin, globals(), locals(), ['*'], -1)
+            mod = __import__(plugin, globals(), locals(), ['*'], 0)
             modules.append({'name':plugin, 'plugin':mod})
-        except Exception, e:
-            print '%s failed to load: %s' % (plugin, e)
+        except Exception as e:
+            print('%s failed to load: %s' % (plugin, e))
 
     try:
         modules.sort(key=lambda x: x['plugin'].match, reverse=True)

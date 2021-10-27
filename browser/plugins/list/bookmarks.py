@@ -38,7 +38,7 @@ def handler(item, config):
         try:
             import browser.plugins.editors.bookmarks
             admin = {'url':'/%s%s' % (editor_prefix, item.url),'name':'Edit Bookmarks'}
-        except ImportError, e:
+        except ImportError as e:
             pass
 
     try:

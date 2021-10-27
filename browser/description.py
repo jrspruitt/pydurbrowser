@@ -27,7 +27,7 @@ def get_desc(item, config, is_displayed=False):
 
         if os.path.exists(desc_path):
             has_desc = True
-            with open(desc_path, 'r') as f:
+            with open(desc_path, 'r', encoding='utf8') as f:
                 try:
                     dtext += md.markdown(f.read().decode('utf-8'), ['tables'])
                 except:

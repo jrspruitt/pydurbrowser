@@ -41,11 +41,11 @@ def check(xfile):
 
 def handler(xfile):
     xfile.config.css.append(get_css('media.css', xfile))
-    with open(xfile.path, 'r') as f:
+    with open(xfile.path, 'r', encoding='utf8') as f:
         try:
-            xfile.text = md(f.read().decode('utf-8'), ['tables'])
-        except Exception, e:
-            print e
+            xfile.text = md(f.read(), extensions=['tables'])
+        except Exception as e:
+            print(e)
             xfile.text = 'Load error.'
 
     try:
@@ -53,7 +53,7 @@ def handler(xfile):
         if xfile.config.user_admin:
             import browser.plugins.editors.markdown
             admin = {'url':'/%s%s' % (editor_prefix, xfile.url)}
-    except ImportError, e:
+    except ImportError as e:
         admin = None
 
     xfile.display = template('display/markdown.tpl', xfile=xfile, admin=admin)

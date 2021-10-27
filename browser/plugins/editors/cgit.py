@@ -35,7 +35,7 @@ def editor(url):
     desc = ''
 
     if os.path.exists(cgitrc):
-        with open(cgitrc, 'r') as f:
+        with open(cgitrc, 'r', encoding='utf8') as f:
             for line in f.readlines():
                 if line.startswith('name='):
                     name = line[len('name='):]
@@ -55,13 +55,13 @@ def updater(url):
         try:
             os.mkdir(path)
             os.system('git init --bare %s' % path)
-            with open(os.path.join(path, 'description'), 'w') as f:
+            with open(os.path.join(path, 'description'), 'w', encoding='utf8') as f:
                 f.write(desc)
         except:
             bottle.abort(403, 'Failed to create git directory.')
 
     try:
-        with open(cgitrc, 'w') as f:
+        with open(cgitrc, 'w', encoding='utf8') as f:
             f.write('name=%s\ndesc=%s' % (name, desc))
 
     except:
