@@ -1,8 +1,6 @@
-
-
-##########################
-#Linux Specific GitIgnore#
-##########################
+############################
+# Linux Specific GitIgnore #
+############################
 .*
 !.gitignore
 *~
@@ -11,28 +9,23 @@
 # KDE
 .directory
  
-############################
-#Eclipse Specific GitIgnore#
-############################
-*.pydevproject
-.project
-.metadata
-bin/**
-tmp/**
-tmp/**/*
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
- 
-# CDT-specific
-.cproject
+##################################
+# Visual Code Specific GitIgnore #
+##################################
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
 
-# My Additions
+# Local History for Visual Studio Code
+.history/
+
+ 
+##############################
+# Project Specific GitIgnore #
+##############################
 *.pyc
 browser/settings.py
 auth/*.json
