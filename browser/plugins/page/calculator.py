@@ -31,7 +31,7 @@ def handler(page):
     if os.path.exists(config_path):
         data = {"items":[]}
         with open(config_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+            data = json.loads(f.read())
 
         for item in data['items']:
             if (item['type'] == 'diagram'):

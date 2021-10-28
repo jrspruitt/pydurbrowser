@@ -45,7 +45,7 @@ def editor(url):
 
     if os.path.exists(path):
         with open(path, 'r', encoding='utf8') as f:
-            buf = f.read();
+            buf = f.read()
 
     if path.endswith(calc_config):
         return bottle.template('editors/calculator.tpl', url=update_url, data=buf, creator=False)
@@ -57,7 +57,7 @@ def updater(url):
     check_url(url)
     path = os.path.join(data_path(), url)
     retpath = '/%s' % (os.path.dirname(url))
-    data = bottle.request.POST.get('data', '')
+    data = bottle.request.forms.data
 
     if os.path.isdir(path):
         name = bottle.request.POST.get('name', '')
@@ -77,7 +77,7 @@ def updater(url):
             f.write(data)
     else:
         with open(path, 'w', encoding='utf8') as f:
-            f.write(data.decode('string_escape').strip("\""))
+            f.write(data.strip("\""))
  
     return bottle.redirect(retpath)
 
@@ -94,7 +94,7 @@ def create_js(path, data):
                 buf += '\tthis.%s.grid.build();\n' % item['id']
 
                 for pitem in item['config']['items']:
-                    buf += '\tthis.%s.plot.draw(fromX, fromY, toX, toY, "%s");\n' % (item['id'], pitem['label'])
+                    buf += '\tthis.%s.plot.line(fromX, fromY, toX, toY, "%s");\n' % (item['id'], pitem['label'])
 
             else:
                 buf += 'mc.calc_%s = function(){\n' % item['id']

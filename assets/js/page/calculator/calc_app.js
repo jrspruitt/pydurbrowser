@@ -240,7 +240,7 @@ Mechcalc.prototype._valid = function(t, inp){
         }
 
         if(!exp){
-            t._set_error(inp, msg + t._format_rounder(value));
+            t._set_error(inp, msg + t.format_rounder(value));
             return false;
         }else{
             return true;
@@ -911,7 +911,7 @@ Mechcalc.prototype._gui_set_input_value = function(inp){
     if(!this.is_number(inp.value) || inp.type == this.type_textbox){
         inp.elem.value = inp.value;
     }else{
-        var rounded = this._format_rounder(inp.value);
+        var rounded = this.format_rounder(inp.value);
 
         if(inp.radix == this.rad_dec){
             inp.elem.value = rounded;
@@ -921,7 +921,7 @@ Mechcalc.prototype._gui_set_input_value = function(inp){
             inp.elem.value = "0x" + rounded.toString(16);
         }
         if(inp.imag){
-            var imag = this._format_rounder(inp.imag);
+            var imag = this.format_rounder(inp.imag);
             inp.elem.value = inp.elem.value + imag + 'i';
         }
     }
@@ -1111,7 +1111,7 @@ Mechcalc.prototype._format_input_value = function(inp){
  * value - value to round
  * Returns: rounded value
  */
-Mechcalc.prototype._format_rounder = function(value){
+Mechcalc.prototype.format_rounder = function(value){
     if(this.rounding == 0 || !this.is_number(value)){
         return value;
     }else{
@@ -1232,6 +1232,7 @@ Mechcalc.prototype.graph = function(t, item, elem){
                         "pink":[255,0,255,1],
                         "aqua":[0,255,255,1],
                         "gray":[127,127,127,1],
+                        "black":[0,0,0,1],
                             }
     
     /*
@@ -1340,29 +1341,22 @@ Mechcalc.prototype.graph = function(t, item, elem){
         this.items[label] = [label, yunit, xunit, rgba, rgba_str];
     }
 
-    this.plot.item_label = function(item){
-        this.t.ctx.fillStyle=item[4];
-        this.t.ctx.fillText(item[0], this.edge + 10, this.t.grid.ystart+25);
-        this.edge += item[0].toString().length * 7;
-        this.t.ctx.fillStyle="rgba(0, 0, 0, 1)";
-    }
-
     /*
      * Draw from fx,fy to tx,ty, for plot item "label"
      */
-    this.plot.draw = function(fx, fy, tx, ty, label){
+    this.plot.line = function(fx, fy, tx, ty, label){
         var color =  this.items[label][4];
         fxc = this.t._convertx(fx);            
-        if(this.t._xoff_grid(fxc)){return false;}
+        if(this.t.xoff_grid(fxc)){return false;}
 
         fyc = this.t._converty(fy);
-        if(this.t._yoff_grid(fyc)){return false;}
+        if(this.t.yoff_grid(fyc)){return false;}
 
         txc = this.t._convertx(tx);
-        if(this.t._xoff_grid(txc)){return false;}
+        if(this.t.xoff_grid(txc)){return false;}
 
         tyc = this.t._converty(ty);
-        if(this.t._yoff_grid(tyc)){return false;}
+        if(this.t.yoff_grid(tyc)){return false;}
 
         this.t.ctx.clearRect(fxc, fyc, 1, 1);
 
@@ -1374,6 +1368,36 @@ Mechcalc.prototype.graph = function(t, item, elem){
         return true;
     }
 
+    this.plot.circle = function(x, y, size, label){
+        var color =  this.items[label][4];
+        xc = this.t._convertx(x);            
+        if(this.t.xoff_grid(xc)){return false;}
+
+        yc = this.t._converty(y);
+        if(this.t.yoff_grid(yc)){return false;}
+
+        this.t.ctx.beginPath();
+        this.t.ctx.strokeStyle=color;
+        this.t.ctx.arc(xc, yc, (size/2)/this.t.xindexer(), 0, 2 * Math.PI);
+        this.t.ctx.stroke();
+        return true;
+    }
+
+    this.plot.text = function(text, x, y, label){
+        var color =  this.items[label][4];
+        xc = this.t._convertx(x);            
+        if(this.t.xoff_grid(xc)){return false;}
+
+        yc = this.t._converty(y);
+        if(this.t.yoff_grid(yc)){return false;}
+
+        this.t.ctx.fillStyle=color;
+        var lines = text.split('\n');
+        for(var i = 0; i < lines.length; i++) {
+            var offset = (10 * i);
+            this.t.ctx.fillText(lines[i], xc, yc + offset);
+        }
+    }
     /*
      * Min/Max values to use for grid labels.
      * In betweens will be calculated by xmax/xlines
@@ -1403,9 +1427,36 @@ Mechcalc.prototype.graph = function(t, item, elem){
         return 1/this.ypixel;
     }
 
+    /*
+     * Check if x or y input is off the grid or not.
+     */
+    this.xoff_grid = function(x){
+        if(x < this.grid.xstart-2 || x > this.grid.xstart+this.grid.width+2){
+            return true;
+        }else{
+            return false;
+        }                
+    }
+
+    this.yoff_grid = function(y){
+        if(y < this.grid.margin-2 || y > this.grid.height+this.grid.margin+2){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     /************************
      * Internal fuctions
      */
+
+     this.grid._draw = function(mx, my, lx, ly, color){
+        this.t.ctx.beginPath();
+        this.t.ctx.strokeStyle=color;
+        this.t.ctx.moveTo(this.xstart + mx, this.ystart - my);
+        this.t.ctx.lineTo(this.xstart + lx, this.ystart - ly);
+        this.t.ctx.stroke();
+    }
     
     /*
      * Convert x or y absolute position to relative to grid position
@@ -1421,12 +1472,23 @@ Mechcalc.prototype.graph = function(t, item, elem){
         return this.plot.ycenter - (this.ypixel * y);
     }
 
+
     /*
-     * Calculate unit size of pixel based against grid units width
+     * log graph specific functions.
      */
-    this.grid.set_pixel_size = function(){
-        this.t.xpixel = this.width/(this.xmax-this.xmin);
-        this.t.ypixel = this.height/(this.ymax-this.ymin);
+
+    this.grid.log.init = function(gxmin, gxmax){
+            if(this.xmin <= 0){
+                this.min = 0;
+            }else{
+                this.min = Math.round(Math.log(gxmin)/Math.LN10);
+            }
+            if(gxmax <= 0){
+                this.max = 0;
+            }else{
+                this.max = Math.round(Math.log(gxmax)/Math.LN10);
+            }
+            this.range = Math.round((this.max - this.min));
     }
 
     /*
@@ -1466,47 +1528,6 @@ Mechcalc.prototype.graph = function(t, item, elem){
         return num;
     }
 
-    /*
-     * Check if x or y input is off the grid or not.
-     */
-    this._xoff_grid = function(x){
-        if(x < this.grid.xstart-2 || x > this.grid.xstart+this.grid.width+2){
-            return true;
-        }else{
-            return false;
-        }                
-    }
-
-    this._yoff_grid = function(y){
-        if(y < this.grid.margin-2 || y > this.grid.height+this.grid.margin+2){
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    /*
-     * log graph specific functions.
-     */
-
-    this.grid.log.init = function(gxmin, gxmax){
-            if(this.xmin <= 0){
-                this.min = 0;
-            }else{
-                this.min = Math.round(Math.log(gxmin)/Math.LN10);
-            }
-            if(gxmax <= 0){
-                this.max = 0;
-            }else{
-                this.max = Math.round(Math.log(gxmax)/Math.LN10);
-            }
-            this.range = Math.round((this.max - this.min));
-    }
-
-    /************************
-     * Drawing functions
-     */
-
     this._draw_ytext = function(text, x, y){
         this.ctx.save();
         this.ctx.translate((this.elem.width/2),(this.elem.height/2))
@@ -1514,14 +1535,6 @@ Mechcalc.prototype.graph = function(t, item, elem){
         this.ctx.fillStyle="rgba(0, 0, 0, 255)";
         this.ctx.fillText(text, x-(this.elem.width/2), y-(this.elem.height/2));
         this.ctx.restore()
-    }
-
-    this.grid.draw = function(mx, my, lx, ly, color){
-        this.t.ctx.beginPath();
-        this.t.ctx.strokeStyle=color;
-        this.t.ctx.moveTo(this.xstart + mx, this.ystart - my);
-        this.t.ctx.lineTo(this.xstart + lx, this.ystart - ly);
-        this.t.ctx.stroke();
     }
 
     /*
@@ -1538,14 +1551,19 @@ Mechcalc.prototype.graph = function(t, item, elem){
         this.t._draw_ytext(this.ylabel, ((this.t.elem.width/2) - (this.ylabel.toString().length/2)*3), 20);
 
         for(item in this.t.plot.items){
-            this.t.plot.item_label(this.t.plot.items[item]);
+            this.t.ctx.fillStyle=this.t.plot.items[item][4];
+            this.t.ctx.fillText(this.t.plot.items[item][0], this.edge + 10, this.t.grid.ystart+25);
+            this.edge += this.t.plot.items[item][0].toString().length * 7;
+            this.t.ctx.fillStyle="rgba(0, 0, 0, 1)";
         }
 
         if(this.type == "log"){
             this.log.init(this.xmin, this.xmax);
         }
 
-        this.set_pixel_size();
+
+        this.t.xpixel = this.width/(this.xmax-this.xmin);
+        this.t.ypixel = this.height/(this.ymax-this.ymin);
         this.t.plot.edge = this.xstart;
         var grid_yline_space = this.height/this.ylines;
         var grid_xline_space = this.width/this.xlines;
@@ -1565,7 +1583,7 @@ Mechcalc.prototype.graph = function(t, item, elem){
 
                 for(i=1; i<=10; i++){
                     ilog = kf+((Math.log(i)/Math.LN10)*kfactor)
-                    this.draw(ilog, 0, ilog, this.height, "rgba(0, 0, 0, 0.2)");
+                    this._draw(ilog, 0, ilog, this.height, "rgba(0, 0, 0, 0.2)");
                 }
             }
 
@@ -1598,7 +1616,7 @@ Mechcalc.prototype.graph = function(t, item, elem){
                 }
 
                 w++;
-                this.draw(i, 0, i, this.height, "rgba(0, 0, 0, 0.2)");
+                this._draw(i, 0, i, this.height, "rgba(0, 0, 0, 0.2)");
             }
         }
 
@@ -1630,27 +1648,27 @@ Mechcalc.prototype.graph = function(t, item, elem){
             }
 
             w++;
-            this.draw(0, i, this.width, i, "rgba(0, 0, 0, 0.2)");
+            this._draw(0, i, this.width, i, "rgba(0, 0, 0, 0.2)");
         }
 
         if(this.align == "center"){
             if(this.center_major_y0 == true){
                 var ystart = this.height-this.t.plot.ycenter+this.margin;
-                this.draw(0, ystart, this.width, ystart, "rgba(0,0,0,1)");
+                this._draw(0, ystart, this.width, ystart, "rgba(0,0,0,1)");
             }else{
-                this.draw(0, this.height/2, this.width, this.height/2, "rgba(0, 0, 0, 1)");
+                this._draw(0, this.height/2, this.width, this.height/2, "rgba(0, 0, 0, 1)");
             }
 
             if(this.center_major_x0 == true){
                 var xstart = this.t.plot.xcenter-this.xstart;
-                this.draw(xstart, 0, xstart, this.height, "rgba(0, 0, 0, 1)");
+                this._draw(xstart, 0, xstart, this.height, "rgba(0, 0, 0, 1)");
             }else{
-                this.draw(this.width/2, 0, this.width/2, this.height, "rgba(0, 0, 0, 1)");
+                this._draw(this.width/2, 0, this.width/2, this.height, "rgba(0, 0, 0, 1)");
             }
 
         }else{
-            this.draw(0, 0, this.width, 0, "rgba(0, 0, 0, 1)");
-            this.draw(0, 0, 0, this.height, "rgba(0, 0, 0, 1)");
+            this._draw(0, 0, this.width, 0, "rgba(0, 0, 0, 1)");
+            this._draw(0, 0, 0, this.height, "rgba(0, 0, 0, 1)");
         }
     }
 
@@ -1691,8 +1709,8 @@ Mechcalc.prototype.graph = function(t, item, elem){
             posx = e.pageX;
             posy = e.pageY;
         }else if(e.clientX || e.clientY)     {
-            posx = e.clientX + document.body.scrollLeft    + document.documentElement.scrollLeft;
-            posy = e.clientY + document.body.scrollTop    + document.documentElement.scrollTop;
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
 
         do{
@@ -1704,8 +1722,8 @@ Mechcalc.prototype.graph = function(t, item, elem){
         graph_x = posx - total_offset_x
         graph_y = posy - total_offset_y
 
-        if(this._xoff_grid(graph_x)){this._xyfloat_off(); return false;}
-        if(this._yoff_grid(graph_y)){this._xyfloat_off(); return false;}
+        if(this.xoff_grid(graph_x)){this._xyfloat_off(); return false;}
+        if(this.yoff_grid(graph_y)){this._xyfloat_off(); return false;}
 
         var plot_item = "";
         var rgba_size = 4;
@@ -1721,12 +1739,12 @@ Mechcalc.prototype.graph = function(t, item, elem){
         if(plot_item == ""){ this._xyfloat_off(); return false; }
 
         if(this.grid.type == "log" && (graph_x) != 0){
-            adjx = this.t._format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.grid.log.range+this.grid.log.min));
+            adjx = this.t.format_rounder(Math.pow(10,((graph_x-this.plot.xcenter)/this.grid.width)*this.grid.log.range+this.grid.log.min));
         }else{
-            adjx = this.t._format_rounder(((graph_x-this.plot.xcenter)/this.xpixel));
+            adjx = this.t.format_rounder(((graph_x-this.plot.xcenter)/this.xpixel));
         }
 
-        adjy =  this.t._format_rounder((this.plot.ycenter-graph_y+2)/this.ypixel);
+        adjy =  this.t.format_rounder((this.plot.ycenter-graph_y+2)/this.ypixel);
 
         this._xyfloater.style.display = "block";
         this._xyfloater.style.top = posy+15+ "px";
@@ -1813,7 +1831,7 @@ Mechcalc.prototype.control_round_all = function(roundit){
     this.rounding = Number(roundit);
     for(id in this.i){
         if(this.i[id].type == this.type_calc){
-            this.i[id].elem.value = this._format_rounder(this.i[id].elem.value);
+            this.i[id].elem.value = this.format_rounder(this.i[id].elem.value);
         }
     }
 }

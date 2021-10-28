@@ -332,13 +332,13 @@ Mechcalc.prototype._html_graph = function(item){
 
     this._html_input_box("X Axis Label: ", "graph_xlabel", item.config.xlabel).appendTo(heading);
     this._html_input_box("X Line Count: ", "graph_xlines", item.config.xlines).appendTo(heading);
-    this._html_input_box("Skip X Labels: ", "graph_skip_xlabels", item.config.skip_xlines).appendTo(heading);
+    this._html_input_box("Skip X Labels: ", "graph_skip_xlabels", item.config.skip_xlabels).appendTo(heading);
     this._html_input_box("Label XMin: ", "graph_labels_xmin", item.config.labels_xmin).appendTo(heading);
     this._html_input_box("Label XMax: ", "graph_labels_xmax", item.config.labels_xmax).appendTo(heading);
     
     this._html_input_box("Y Axis Label: ", "graph_ylabel", item.config.ylabel).appendTo(heading);
     this._html_input_box("Y Line Count: ", "graph_ylines", item.config.ylines).appendTo(heading);
-    this._html_input_box("Skip Y Labels: ", "graph_skip_ylabels", item.config.skip_xlines).appendTo(heading);
+    this._html_input_box("Skip Y Labels: ", "graph_skip_ylabels", item.config.skip_ylabels).appendTo(heading);
     this._html_input_box("Label YMin: ", "graph_labels_ymin", item.config.labels_ymin).appendTo(heading);
     this._html_input_box("Label YMax: ", "graph_labels_ymax", item.config.labels_ymax).appendTo(heading);
 
@@ -373,7 +373,7 @@ Mechcalc.prototype._html_graph = function(item){
     var units_select = $("<select />", {class:"mcalc_select",
                                         id:"units_picker_select"})
                                         .appendTo(units_picker)
-                                        .on("click", function(){$("#units_picker_input").val(this.options[this.selectedIndex].value)});
+                                        .on("change", function(){$("input[id=units_picker_input]").val(this.options[this.selectedIndex].value)});
 
     $("<option />", {value: "Units", text: "Units", disabled:true}).appendTo(units_select);
     units_select.val("Units");
