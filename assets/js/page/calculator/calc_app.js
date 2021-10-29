@@ -1368,7 +1368,7 @@ Mechcalc.prototype.graph = function(t, item, elem){
         return true;
     }
 
-    this.plot.circle = function(x, y, size, label){
+    this.plot.circle = function(x, y, diameter, label){
         var color =  this.items[label][4];
         xc = this.t._convertx(x);            
         if(this.t.xoff_grid(xc)){return false;}
@@ -1378,7 +1378,22 @@ Mechcalc.prototype.graph = function(t, item, elem){
 
         this.t.ctx.beginPath();
         this.t.ctx.strokeStyle=color;
-        this.t.ctx.arc(xc, yc, (size/2)/this.t.xindexer(), 0, 2 * Math.PI);
+        this.t.ctx.arc(xc, yc, (diameter/2)/this.t.xindexer(), 0, 2 * Math.PI);
+        this.t.ctx.stroke();
+        return true;
+    }
+
+    this.plot.arc = function(x, y, radius, start_rads, end_rads, label){
+        var color =  this.items[label][4];
+        xc = this.t._convertx(x);            
+        if(this.t.xoff_grid(xc)){return false;}
+
+        yc = this.t._converty(y);
+        if(this.t.yoff_grid(yc)){return false;}
+
+        this.t.ctx.beginPath();
+        this.t.ctx.strokeStyle=color;
+        this.t.ctx.arc(xc, yc, radius/this.t.xindexer(), 2*Math.PI-start_rads, 2*Math.PI-end_rads, true);
         this.t.ctx.stroke();
         return true;
     }
