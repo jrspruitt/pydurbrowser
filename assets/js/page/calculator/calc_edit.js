@@ -408,10 +408,10 @@ Mechcalc.prototype._html_choice = function(item){
 
     for(option in item.config.options){
         var o = item.config.options[option];
-        if(o.selected == "False"){
-            o.selected = false;
-        }else{
+        if(o.selected){
             o.selected = true;
+        }else{
+            o.selected = false;
         }
         this._html_choice_options(o.value, o.label, o.selected, item.id).appendTo(option_list);
     }

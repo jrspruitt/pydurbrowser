@@ -51,7 +51,7 @@ class page(object):
 def _open_readme(path, page):
     try:
         with open(path, 'r', encoding='utf8') as f:
-            page.readme = md.markdown(f.read().decode('utf-8'), ['tables'])
+            page.readme = md.markdown(f.read(), extensions=['tables'])
     except:
         page.readme = ''
 

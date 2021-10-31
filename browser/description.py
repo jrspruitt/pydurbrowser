@@ -29,7 +29,7 @@ def get_desc(item, config, is_displayed=False):
             has_desc = True
             with open(desc_path, 'r', encoding='utf8') as f:
                 try:
-                    dtext += md.markdown(f.read().decode('utf-8'), ['tables'])
+                    dtext += md.markdown(f.read(), extensions=['tables'])
                 except:
                     f.seek(0)
                     dtext += f.read()
